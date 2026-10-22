@@ -206,6 +206,25 @@ tbody th { font-weight: 600; width: 20%; }
 tr:last-child th, tr:last-child td { border-bottom: 0; }
 td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
+/* Fundus drawings and sign list */
+.fundus-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 8px 0 12px; }
+.fundus { min-width: 0; }
+.fundus svg { width: 100%; height: auto; display: block; }
+.fundus figcaption { font-family: var(--mono); font-size: 0.78rem; color: var(--ink-2); margin: 6px 0 0; text-align: center; }
+.fundus figure { margin: 0; }
+.fundus text.lbl { fill: var(--ink-2); font: 500 12px var(--mono); }
+.fundus .mk { cursor: pointer; transition: transform .2s, opacity .2s; transform-box: fill-box; transform-origin: center; }
+.fundus .mk circle { fill: var(--accent); stroke: var(--paper); stroke-width: 2; }
+.fundus .mk text { fill: var(--accent-ink); font: 600 12px var(--mono); text-anchor: middle; pointer-events: none; }
+.fundus .mk.on { transform: scale(1.4); }
+.fundus.sel .mk:not(.on) { opacity: .4; }
+.signs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 16px; }
+.sign { display: flex; gap: 10px; align-items: flex-start; width: 100%; text-align: left; padding: 9px 11px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper); color: inherit; font: inherit; font-size: 0.92rem; line-height: 1.4; cursor: pointer; min-width: 0; }
+.sign .n { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font: 600 0.78rem var(--mono); background: var(--accent-soft); color: var(--accent); }
+.sign.on { border-color: var(--accent); background: var(--accent-soft); }
+.sign.on .n { background: var(--accent); color: var(--accent-ink); }
+@media (max-width: 600px) { .fundus-wrap, .signs { grid-template-columns: minmax(0, 1fr); } }
+
 /* Tools: calculators and checklists */
 .tool { border: 1px solid var(--rule); border-radius: var(--radius); padding: 14px 16px; margin: 12px 0 16px; background: var(--paper-2); }
 .tool h3 { margin-top: 0 !important; }
@@ -290,7 +309,7 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
 </div>
 
 <footer class="foot">
-  <p>Adapted from the GIRFT headache interactive pathway. Not an official GIRFT or NHS England product. <a href="#sources">Sources and governance</a></p>
+  <p>Adapted from the GIRFT headache interactive pathway. Not an official GIRFT or NHS England product. <a href="#teaching">Teaching session</a> · <a href="#sources">Sources and governance</a></p>
   <p class="mono" id="version-line"></p>
 </footer>
 
@@ -300,7 +319,7 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
    Leave a route empty ("") to show it as "route to confirm".
    ============================================================ */
 const META = {
-  version: "Draft 0.3",
+  version: "Draft 0.4",
   date: "22 October 2026",
   owner: "",            // for example, "SDEC clinical lead"
   approvedBy: "",       // governance group, once approved
@@ -322,6 +341,7 @@ const CONTACTS = {
   obstetrics:    { service: "Obstetric on call or maternity assessment", route: "" },
   anaesthetics:  { service: "Obstetric anaesthetist", route: "" },
   infection:     { service: "Microbiology or infectious diseases advice", route: "" },
+  fundus:        { service: "Fundus camera or OCT (eye service or medical photography)", route: "" },
   headacheClinic:{ service: "Headache clinic or neurology outpatient referral", route: "" }
 };
 
@@ -452,12 +472,113 @@ const PAGES = [
       "temporal arteries if 50 or over",
       "acuity, pupils, fields, eye movements",
       "focused neurological examination",
-      "fundi: papilloedema, hypertensive retinopathy",
+      "fundi: papilloedema, hypertensive retinopathy (" + go("papilloedema", "photo guide") + ")",
       "weight if IIH possible",
       "verbal fluency if cognitive or speech change: fewer than 17 animals in 1 minute is abnormal"
     ])}
-    ${panel("Fundi not seen", `<p>Get a view before discharge if raised pressure is possible.</p>` + contacts("sdecSenior", "ophthalmology"), "caution")}
+    ${panel("Fundi not seen", `<p>Get a view before discharge if raised pressure is possible. A fundal photo or OCT is an alternative to direct ophthalmoscopy: see the ${go("papilloedema", "photo guide")}.</p>` + contacts("sdecSenior", "ophthalmology", "fundus"), "caution")}
   `,
+  next: { to: "tests", label: "Continue to tests" }
+},
+{
+  id: "papilloedema", stage: "assess", nav: "Papilloedema on a fundal photo", sub: true,
+  title: "Papilloedema on a fundal photo",
+  lede: "Bilateral disc swelling from raised intracranial pressure. Photograph both eyes. Tap a sign to find it on the drawing.",
+  body: () => `
+    <div class="fundus-wrap">
+      <figure class="fundus"><svg viewBox="0 0 320 340" role="img" aria-label="Drawing of a normal optic disc: crisp margin, visible cup, vessels clearly seen crossing the margin">
+        <defs><radialGradient id="fgA" cx="50%" cy="50%" r="60%"><stop offset="0" stop-color="#D9743F"/><stop offset="1" stop-color="#A9472A"/></radialGradient></defs>
+        <circle cx="160" cy="160" r="152" fill="url(#fgA)"/>
+        <circle cx="100" cy="162" r="24" fill="#9E3E24" opacity=".8"/><circle cx="100" cy="162" r="5" fill="#7E2C18"/>
+        <ellipse cx="218" cy="160" rx="30" ry="34" fill="#F1C58A" stroke="#D99A5A" stroke-width="1.5"/>
+        <ellipse cx="222" cy="160" rx="11" ry="13" fill="#F8E6C2"/>
+        <g fill="none" stroke="#6F1D1D" stroke-width="3.6" stroke-linecap="round">
+          <path d="M216 148C212 122 188 98 140 86S70 82 40 96"/><path d="M216 172C212 198 188 222 140 234S70 238 40 224"/>
+          <path d="M226 150C240 136 258 128 282 120"/><path d="M226 170C240 184 258 192 282 200"/></g>
+        <g fill="none" stroke="#C94A33" stroke-width="2.4" stroke-linecap="round">
+          <path d="M220 146C220 118 196 92 150 78S86 70 52 80"/><path d="M220 174C220 202 196 228 150 242S86 250 52 240"/>
+          <path d="M228 154C244 144 262 140 286 136"/><path d="M228 166C244 176 262 180 286 184"/></g>
+        <text class="lbl" x="40" y="332">temporal · macula</text><text class="lbl" x="232" y="332">nasal · disc</text>
+      </svg><figcaption>Normal: crisp margin, central cup, vessels clear as they cross the edge</figcaption></figure>
+      <figure class="fundus" id="pp-fig"><svg viewBox="0 0 320 340" role="img" aria-label="Drawing of papilloedema: blurred raised margin with a halo, hyperaemic disc without a cup, vessels obscured at the margin, engorged veins, flame haemorrhages and concentric folds on the temporal side">
+        <defs><radialGradient id="fgB" cx="50%" cy="50%" r="60%"><stop offset="0" stop-color="#D9743F"/><stop offset="1" stop-color="#A9472A"/></radialGradient>
+          <filter id="bl4" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="4"/></filter><filter id="bl2" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.6"/></filter></defs>
+        <circle cx="160" cy="160" r="152" fill="url(#fgB)"/>
+        <circle cx="100" cy="162" r="24" fill="#9E3E24" opacity=".8"/><circle cx="100" cy="162" r="5" fill="#7E2C18"/>
+        <g fill="none" stroke="#8F3620" stroke-width="1.4" opacity=".75"><path d="M168 120C158 140 158 180 168 200"/><path d="M160 112C148 138 148 182 160 208"/><path d="M152 106C138 136 138 184 152 214"/></g>
+        <path filter="url(#bl4)" fill="#E9B88E" opacity=".9" d="M218 108C240 106 262 118 268 140 274 160 270 190 256 206 242 222 214 222 196 210 178 198 170 176 172 154 174 130 194 110 218 108Z"/>
+        <ellipse cx="218" cy="160" rx="36" ry="40" fill="#E58C66" filter="url(#bl2)"/><ellipse cx="218" cy="160" rx="28" ry="32" fill="#E07A58" opacity=".7" filter="url(#bl2)"/>
+        <g fill="none" stroke="#5E1616" stroke-width="4.8" stroke-linecap="round">
+          <path d="M216 148C214 130 206 118 190 104 176 92 150 92 130 84S70 82 40 96"/><path d="M216 172C214 190 206 202 190 216 176 228 150 228 130 236S70 238 40 224"/>
+          <path d="M226 150C238 140 250 134 260 128 268 124 276 122 284 118"/><path d="M226 170C238 180 250 186 260 192 268 196 276 198 284 202"/></g>
+        <g fill="none" stroke="#C94A33" stroke-width="2.6" stroke-linecap="round">
+          <path d="M220 146C220 118 196 92 150 78S86 70 52 80"/><path d="M220 174C220 202 196 228 150 242S86 250 52 240"/>
+          <path d="M228 154C244 144 262 140 286 136"/><path d="M228 166C244 176 262 180 286 184"/></g>
+        <ellipse cx="218" cy="160" rx="38" ry="42" fill="none" stroke="#E8AA82" stroke-width="12" opacity=".85" filter="url(#bl4)"/>
+        <g stroke="#7E1414" stroke-width="2.6" stroke-linecap="round"><path d="M196 118l-12-10"/><path d="M252 124l12-9"/><path d="M262 178l12 8"/><path d="M190 196l-12 10"/><path d="M240 206l6 14"/></g>
+        <ellipse cx="248" cy="214" rx="9" ry="6" fill="#F6F0E4" opacity=".9" filter="url(#bl2)"/>
+        <g class="mk" data-n="1"><circle cx="252" cy="110" r="11"/><text x="252" y="114">1</text></g>
+        <g class="mk" data-n="2"><circle cx="218" cy="160" r="11"/><text x="218" y="164">2</text></g>
+        <g class="mk" data-n="3"><circle cx="182" cy="140" r="11"/><text x="182" y="144">3</text></g>
+        <g class="mk" data-n="4"><circle cx="140" cy="88" r="11"/><text x="140" y="92">4</text></g>
+        <g class="mk" data-n="5"><circle cx="276" cy="196" r="11"/><text x="276" y="200">5</text></g>
+        <g class="mk" data-n="6"><circle cx="150" cy="160" r="11"/><text x="150" y="164">6</text></g>
+        <text class="lbl" x="40" y="332">temporal · macula</text><text class="lbl" x="232" y="332">nasal · disc</text>
+      </svg><figcaption>Papilloedema, about Frisén grade 3</figcaption></figure>
+    </div>
+    <div class="signs" id="pp-signs">
+      ${[
+        ["Blurred, raised margin with a feathery halo", "Nerve fibre layer oedema. Starts at the upper and lower poles and the nasal side; the temporal margin goes last."],
+        ["Hyperaemic disc, cup filled in", "The disc looks pink or red and the central cup disappears as the nerve head swells."],
+        ["Vessels obscured at the margin", "Swollen nerve fibres bury the vessels where they cross the edge. Obscuring a segment of a major vessel is the step to grade 3."],
+        ["Engorged, tortuous veins", "Venous congestion from raised pressure. Compare with the arteries, which stay thin."],
+        ["Flame haemorrhages and cotton wool spots", "Radial haemorrhages at the margin and fluffy white infarcts of the nerve fibre layer. A feature of established or rapidly rising pressure."],
+        ["Paton’s lines", "Concentric retinal folds on the temporal side, pushed up by the swollen disc."]
+      ].map((s, i) => '<button class="sign" type="button" data-n="' + (i + 1) + '"><span class="n">' + (i + 1) + "</span><span><strong>" + s[0] + "</strong><br>" + s[1] + "</span></button>").join("")}
+    </div>
+    <h2>Frisén grade</h2>
+    ${table(["Grade", "Key feature", "Margin"], [
+      ["0", "Normal", "Crisp, nasal side may look slightly blurred by nerve fibres"],
+      ["1", "C-shaped halo sparing the temporal side", "Nasal margin obscured"],
+      ["2", "Halo all the way round, no vessel obscuration", "All margins obscured, nasal border raised"],
+      ["3", "At least 1 segment of a major vessel obscured as it leaves the disc", "All raised, halo has an irregular outer edge"],
+      ["4", "A major vessel segment totally obscured on the disc", "Whole nerve head raised, cup filled"],
+      ["5", "All vessels on and leaving the disc obscured", "Dome-shaped disc"]
+    ])}
+    <p class="small">Modified Frisén scale (Scott and others, Archives of Ophthalmology 2010). Grade 3 or more is unmistakable; grades 1 and 2 are where photos and OCT beat the ophthalmoscope.</p>
+    <h2>What a photo cannot tell you</h2>
+    ${ul([
+      "spontaneous venous pulsation: present on a live view, raised pressure is unlikely at that moment; absent in 10% to 20% of normal people, so absence alone proves nothing",
+      "elevation: a 2D photo flattens it. OCT measures the nerve fibre layer and separates drusen from oedema",
+      "the other eye: papilloedema is bilateral, so photograph both"
+    ])}
+    <h2>Swollen disc, but is it papilloedema?</h2>
+    ${table(["", "Papilloedema", "Pseudopapilloedema", "Optic neuritis", "Arteritic AION (GCA)", "Hypertensive"], [
+      ["Eyes", "Both", "Both, often small crowded discs", "Usually 1", "1, the other at risk", "Both"],
+      ["Acuity", "Normal early", "Normal", "Reduced", "Severely reduced", "Variable"],
+      ["Pain", "Headache, no eye pain", "None", "On eye movement", "Headache, jaw claudication", "Headache"],
+      ["Disc", "Hyperaemic, haemorrhages, vessels obscured", "Lumpy margin, glistening drusen, odd vessel branching, no haemorrhage, vessels clear", "Swollen or normal, RAPD", "Pale, chalky swelling", "Swollen with flame haemorrhages, cotton wool spots, macular star"],
+      ["Do", go("pressure", "CT and CT venogram today"), "OCT and autofluorescence via the eye service; no urgent imaging", "Same-day ophthalmology, MRI", go("gca", "IV methylprednisolone, same-day ophthalmology"), go("hypertension", "Hypertensive emergency")]
+    ])}
+    ${panel("If you are not sure", `<p>Do not discharge on “probably normal”. Ask the eye service for OCT the same day, and check the blood pressure while you wait.</p>` + contacts("ophthalmology", "fundus"), "caution")}
+  `,
+  mount: () => {
+    const fig = document.getElementById("pp-fig");
+    const select = n => {
+      const any = n !== null;
+      fig.classList.toggle("sel", any);
+      fig.querySelectorAll(".mk").forEach(m => m.classList.toggle("on", any && m.dataset.n === String(n)));
+      document.querySelectorAll("#pp-signs .sign").forEach(b => { const on = any && b.dataset.n === String(n); b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on)); });
+    };
+    document.querySelectorAll("#pp-signs .sign").forEach(b => b.addEventListener("click", () => select(b.classList.contains("on") ? null : b.dataset.n)));
+    fig.querySelectorAll(".mk").forEach(m => m.addEventListener("click", () => select(m.classList.contains("on") ? null : m.dataset.n)));
+  },
+  routesTitle: "Then",
+  routes: [
+    { to: "pressure", title: "Papilloedema in both eyes", note: "Raised pressure: CT and CT venogram today", level: "sameday" },
+    { to: "gca", title: "Pale swollen disc, 50 or over", note: "Arteritic ischaemic optic neuropathy", level: "sameday" },
+    { to: "hypertension", title: "Haemorrhages and cotton wool spots", note: "Check the blood pressure", level: "sameday" }
+  ],
   next: { to: "tests", label: "Continue to tests" }
 },
 {
@@ -512,6 +633,7 @@ const PAGES = [
       ${route({ to: "hypertension", title: "Severe hypertension", note: "180/120mmHg or higher", level: "sameday" })}
       ${route({ to: "pressure", title: "Raised or low pressure", note: "Postural headache, papilloedema", level: "sameday" })}
       ${route({ to: "pregnancy", title: "Pregnant or postpartum", note: "Up to 6 weeks after birth", level: "sameday" })}
+      ${route({ to: "headinjury", title: "Head injury within 1 month", note: "NICE NG232 CT criteria, chronic subdural", level: "sameday" })}
     </div>
     <h2>Amber flags</h2>
     ${lead("Any one: senior review and consider " + go("tests", "imaging") + ".", [
@@ -589,11 +711,15 @@ const PAGES = [
   lede: "Infection, inflammation or malignancy.",
   body: () => `
     ${panel("Suspected meningitis or encephalitis", steps([
-      "Resus and sepsis pathway. Do not delay antibiotics for CT or LP.",
-      "Blood cultures.",
-      "IV ceftriaxone 2g. Add amoxicillin 2g 4-hourly if 60 or over or immunocompromised. Add aciclovir 10mg/kg 8-hourly if encephalitis possible.",
-      "IV dexamethasone 10mg 6-hourly if bacterial meningitis suspected, with or just before the first antibiotic dose."
+      "Resus and sepsis pathway. Antibiotics within 1 hour of arrival; never delayed for CT or LP.",
+      "Blood cultures, then LP before antibiotics only if it causes no delay and none of the CT-first features below apply.",
+      "IV ceftriaxone 2g 12-hourly. Add amoxicillin 2g 4-hourly if 60 or over, pregnant or immunocompromised (Listeria). Aciclovir 10mg/kg 8-hourly only if herpes simplex encephalitis is strongly suspected: fever with confusion, seizures or focal signs.",
+      "IV dexamethasone 10mg 6-hourly if bacterial meningitis suspected, with or just before the first antibiotic dose; within 12 hours of it at the latest."
     ]) + contacts("edResus", "infection"), "stop")}
+    ${ifthen([
+      ["CT before LP (NICE NG240)", "New focal signs including seizures or posturing, abnormal pupils, GCS 9 or below, or a rapid or sustained fall in consciousness. Also no LP with spreading purpura, infection at the site, or uncorrected bleeding risk."],
+      ["CSF to send", "Cell count and differential, protein, glucose with a paired blood glucose, Gram stain, culture, PCR for bacteria and viruses. Keep the spare sample."]
+    ])}
     <h2>Other patterns</h2>
     ${ul([
       "50 or over with systemic symptoms: " + go("gca", "possible GCA"),
@@ -684,7 +810,7 @@ const PAGES = [
       ["All", "CT and CT venogram today."],
       ["Mass or hydrocephalus", "Neurosurgery."],
       ["Venous sinus thrombosis", "Anticoagulation via neurology or stroke team."],
-      ["Normal imaging with papilloedema", "Probable IIH. Urgent ophthalmology and neurology. Check for tetracyclines, retinoids, vitamin A."]
+      ["Normal imaging with papilloedema", "Probable IIH. Urgent ophthalmology (acuity and fields) and neurology. LP with opening pressure after imaging: above 25cmH2O with normal CSF supports the diagnosis. Check for tetracyclines, retinoids, vitamin A, lithium and recent steroid withdrawal. Rapidly failing vision is fulminant IIH: same-day neurosurgical and ophthalmology discussion."]
     ])}
     <h2>Low</h2>
     <p>Orthostatic headache, often after LP, epidural or spinal surgery.</p>
@@ -719,6 +845,36 @@ const PAGES = [
       "Check drug safety. No topiramate or valproate."
     ])}
     ${local("obstetrics", "anaesthetics", "radiology")}
+  `,
+  next: BACK_TO_SCREEN
+},
+{
+  id: "headinjury", stage: "screen", nav: "Head injury within 1 month", sub: true, level: "sameday",
+  title: "Headache after a head injury",
+  lede: "Injury in the past month. Acute injuries belong on the ED head injury pathway; SDEC sees the late presenters.",
+  body: () => `
+    <h2>CT head within 1 hour (NICE NG232)</h2>
+    ${ul([
+      "GCS below 13 on arrival, or below 15 at 2 hours",
+      "suspected open or depressed skull fracture",
+      "signs of a basal skull fracture: haemotympanum, panda eyes, CSF leak, Battle’s sign",
+      "post-traumatic seizure",
+      "focal neurological deficit",
+      "more than 1 episode of vomiting"
+    ])}
+    <h2>CT head within 8 hours</h2>
+    <p>Within 1 hour instead if they present more than 8 hours after the injury.</p>
+    ${ul([
+      "on anticoagulant or antiplatelet treatment (aspirin alone excepted), even with none of the above",
+      "with loss of consciousness or amnesia, any of: 65 or over, bleeding or clotting disorder, dangerous mechanism, more than 30 minutes of retrograde amnesia"
+    ])}
+    <h2>Weeks after a minor injury</h2>
+    ${ifthen([
+      ["Older, anticoagulated, fluctuating confusion or drowsiness", "Chronic subdural haematoma: CT today, neurosurgery if confirmed."],
+      ["Headache like migraine or tension-type, normal examination", "Post-traumatic headache (onset within 7 days of injury). Treat as the primary headache it resembles; avoid medication overuse; explain that most settle within 3 months."],
+      ["Postural headache after the injury", "Consider CSF leak: " + go("pressure", "low pressure") + "."]
+    ])}
+    ${local("edResus", "radiology", "neurosurgery")}
   `,
   next: BACK_TO_SCREEN
 },
@@ -846,8 +1002,41 @@ const PAGES = [
       "gepants after 3 failed preventives (NICE TA906, TA973)",
       "no valproate if could become pregnant"
     ])}
-    ${panel("Aura", `<p>No oestrogen-containing contraception.</p>`, "caution")}
+    ${panel("Aura", `<p>No oestrogen-containing contraception (UKMEC 4). Progestogen-only or non-hormonal methods are fine.</p>`, "caution")}
+    <h2>Pregnancy and breastfeeding</h2>
+    ${ul([
+      "paracetamol first; ibuprofen only before 20 weeks; no NSAIDs in the third trimester",
+      "sumatriptan if needed; metoclopramide or prochlorperazine for nausea",
+      "prevention: low-dose propranolol or amitriptyline; never topiramate or valproate",
+      "a new or changed headache in pregnancy still goes through " + go("pregnancy", "the pregnancy branch")
+    ])}
     ${local("headacheClinic")}
+  `,
+  routes: [{ to: "refractory", title: "Attack not settling in SDEC", note: "Over 72 hours or no response to first-line treatment", level: "sameday" }],
+  next: { to: "discharge", label: "Continue to discharge" }
+},
+{
+  id: "refractory", stage: "primary", nav: "Migraine not settling", sub: true, level: "sameday",
+  title: "Migraine that will not settle",
+  lede: "An attack over 72 hours (status migrainosus), or no response to oral treatment. Reconfirm the diagnosis before escalating.",
+  body: () => `
+    ${panel("Before escalating", ul(["recheck the red flags and the examination, including the fundi", "ask what has been taken in the last 24 hours: no second triptan dose within 2 hours of the first, no triptan within 24 hours of an ergot", "think medication overuse if this is a frequent pattern"]), "caution")}
+    <h2>In SDEC</h2>
+    ${steps([
+      "IV fluids: 1 litre of sodium chloride 0.9% if dehydrated or vomiting.",
+      "IV metoclopramide 10mg or IV prochlorperazine 12.5mg (slowly). Both treat the migraine as well as the nausea.",
+      "Parenteral NSAID if not already given: ketorolac 30mg IM or IV (check renal function and bleeding risk).",
+      "Sumatriptan 6mg subcutaneous if no triptan in the last 24 hours and no vascular contraindication.",
+      "Dexamethasone 10mg IV once, to cut the chance of the headache returning after discharge.",
+      "Quiet, dark cubicle. Reassess at 1 hour. No opioids at any step."
+    ])}
+    <h2>Still not settling</h2>
+    ${ul([
+      "discuss with neurology: greater occipital nerve block, IV magnesium, admission",
+      "an attack with new features is a new headache: back to the " + go("screen", "secondary screen")
+    ])}
+    <p class="small">Doses are adult. Check the BNF and the trust formulary; prochlorperazine IV is off-label in some trusts.</p>
+    ${local("neurology", "sdecSenior")}
   `,
   next: { to: "discharge", label: "Continue to discharge" }
 },
@@ -878,10 +1067,11 @@ const PAGES = [
     ])}
     <h2>Arrange</h2>
     ${ul([
-      "neurology referral",
-      "home oxygen if effective",
-      "verapamil (ECG monitoring) or steroid bridge on specialist advice only",
-      ext("https://ouchuk.org/", "OUCH (UK)")
+      "neurology referral, with MRI brain and pituitary for every new trigeminal autonomic cephalalgia",
+      "home oxygen if effective (home oxygen order form, 12 to 15 litres per minute with a non-rebreather mask)",
+      "sumatriptan 6mg subcutaneous, maximum 12mg in 24 hours; nasal zolmitriptan maximum 10mg in 24 hours",
+      "verapamil (ECG before starting and after each increase) or a prednisolone bridge on specialist advice only",
+      "alcohol avoidance during a bout; " + ext("https://ouchuk.org/", "OUCH (UK)")
     ])}
     ${local("neurology", "headacheClinic")}
   `,
@@ -896,10 +1086,30 @@ const PAGES = [
       "headache diary for 8 weeks",
       "recheck " + go("moh", "overuse") + " and " + go("screen", "red flags"),
       "review drugs: nitrates, calcium-channel blockers, PDE5 inhibitors, contraceptives",
-      "consider hemicrania, trigeminal neuralgia, sleep apnoea",
+      "consider the " + go("othertypes", "other primary headaches") + ", sleep apnoea, sinus or jaw disease",
       "headache clinic or Advice and Guidance"
     ])}
     ${local("headacheClinic", "neurology")}
+  `,
+  routes: [{ to: "othertypes", title: "Other primary headaches", note: "Trigeminal autonomic cephalalgias, trigeminal neuralgia, new daily persistent headache", level: "routine" }],
+  next: { to: "discharge", label: "Continue to discharge" }
+},
+{
+  id: "othertypes", stage: "primary", nav: "Other primary headaches", sub: true, level: "routine",
+  title: "Other primary headaches",
+  lede: "Less common patterns worth naming. All of the trigeminal autonomic cephalalgias need MRI brain and pituitary and a neurology referral.",
+  body: () => `
+    ${table(["Headache", "Pattern", "Clues", "Do"], [
+      ["Paroxysmal hemicrania", "Strictly one-sided, 2 to 30 minutes, 5 to 40 attacks a day, autonomic features", "Complete response to indometacin", "Neurology; MRI; indometacin trial on advice"],
+      ["Hemicrania continua", "Continuous one-sided headache with exacerbations", "Indometacin-responsive", "Neurology; MRI"],
+      ["SUNCT and SUNA", "Seconds-long stabs, dozens to hundreds a day, red watering eye", "Triggered by touch; can mimic trigeminal neuralgia", "Neurology; MRI; lamotrigine on advice"],
+      ["Trigeminal neuralgia", "Electric-shock pain in a trigeminal division, seconds, triggered by chewing, touch or cold", "No autonomic features; sensory loss suggests a secondary cause", "Carbamazepine; MRI for compression or MS; neurology"],
+      ["New daily persistent headache", "Daily from a remembered start, unremitting", "Exclude venous thrombosis and low pressure first", "Imaging; treat as the phenotype it resembles; neurology"],
+      ["Cough, exertional or sexual headache", "Brought on by Valsalva, exertion or orgasm", "Secondary causes common on first presentation: Chiari, SAH, dissection, RCVS", "Imaging first (CT, CTA or MRI); indometacin on advice"],
+      ["Hypnic headache", "Wakes the person at the same time each night, usually over 50", "Diagnosis of exclusion", "Imaging to exclude secondary causes; caffeine at bedtime or lithium on advice"],
+      ["Primary stabbing headache", "Brief ice-pick stabs, random sites", "Benign; common in migraineurs", "Reassure; indometacin if frequent"]
+    ])}
+    ${local("neurology", "headacheClinic")}
   `,
   next: { to: "discharge", label: "Continue to discharge" }
 },
@@ -979,6 +1189,125 @@ const PAGES = [
   `
 },
 {
+  id: "teaching", stage: "ref", nav: "Teaching session",
+  title: "Teaching session",
+  lede: "A narrated, interactive deck that teaches the principles behind this pathway. About 40 minutes.",
+  body: () => `
+    <div class="routes">
+      <a class="route" href="teaching.html" target="_blank" rel="noopener"><span class="r-title">Open the teaching deck</span><span class="r-note">32 slides with spoken narration, animated builds, quizzes and 2 case walkthroughs. Opens in a new tab.</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>
+    </div>
+    <h2>What it covers</h2>
+    ${ul([
+      "primary or secondary: the question at every step",
+      "time to peak, and the thunderclap clock (6 hours, 12 hours, 24 hours)",
+      "the 5 examination essentials, including the fundi",
+      "who needs a scan today and who needs none",
+      "the 8 red flags, with a closer look at thunderclap and GCA",
+      "medication overuse, naming the primary headache, and treatment without opioids",
+      "safe discharge and the GP letter"
+    ])}
+    <h2>How to use it</h2>
+    ${ul([
+      "arrow keys or the on-screen buttons move through the builds; swipe on a phone",
+      "N shows the presenter notes; V reads them aloud using the device’s own voice",
+      "F goes full screen for projection",
+      "the quizzes, flip cards and case are for the room to answer before you tap"
+    ])}
+    <p class="small">Maps to IM Clinical CiP 1 (Managing an acute unselected take), CiP 2 (Managing the acute care of patients within a medical specialty service), CiP 4 (Managing patients in an outpatient clinic, ambulatory or community setting) and CiP 7 (Delivering effective resuscitation and managing the acutely deteriorating patient).</p>
+  `
+},
+{
+  id: "doses", stage: "ref", nav: "Dose sheet",
+  title: "Dose sheet",
+  lede: "Every adult dose used in this pathway, in one place. Check against the BNF and the trust formulary.",
+  body: () => `
+    <h2>Migraine, acute</h2>
+    ${table(["Medicine", "Dose", "Note"], [
+      ["Aspirin", "900mg oral", "With food"],
+      ["Ibuprofen", "400mg to 600mg oral", ""],
+      ["Naproxen", "250mg to 500mg oral", ""],
+      ["Paracetamol", "1g oral", "If NSAID unsuitable; rarely enough alone"],
+      ["Sumatriptan", "50mg to 100mg oral; 6mg subcutaneous; 20mg nasal", "Not with uncontrolled hypertension, ischaemic heart disease, stroke or TIA, peripheral vascular disease"],
+      ["Zolmitriptan", "2.5mg to 5mg oral; 5mg nasal", "Maximum 10mg in 24 hours"],
+      ["Metoclopramide", "10mg oral, IM or IV", "Maximum 5 days; not in Parkinson’s or under 18"],
+      ["Prochlorperazine", "3mg buccal; 12.5mg IM or slow IV", ""],
+      ["Domperidone", "10mg oral", "Maximum 1 week; not with QT prolongation"],
+      ["Ketorolac", "30mg IM or IV", "Refractory attack; check renal function"],
+      ["Dexamethasone", "10mg IV once", "Refractory attack, to reduce recurrence"],
+      ["Rimegepant", "75mg oral", "At most 1 dose in 24 hours; after 2 triptans and NSAIDs fail (NICE TA919)"]
+    ], [1])}
+    <h2>Migraine, prevention</h2>
+    ${table(["Medicine", "Start", "Target", "Maximum", "Note"], [
+      ["Amitriptyline", "10mg at night", "30mg to 75mg", "100mg", "Also tension-type headache"],
+      ["Candesartan", "4mg daily", "16mg", "16mg", "U&E before and after titration"],
+      ["Propranolol", "40mg daily", "80mg twice daily", "120mg twice daily", "Not in asthma"],
+      ["Topiramate", "25mg daily", "50mg twice daily", "100mg twice daily", "Pregnancy Prevention Programme (MHRA 2024)"],
+      ["Atogepant", "60mg daily", "", "", "After 3 preventives (NICE TA973)"],
+      ["Rimegepant", "75mg alternate days", "", "", "Episodic, after 3 preventives (NICE TA906)"],
+      ["CGRP antibodies", "Specialist", "", "", "Erenumab TA682, fremanezumab TA631, galcanezumab TA659, eptinezumab TA871"]
+    ], [1, 2, 3])}
+    <h2>Cluster headache</h2>
+    ${table(["Treatment", "Dose", "Note"], [
+      ["Oxygen", "100% at 12 to 15 litres per minute, 15 to 20 minutes", "Non-rebreather mask with reservoir"],
+      ["Sumatriptan", "6mg subcutaneous", "Maximum 12mg in 24 hours"],
+      ["Zolmitriptan", "5mg nasal", "Maximum 10mg in 24 hours"],
+      ["Verapamil", "Specialist", "ECG before starting and after each increase"],
+      ["Prednisolone bridge", "Specialist", "Short course while prevention starts"]
+    ], [1])}
+    <h2>Emergencies</h2>
+    ${table(["Condition", "Treatment", "Dose"], [
+      ["GCA, no visual symptoms", "Prednisolone", "40mg to 60mg oral daily"],
+      ["GCA, visual symptoms", "Methylprednisolone", "500mg to 1g IV daily, up to 3 days"],
+      ["Bacterial meningitis", "Ceftriaxone", "2g IV 12-hourly"],
+      ["Listeria risk (60 or over, pregnant, immunocompromised)", "Amoxicillin", "2g IV 4-hourly"],
+      ["Bacterial meningitis", "Dexamethasone", "10mg IV 6-hourly, with or before the first antibiotic"],
+      ["Herpes simplex encephalitis", "Aciclovir", "10mg/kg IV 8-hourly"],
+      ["Pre-eclampsia, severe", "Labetalol", "Per NICE NG133 and the obstetric team"]
+    ], [2])}
+  `
+},
+{
+  id: "audit", stage: "ref", nav: "Audit measures",
+  title: "Audit measures",
+  lede: "How to know the pathway is working. Each measure comes from the notes, with a target to agree at governance.",
+  body: () => `
+    ${table(["Measure", "Source", "Suggested target"], [
+      ["Onset time recorded for every headache", "Clerking", "95%"],
+      ["Fundi documented (seen, or photo or OCT, or referral)", "Clerking", "95%"],
+      ["Red flags documented as screened", "Clerking or copied route", "95%"],
+      ["CT in typical migraine with normal examination", "Imaging requests", "Under 5%"],
+      ["Thunderclap: CT requested within 1 hour of arrival", "Imaging timestamps", "90%"],
+      ["Thunderclap: no LP after a normal CT within 6 hours", "Notes", "95%"],
+      ["Suspected GCA: steroid given before leaving SDEC", "Drug chart", "100%"],
+      ["Suspected GCA: fast-track referral within 3 working days", "Referral log", "100%"],
+      ["Opioid prescribed or administered for migraine", "Drug chart", "0%"],
+      ["Discharge letter states the 2-days-a-week limit", "Letters", "90%"],
+      ["Reattendance within 30 days with the same headache", "PAS", "Monitor"]
+    ])}
+    <p class="small">A 20-case monthly sample is enough to see change. The “copy route for the notes” button on the discharge page makes the first 3 measures easy to find.</p>
+  `
+},
+{
+  id: "patientinfo", stage: "ref", nav: "Patient information",
+  title: "Patient information",
+  lede: "Links to give at discharge. All open in a new tab.",
+  body: () => `
+    ${ul([
+      ext("https://www.nhs.uk/conditions/migraine/", "NHS: migraine"),
+      ext("https://www.nhs.uk/conditions/headaches/", "NHS: headaches"),
+      ext("https://www.nhs.uk/conditions/cluster-headaches/", "NHS: cluster headaches"),
+      ext("https://migrainetrust.org/", "The Migraine Trust") + ", including a headache diary and the Migraine Trust helpline",
+      ext("https://ouchuk.org/", "OUCH (UK)") + " for cluster headache",
+      ext("https://bash.org.uk/", "BASH") + " patient leaflets, including medication overuse headache",
+      ext("https://www.nhs.uk/conditions/giant-cell-arteritis/", "NHS: giant cell arteritis")
+    ])}
+    <h2>Driving</h2>
+    <p>Migraine, including migraine with aura, does not need to be notified to the DVLA. Anyone who had a seizure, a loss of consciousness or a stroke must not drive and must notify the DVLA; say so in the letter.</p>
+    <h2>Work</h2>
+    <p>Most people can return to work when the attack settles. A fit note from SDEC covers the first 7 days if needed.</p>
+  `
+},
+{
   id: "sources", stage: "ref", nav: "Sources and governance",
   title: "Sources and governance",
   lede: "",
@@ -993,7 +1322,11 @@ const PAGES = [
       ext("https://girft-interactivepathways.org.uk/headache/", "GIRFT headache pathway") + ", adapted and rewritten",
       ext("https://www.nice.org.uk/guidance/cg150", "NICE CG150") + ", prevention update with candesartan agreed December 2025",
       ext("https://www.nice.org.uk/guidance/ng228", "NICE NG228") + ", subarachnoid haemorrhage (2022)",
-      ext("https://www.nice.org.uk/guidance/ng232", "NICE NG232") + ", head injury",
+      ext("https://www.nice.org.uk/guidance/ng232", "NICE NG232") + ", head injury (2023)",
+      ext("https://www.nice.org.uk/guidance/ng240", "NICE NG240") + ", bacterial meningitis and meningococcal disease (2024)",
+      "NICE technology appraisals: rimegepant acute TA919 and prevention TA906; atogepant TA973; erenumab TA682; fremanezumab TA631; galcanezumab TA659; eptinezumab TA871",
+      ext("https://bash.org.uk/", "BASH National Headache Management System for Adults") + " (2019)",
+      "Modified Frisén scale: Scott CJ and others, Archives of Ophthalmology 2010",
       ext("https://www.nice.org.uk/guidance/ng136", "NICE NG136") + ", hypertension",
       ext("https://www.nice.org.uk/guidance/ng133", "NICE NG133") + ", hypertension in pregnancy",
       "BSR guideline on giant cell arteritis (Mackie and others, Rheumatology 2020)",
@@ -1080,7 +1413,7 @@ function render(id, opts) {
 
   let routes = "";
   if (p.routes && p.routes.length) {
-    routes = '<h2 class="routes-title">' + (p.id === "primary" ? "Which fits best?" : "Also consider") + '</h2><div class="routes">' + p.routes.map(route).join("") + "</div>";
+    routes = '<h2 class="routes-title">' + (p.routesTitle || (p.id === "primary" ? "Which fits best?" : "Also consider")) + '</h2><div class="routes">' + p.routes.map(route).join("") + "</div>";
   }
   const canBack = STATE.trail.length > 1;
   const footer = '<nav class="stepper" aria-label="Step navigation">' +
