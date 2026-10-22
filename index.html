@@ -267,7 +267,36 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
   .lede { font-size: 0.98rem; }
   .head-row { margin-top: 6px; }
   #page { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
-  .prose { flex: 1 1 auto; min-height: 0; margin-top: 10px; font-size: 0.9rem; line-height: 1.45; columns: 2; column-gap: 32px; column-fill: auto; overflow: hidden; }
+  .prose { flex: 1 1 auto; min-height: 0; margin-top: 10px; font-size: 0.9rem; line-height: 1.45; columns: 2; column-gap: 40px; column-fill: balance; overflow: hidden; }
+  .prose.roomy { font-size: 1rem; line-height: 1.5; }
+  .prose.roomy h2 { font-size: 1.2rem; margin: 16px 0 6px; }
+  .prose.roomy h3 { font-size: 1rem; margin: 10px 0 4px; }
+  .prose.roomy p { margin-bottom: 8px; }
+  .prose.roomy ul { margin-bottom: 12px; }
+  .prose.roomy ul li { margin-bottom: 4px; }
+  .prose.roomy .panel { padding: 10px 14px 4px; margin: 10px 0; }
+  .prose.roomy ol.steps { gap: 8px; }
+  .prose.roomy .route { padding: 10px 14px; }
+  .prose.roomy .route .r-title { font-size: 1rem; }
+  .prose.roomy .route .r-note { font-size: 0.88rem; }
+  .prose.roomy dl.ifthen dt, .prose.roomy dl.ifthen dd { padding: 8px 0; }
+  .prose.roomy .contact { padding: 7px 12px; font-size: 0.9rem; }
+  .prose.roomy table { font-size: 0.88rem; }
+  .prose.roomy .check { font-size: 0.95rem; padding: 6px 0; }
+  .prose.spacious { font-size: 1.12rem; line-height: 1.55; column-gap: 56px; }
+  .prose.spacious h2 { font-size: 1.4rem; margin: 22px 0 8px; }
+  .prose.spacious h3 { font-size: 1.1rem; }
+  .prose.spacious ul li { margin-bottom: 7px; }
+  .prose.spacious ol.steps { gap: 12px; }
+  .prose.spacious ol.steps > li::before { width: 26px; height: 26px; font-size: 0.8rem; }
+  .prose.spacious .panel { padding: 14px 18px 6px; margin: 14px 0; }
+  .prose.spacious .panel-label { font-size: 0.76rem; margin-bottom: 8px !important; }
+  .prose.spacious .contact { padding: 10px 14px; font-size: 1rem; }
+  .prose.spacious .route { padding: 13px 16px; }
+  .prose.spacious .route .r-title { font-size: 1.08rem; }
+  .prose.spacious .route .r-note { font-size: 0.94rem; }
+  .prose.spacious dl.ifthen dt, .prose.spacious dl.ifthen dd { padding: 10px 0; }
+  .prose.spacious .chip { font-size: 0.74rem; padding: 3px 9px; }
   .prose.c1 { columns: 1; }
   .prose.c3 { columns: 3; column-gap: 24px; font-size: 0.86rem; }
   .prose > * { max-width: none; }
@@ -755,7 +784,7 @@ const SLIDES = [
     <div><h1>Headache in SDEC</h1><p class="lede">Find the few. Don’t scan the many.</p>
     <p class="small" style="margin-top:28px">About 40 minutes · interactive · narrated<br>Based on the QEHB SDEC headache pathway, adapted from GIRFT</p></div>
     <div class="art">${ART.title}</div></div>
-    <p class="hint">Arrow keys or the buttons move on. Press N for notes, V for narration.</p>`,
+    <p class="hint">Arrow keys or the buttons move on. N for notes. Narrate plays the whole deck; press again to stop.</p>`,
   notes: "Welcome. This session is about headache in same day emergency care. Most people who come to us with headache have migraine. They need a diagnosis and a plan, not a scan. A few have something dangerous, and they need action today. The whole pathway is built around telling those two groups apart. Use the arrow keys or the buttons to move through the slides. Some slides are interactive: tap the cards and answer the questions as we go."
 },
 {
@@ -1271,7 +1300,7 @@ const TEMPLATE = `<div class="progress" aria-hidden="true"><i data-id="prog"></i
   <button class="tb" data-id="b-voice" type="button" aria-pressed="false">Narrate</button>
   <button class="tb" data-id="b-full" type="button">Full screen</button>
   
-  <span class="keys">→ next · ← back · N notes · V narrate · F full screen</span>
+  <span class="keys">→ next · ← back · N notes · V narrate all · F full screen</span>
 </div>
 <div class="notes" data-id="notes" hidden><p class="nl" data-id="notes-label">Narration</p><p data-id="notes-text"></p></div>`;
 let root = null, el = {}, slides = [], ST = { i: 0, step: 0 }, voice = null, off = [];
@@ -1291,7 +1320,8 @@ function buttons() {
 }
 function show(i, atEnd) {
   i = Math.max(0, Math.min(SLIDES.length - 1, i));
-  stopVoice();
+  const wasAuto = auto;
+  if (synth) synth.cancel();
   slides.forEach((e, k) => e.classList.toggle("active", k === i));
   ST.i = i; ST.step = atEnd ? frags(i).length : 0;
   applyStep(i); runEnter(i); buttons();
@@ -1300,6 +1330,7 @@ function show(i, atEnd) {
   el.notesText.textContent = SLIDES[i].notes;
   el.notesLabel.textContent = "Narration · slide " + (i + 1);
   try { sessionStorage.setItem("deckSlide", String(i)); } catch (e) {}
+  if (wasAuto) speakCurrent(); else stopVoice();
 }
 function next() {
   if (ST.step < frags(ST.i).length) { ST.step++; applyStep(ST.i); buttons(); return; }
@@ -1341,22 +1372,49 @@ function pickVoice() {
   voice = vs.find(v => /en[-_]GB/i.test(v.lang) && /female|Google UK English Female|Kate|Serena|Stephanie/i.test(v.name)) ||
           vs.find(v => /en[-_]GB/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
 }
+/* Narration autoplay: reads the slide sentence by sentence, reveals the builds as it goes, then moves to the next slide until the end or Stop */
+let auto = false, run = 0;
 function stopVoice() {
-  if (!synth || !root) return;
-  synth.cancel();
+  auto = false; run++;
+  if (synth) synth.cancel();
+  if (!root) return;
   el.voice.classList.remove("on"); el.voice.setAttribute("aria-pressed", "false"); el.voice.textContent = "Narrate";
   el.notesText.classList.remove("speaking");
 }
-function speak() {
-  if (!synth) return;
-  if (synth.speaking) { stopVoice(); return; }
-  const u = new SpeechSynthesisUtterance(SLIDES[ST.i].notes);
-  u.lang = "en-GB"; u.rate = 0.98; u.pitch = 1;
-  if (voice) u.voice = voice;
-  u.onend = u.onerror = () => stopVoice();
+function speakCurrent() {
+  if (!synth || !root) return;
+  const myRun = ++run;
+  synth.cancel();
   el.voice.classList.add("on"); el.voice.setAttribute("aria-pressed", "true"); el.voice.textContent = "Stop";
   el.notesText.classList.add("speaking");
-  synth.speak(u);
+  const slideIndex = ST.i, F = frags(slideIndex).length;
+  const sentences = SLIDES[slideIndex].notes.match(/[^.!?]+[.!?]+["”]?\s*|[^.!?]+$/g) || [SLIDES[slideIndex].notes];
+  const total = sentences.length;
+  let done = 0;
+  const advance = () => {
+    if (myRun !== run || !auto) return;
+    if (ST.i < SLIDES.length - 1) show(ST.i + 1); else stopVoice();
+  };
+  sentences.forEach((text, k) => {
+    const u = new SpeechSynthesisUtterance(text.trim());
+    u.lang = "en-GB"; u.rate = 0.98; u.pitch = 1;
+    if (voice) u.voice = voice;
+    u.onend = () => {
+      if (myRun !== run) return;
+      done = k + 1;
+      const target = Math.min(F, Math.floor(done * (F + 1) / total));
+      if (target > ST.step) { ST.step = target; applyStep(slideIndex); buttons(); }
+      if (done === total) { ST.step = F; applyStep(slideIndex); buttons(); setTimeout(advance, 700); }
+    };
+    u.onerror = () => { if (myRun === run) stopVoice(); };
+    synth.speak(u);
+  });
+}
+function speak() {
+  if (!synth) return;
+  if (auto) { stopVoice(); return; }
+  auto = true;
+  speakCurrent();
 }
 function fullscreen() {
   try {
@@ -2291,7 +2349,7 @@ const PAGES = [
   lede: "A narrated, interactive deck on the principles behind this pathway. About 40 minutes. Full screen to present.",
   body: () => `
     <div id="deck-root"></div>
-    <p class="small" style="margin-top:12px">Arrow keys or the buttons move through the builds; swipe on a phone. N shows the presenter notes, V reads them aloud with the device’s own voice, F goes full screen. The quizzes, flip cards and cases are for the room to answer before you tap.</p>
+    <p class="small" style="margin-top:12px">Arrow keys or the buttons move through the builds; swipe on a phone. N shows the presenter notes. V (or Narrate) plays the whole deck from the current slide with the device’s own voice, revealing each build as it is read; press again to stop. F goes full screen. The quizzes, flip cards and cases are for the room to answer before you tap.</p>
     <p class="small">Maps to IM Clinical CiP 1 (Managing an acute unselected take), CiP 2 (Managing the acute care of patients within a medical specialty service), CiP 4 (Managing patients in an outpatient clinic, ambulatory or community setting) and CiP 7 (Delivering effective resuscitation and managing the acutely deteriorating patient).</p>
   `,
   mount: () => Deck.mount(document.getElementById("deck-root")),
@@ -2547,10 +2605,16 @@ function render(id, opts) {
 function fitPage() {
   const pr = document.querySelector("#page .prose");
   if (!pr || window.innerWidth < 961 || document.body.classList.contains("mode-deck")) return;
-  pr.classList.remove("c3", "shrink", "scroll");
+  pr.classList.remove("roomy", "spacious", "c3", "shrink", "scroll");
   const base = pr.classList.contains("c1");
   const over = () => pr.scrollWidth > pr.clientWidth + 2 || pr.scrollHeight > pr.clientHeight + 2;
-  if (!over()) return;
+  const used = () => Math.max(...[...pr.children].map(k => k.offsetTop + k.offsetHeight - pr.offsetTop)) / pr.clientHeight;
+  pr.classList.add("roomy");
+  if (!over()) {
+    if (used() < 0.6) { pr.classList.add("spacious"); if (over()) pr.classList.remove("spacious"); }
+    return;
+  }
+  pr.classList.remove("roomy"); if (!over()) return;
   if (!base) { pr.classList.add("c3"); if (!over()) return; }
   pr.classList.add("shrink"); if (!over()) return;
   pr.classList.add("scroll");
