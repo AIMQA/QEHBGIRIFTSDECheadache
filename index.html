@@ -1301,9 +1301,9 @@ EXTRA.forEach(([after, slide]) => {
 
 /* Recorded narration: one file per slide per voice, made with the Kokoro engine (Apache 2.0). Durations are filled in by the build; null means read them from the files. */
 const AUDIO = {
-  base: "audio/",
-  voices: { female: { name: "Emma", dir: "female" }, male: { name: "George", dir: "male" } },
-  durations: {"female": [36.9, 32.9, 27.6, 36.1, 37.2, 36.8, 37.8, 36.6, 51.6, 41.8, 42.4, 33.7, 51.0, 48.0, 51.8, 42.8, 57.4, 51.7, 45.3, 47.6, 41.6, 44.6, 39.1, 49.9, 40.8, 47.3, 41.5, 38.1, 40.1, 42.9, 35.8, 37.2], "male": [42.0, 36.2, 31.2, 40.1, 40.9, 40.4, 42.2, 41.9, 57.8, 47.5, 48.0, 37.8, 58.1, 54.1, 59.1, 47.7, 64.5, 57.2, 51.3, 54.9, 46.9, 50.6, 43.8, 56.4, 45.9, 53.5, 46.7, 42.3, 44.9, 48.5, 40.7, 42.0]}
+  base: "",   // files sit beside index.html, named emma-s01.mp3 … george-s32.mp3
+  voices: { female: { name: "Emma", file: "emma-" } },
+  durations: {"female": [36.9, 32.9, 27.6, 36.1, 37.2, 36.8, 37.8, 36.6, 51.6, 41.8, 42.4, 33.7, 51.0, 48.0, 51.8, 42.8, 57.4, 51.7, 45.3, 47.6, 41.6, 44.6, 39.1, 49.9, 40.8, 47.3, 41.5, 38.1, 40.1, 42.9, 35.8, 37.2]}
 };
 const pad2 = n => String(n).padStart(2, "0");
 
@@ -1452,8 +1452,7 @@ function fillVoices(vs, saved) {
   const sel = el.voicePick;
   if (!sel) return;
   const english = vs.filter(v => /^en/i.test(v.lang)).sort((a, b) => (/en[-_]GB/i.test(b.lang) - /en[-_]GB/i.test(a.lang)) || a.name.localeCompare(b.name));
-  let html = '<option value="rec:female"' + (saved === "rec:female" ? " selected" : "") + ">UK female · " + esc(AUDIO.voices.female.name) + " (recorded)</option>" +
-             '<option value="rec:male"' + (saved === "rec:male" ? " selected" : "") + ">UK male · " + esc(AUDIO.voices.male.name) + " (recorded)</option>" +
+  let html = '<option value="rec:female"' + (saved === "rec:female" ? " selected" : "") + ">Recorded · " + esc(AUDIO.voices.female.name) + " (UK female)</option>" +
              '<optgroup label="This device’s voices">' +
              '<option value="female"' + (saved === "female" ? " selected" : "") + ">UK female · " + esc(describe(vs, "female")) + "</option>" +
              '<option value="male"' + (saved === "male" ? " selected" : "") + ">UK male · " + esc(describe(vs, "male")) + "</option></optgroup>";
@@ -1515,7 +1514,7 @@ function playRecorded(myRun, kind) {
     if (target > ST.step) { ST.step = target; applyStep(slideIndex); buttons(); }
   };
   a.onerror = () => { if (myRun === run) speakLive(myRun); };
-  a.src = AUDIO.base + AUDIO.voices[kind].dir + "/s" + pad2(slideIndex + 1) + ".mp3";
+  a.src = AUDIO.base + AUDIO.voices[kind].file + "s" + pad2(slideIndex + 1) + ".mp3";
   const pr = a.play();
   if (pr && pr.catch) pr.catch(() => { if (myRun === run) speakLive(myRun); });
 }
@@ -2496,10 +2495,10 @@ const PAGES = [
   body: () => `
     <dl class="figures" style="margin-top:0">
       <dt>${Deck.timing().sessionMin} minutes</dt><dd>A full teaching session: narration plus the ${Deck.timing().exercises} exercises, with time for the room to answer</dd>
-      <dt>${Deck.timing().narrationMin} minutes</dt><dd>Narration alone, if you press Narrate and let it play through all ${Deck.count()} slides. Recorded in 2 voices, so it sounds the same on every device</dd>
+      <dt>${Deck.timing().narrationMin} minutes</dt><dd>Narration alone, if you press Narrate and let it play through all ${Deck.count()} slides. Recorded, so it sounds the same on every device</dd>
     </dl>
     <div id="deck-root"></div>
-    <p class="small" style="margin-top:12px">The counter shows how far into the session each slide falls, and the notes drawer shows the spoken length of each slide. Arrow keys or the buttons move through the builds; swipe on a phone. N shows the presenter notes. V (or Narrate) plays the whole deck from the current slide in a recorded voice, Emma or George, revealing each build as it is read; press again to stop. The device’s own voices are in the same menu if the recordings cannot load. F goes full screen. The quizzes, flip cards and cases are for the room to answer before you tap.</p>
+    <p class="small" style="margin-top:12px">The counter shows how far into the session each slide falls, and the notes drawer shows the spoken length of each slide. Arrow keys or the buttons move through the builds; swipe on a phone. N shows the presenter notes. V (or Narrate) plays the whole deck from the current slide in a recorded voice (Emma, UK female), revealing each build as it is read; press again to stop. The device’s own voices are in the same menu if the recordings cannot load. F goes full screen. The quizzes, flip cards and cases are for the room to answer before you tap.</p>
     <p class="small">Maps to IM Clinical CiP 1 (Managing an acute unselected take), CiP 2 (Managing the acute care of patients within a medical specialty service), CiP 4 (Managing patients in an outpatient clinic, ambulatory or community setting) and CiP 7 (Delivering effective resuscitation and managing the acutely deteriorating patient).</p>
   `,
   mount: () => Deck.mount(document.getElementById("deck-root")),
@@ -2639,7 +2638,7 @@ const PAGES = [
       ext("https://gettingitrightfirsttime.co.uk/wp-content/uploads/2022/11/Rheumatology-Giant-Cell-Arteritis-Pathway.html", "GIRFT rheumatology GCA pathway")
     ])}
     <h2>Narration</h2>
-    ${ul([ext("https://huggingface.co/hexgrad/Kokoro-82M", "Kokoro-82M") + " open-source speech engine (Apache 2.0), voices Emma and George; recorded from the presenter scripts"])}
+    ${ul([ext("https://huggingface.co/hexgrad/Kokoro-82M", "Kokoro-82M") + " open-source speech engine (Apache 2.0), voice Emma; recorded from the presenter scripts"])}
     <h2>Patient-facing</h2>
     ${ul([ext("https://migrainetrust.org/", "The Migraine Trust"), ext("https://ouchuk.org/", "OUCH (UK)"), ext("https://www.nhs.uk/conditions/migraine/", "NHS: migraine")])}
     <p class="small">Supports, does not replace, clinical judgement. Check doses against the BNF and trust formulary.</p>
