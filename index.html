@@ -1,11 +1,16 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
 <title>QEHB SDEC headache pathway</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Headache pathway for same day emergency care at Queen Elizabeth Hospital Birmingham, adapted from the GIRFT headache pathway.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,560&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: clinical hub system. Sticky pathway map on the left, one decision step at a time on the right, Back / Restart / Continue at the foot of every step. */
+/* Layout: clinical hub system. Desktop: sticky pathway map left, one step right. Phone: map behind a toggle, trail for orientation, Back / Continue pinned to the bottom of the screen. */
 :root {
   --paper: #F7F4EE;
   --paper-2: #EFEAE1;
@@ -21,16 +26,20 @@
   --amber-soft: #F4E7CC;
   --green: #2C6E49;
   --green-soft: #DFECE3;
+  --shadow: 0 -10px 18px -14px rgba(11, 31, 51, 0.45);
   --display: "Fraunces", "Iowan Old Style", Georgia, serif;
   --body: "Inter Tight", "Segoe UI", system-ui, -apple-system, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
   --radius: 6px;
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --paper: #0E1824; --paper-2: #152232; --ink: #ECE7DC; --ink-2: #A8B3BE; --rule: #2A394A;
     --accent: #BCA7E2; --accent-ink: #1A1230; --accent-soft: #2A2340;
     --red: #F2A097; --red-soft: #3A1F1E; --amber: #E6BB66; --amber-soft: #33290F; --green: #8FCBA4; --green-soft: #183021;
+    --shadow: 0 -10px 18px -14px rgba(0, 0, 0, 0.8);
     color-scheme: dark;
   }
 }
@@ -38,48 +47,56 @@
   --paper: #0E1824; --paper-2: #152232; --ink: #ECE7DC; --ink-2: #A8B3BE; --rule: #2A394A;
   --accent: #BCA7E2; --accent-ink: #1A1230; --accent-soft: #2A2340;
   --red: #F2A097; --red-soft: #3A1F1E; --amber: #E6BB66; --amber-soft: #33290F; --green: #8FCBA4; --green-soft: #183021;
+  --shadow: 0 -10px 18px -14px rgba(0, 0, 0, 0.8);
   color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
+html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+[hidden] { display: none !important; }
 body {
+  margin: 0;
   background: var(--paper);
   color: var(--ink);
   font-family: var(--body);
   font-size: 16px;
   line-height: 1.55;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-left: var(--gutter-l);
+  padding-right: var(--gutter-r);
   -webkit-font-smoothing: antialiased;
 }
 a { color: var(--accent); text-underline-offset: 3px; text-decoration-thickness: 1px; }
 a:hover { text-decoration-thickness: 2px; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
 .newtab { font-size: 0.8em; color: var(--ink-2); }
+button, input { font-family: inherit; }
 
 /* Masthead */
-.masthead { max-width: 1180px; margin: 0 auto; padding-block: 24px 16px; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; border-bottom: 1px solid var(--rule); }
-.masthead .where { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.04em; color: var(--ink-2); margin: 0 0 6px; }
-.masthead .name { font-family: var(--display); font-weight: 560; font-size: clamp(1.6rem, 4vw, 2.2rem); line-height: 1.05; margin: 0; letter-spacing: -0.01em; }
+.masthead { max-width: 1180px; margin: 0 auto; padding-block: 20px 14px; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; border-bottom: 1px solid var(--rule); }
+.masthead .where { font-family: var(--mono); font-size: 0.76rem; letter-spacing: 0.04em; color: var(--ink-2); margin: 0 0 4px; }
+.masthead .name { font-family: var(--display); font-weight: 560; font-size: clamp(1.5rem, 4vw, 2.1rem); line-height: 1.05; margin: 0; letter-spacing: -0.01em; }
 .masthead .name em { font-style: normal; color: var(--accent); }
-.mast-tools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.status { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.03em; color: var(--amber); background: var(--amber-soft); border: 1px solid color-mix(in srgb, var(--amber) 35%, transparent); padding: 4px 10px; border-radius: 99px; white-space: nowrap; }
-.btn-ghost { font: 500 0.9rem var(--body); color: var(--ink); background: transparent; border: 1px solid var(--rule); border-radius: var(--radius); padding: 8px 14px; cursor: pointer; text-decoration: none; }
+.masthead .where .short { display: none; }
+.name-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.mast-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.status { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.03em; color: var(--amber); background: var(--amber-soft); border: 1px solid color-mix(in srgb, var(--amber) 35%, transparent); padding: 4px 10px; border-radius: 99px; white-space: nowrap; }
+.btn-ghost { appearance: none; -webkit-appearance: none; font: 500 0.9rem var(--body); color: var(--ink); background: transparent; border: 1px solid var(--rule); border-radius: var(--radius); padding: 9px 14px; min-height: 40px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
 .btn-ghost:hover { border-color: var(--accent); }
+.btn-ghost.red { color: var(--red); border-color: color-mix(in srgb, var(--red) 45%, transparent); font-weight: 600; }
 .map-toggle { display: none; }
 
 /* Shell */
-.shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 48px; padding-block: 24px 56px; }
+.shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 256px minmax(0, 1fr); gap: 48px; padding-block: 22px 48px; }
 
 /* Pathway map */
 .map { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; max-height: calc(100vh - 32px); overflow-y: auto; padding-right: 6px; }
-.map label { display: block; font-family: var(--mono); font-size: 0.75rem; color: var(--ink-2); margin-bottom: 6px; }
-.map input { width: 100%; font: 0.95rem var(--body); color: var(--ink); background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); padding: 8px 10px; }
-.map-stage { margin-top: 18px; }
-.map-stage h2 { font-family: var(--mono); font-weight: 500; font-size: 0.75rem; letter-spacing: 0.04em; color: var(--ink-2); margin: 0 0 6px; display: flex; gap: 8px; }
+.map label { display: block; font-family: var(--mono); font-size: 0.74rem; color: var(--ink-2); margin-bottom: 6px; }
+.map input { appearance: none; -webkit-appearance: none; width: 100%; font-size: 1rem; color: var(--ink); background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); padding: 9px 10px; }
+.map-stage { margin-top: 16px; }
+.map-stage h2 { font-family: var(--mono); font-weight: 500; font-size: 0.74rem; letter-spacing: 0.04em; color: var(--ink-2); margin: 0 0 4px; display: flex; gap: 8px; }
 .map-stage h2 .n { color: var(--accent); font-variant-numeric: tabular-nums; }
 .map ul { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--rule); }
-.map li a { display: flex; align-items: baseline; gap: 8px; padding: 4px 0 4px 14px; margin-left: -1px; border-left: 2px solid transparent; color: var(--ink); text-decoration: none; font-size: 0.93rem; line-height: 1.35; }
+.map li a { display: flex; align-items: baseline; gap: 8px; padding: 7px 0 7px 14px; margin-left: -1px; border-left: 2px solid transparent; color: var(--ink); text-decoration: none; font-size: 0.93rem; line-height: 1.35; }
 .map li a:hover { color: var(--accent); }
 .map li a[aria-current="page"] { border-left-color: var(--accent); color: var(--accent); font-weight: 600; }
 .map li a.sub { padding-left: 26px; font-size: 0.88rem; color: var(--ink-2); }
@@ -88,49 +105,49 @@ a:hover { text-decoration-thickness: 2px; }
 
 /* Main */
 main { min-width: 0; max-width: 44rem; }
-.trail { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 20px; font-size: 0.82rem; }
+.trail { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 18px; font-size: 0.82rem; }
 .trail .lbl { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-2); margin-right: 4px; }
-.trail a { color: var(--ink-2); text-decoration: none; background: var(--paper-2); border: 1px solid var(--rule); border-radius: 99px; padding: 2px 10px; }
+.trail a { color: var(--ink-2); text-decoration: none; background: var(--paper-2); border: 1px solid var(--rule); border-radius: 99px; padding: 4px 10px; }
 .trail a:hover { color: var(--accent); border-color: var(--accent); }
 .trail .sep { color: var(--rule); }
 .trail .here { color: var(--accent); font-weight: 600; padding: 2px 4px; }
 
-.kicker { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.03em; color: var(--accent); margin: 0 0 8px; }
-h1 { font-family: var(--display); font-weight: 560; font-size: clamp(1.8rem, 4vw, 2.4rem); line-height: 1.08; letter-spacing: -0.015em; margin: 0 0 10px; text-wrap: balance; }
+.kicker { font-family: var(--mono); font-size: 0.76rem; letter-spacing: 0.03em; color: var(--accent); margin: 0 0 8px; }
+h1 { font-family: var(--display); font-weight: 560; font-size: clamp(1.7rem, 4vw, 2.3rem); line-height: 1.08; letter-spacing: -0.015em; margin: 0 0 8px; text-wrap: balance; }
 h1:focus { outline: none; }
-.lede { font-size: 1.08rem; color: var(--ink-2); margin: 0; max-width: 60ch; }
-.head-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
-.prose { margin-top: 20px; }
+.lede { font-size: 1.06rem; color: var(--ink-2); margin: 0; max-width: 60ch; }
+.head-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
+.prose { margin-top: 18px; }
 .prose > * { max-width: 65ch; }
-.prose h2 { font-family: var(--display); font-weight: 560; font-size: 1.28rem; line-height: 1.2; margin: 26px 0 8px; text-wrap: balance; }
-.prose h3 { font-size: 1rem; font-weight: 600; margin: 18px 0 4px; }
+.prose h2 { font-family: var(--display); font-weight: 560; font-size: 1.26rem; line-height: 1.2; margin: 24px 0 8px; text-wrap: balance; }
+.prose h3 { font-size: 1rem; font-weight: 600; margin: 16px 0 4px; }
 .prose p { margin: 0 0 10px; }
-.prose ul { margin: 0 0 14px; padding-left: 1.2em; }
-.prose ul li { margin: 0 0 4px; padding-left: 4px; }
+.prose ul { margin: 0 0 12px; padding-left: 1.2em; }
+.prose ul li { margin: 0 0 5px; padding-left: 4px; }
 .prose ul li::marker { color: var(--accent); }
 .prose strong { font-weight: 600; }
 .small { font-size: 0.88rem; color: var(--ink-2); }
 .mono { font-family: var(--mono); font-size: 0.92em; font-variant-numeric: tabular-nums; }
 
 /* Numbered actions: a real sequence */
-ol.steps { list-style: none; counter-reset: s; margin: 6px 0 16px; padding: 0; display: grid; gap: 8px; }
+ol.steps { list-style: none; counter-reset: s; margin: 6px 0 14px; padding: 0; display: grid; gap: 8px; }
 ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; align-items: start; }
 ol.steps > li::before { content: counter(s); font-family: var(--mono); font-size: 0.78rem; font-weight: 500; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); margin-top: 1px; }
 
-/* If / then decision table */
-dl.ifthen { display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); margin: 6px 0 16px; border-top: 1px solid var(--rule); }
-dl.ifthen dt, dl.ifthen dd { margin: 0; padding: 8px 0; border-bottom: 1px solid var(--rule); }
+/* If / then decision rows */
+dl.ifthen { display: grid; grid-template-columns: minmax(0, 14rem) minmax(0, 1fr); margin: 6px 0 14px; border-top: 1px solid var(--rule); }
+dl.ifthen dt, dl.ifthen dd { margin: 0; padding: 9px 0; border-bottom: 1px solid var(--rule); }
 dl.ifthen dt { font-weight: 600; padding-right: 16px; }
 
 /* Urgency chips */
-.chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.02em; padding: 3px 9px; border-radius: 99px; white-space: nowrap; border: 1px solid transparent; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.02em; padding: 3px 9px; border-radius: 99px; white-space: nowrap; border: 1px solid transparent; }
 .chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 .chip.emergency { color: var(--red); background: var(--red-soft); border-color: color-mix(in srgb, var(--red) 30%, transparent); }
 .chip.sameday { color: var(--amber); background: var(--amber-soft); border-color: color-mix(in srgb, var(--amber) 30%, transparent); }
 .chip.routine { color: var(--green); background: var(--green-soft); border-color: color-mix(in srgb, var(--green) 30%, transparent); }
 
 /* Panels: set apart by role only */
-.panel { border: 1px solid var(--rule); border-radius: var(--radius); padding: 12px 16px 4px; margin: 16px 0; background: var(--paper); }
+.panel { border: 1px solid var(--rule); border-radius: var(--radius); padding: 12px 16px 4px; margin: 14px 0; background: var(--paper); }
 .panel-label { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.03em; color: var(--ink-2); margin: 0 0 8px !important; }
 .panel.stop { background: var(--red-soft); border-color: color-mix(in srgb, var(--red) 35%, transparent); }
 .panel.stop .panel-label { color: var(--red); }
@@ -140,26 +157,26 @@ dl.ifthen dt { font-weight: 600; padding-right: 16px; }
 
 /* Local contacts */
 .contacts { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 12px; }
-.contact { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding: 7px 12px; border-radius: var(--radius); border: 1px solid var(--rule); background: var(--paper); font-size: 0.92rem; }
+.contact { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 16px; padding: 8px 12px; border-radius: var(--radius); border: 1px solid var(--rule); background: var(--paper); font-size: 0.92rem; }
 .contact-name { font-weight: 500; }
 .contact-route { font-family: var(--mono); font-size: 0.82rem; font-variant-numeric: tabular-nums; }
 .contact.unset { border-style: dashed; border-color: color-mix(in srgb, var(--amber) 55%, transparent); }
 .contact.unset .contact-route { color: var(--amber); }
 
 /* Decision routes */
-.routes { display: grid; gap: 8px; margin: 20px 0 0; }
-.routes-title { font-family: var(--display); font-weight: 560; font-size: 1.28rem; margin: 28px 0 4px; }
-.route { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 14px; align-items: center; text-decoration: none; color: var(--ink); border: 1px solid var(--rule); border-radius: var(--radius); padding: 11px 16px; background: var(--paper); transition: border-color .15s, background .15s; }
+.routes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px; margin: 16px 0 0; }
+.routes-title { font-family: var(--display); font-weight: 560; font-size: 1.26rem; margin: 24px 0 2px; }
+.route { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: center; text-decoration: none; color: var(--ink); border: 1px solid var(--rule); border-radius: var(--radius); padding: 12px 14px; min-height: 48px; background: var(--paper); transition: border-color .15s, background .15s; }
 .route:hover { border-color: var(--accent); background: var(--accent-soft); }
-.route .r-title { font-weight: 600; font-size: 1rem; }
-.route .r-note { grid-column: 1; color: var(--ink-2); font-size: 0.88rem; line-height: 1.4; }
-.route .r-side { grid-column: 2; grid-row: 1 / span 2; display: flex; align-items: center; gap: 10px; }
+.route .r-title { font-weight: 600; font-size: 0.98rem; line-height: 1.3; }
+.route .r-note { grid-column: 1; color: var(--ink-2); font-size: 0.86rem; line-height: 1.4; }
+.route .r-side { grid-column: 2; grid-row: 1 / span 2; display: flex; align-items: center; gap: 8px; }
 .route .arrow { font-family: var(--mono); color: var(--accent); font-size: 1.05rem; }
 
 /* Step footer */
-.stepper { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--rule); }
+.stepper { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--rule); }
 .stepper .spacer { flex: 1; }
-.btn { font: 600 0.95rem var(--body); border-radius: var(--radius); padding: 10px 18px; cursor: pointer; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+.btn { appearance: none; -webkit-appearance: none; font: 600 0.95rem var(--body); border-radius: var(--radius); padding: 11px 18px; min-height: 44px; cursor: pointer; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 .btn:hover { border-color: var(--accent); }
 .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .btn.primary:hover { filter: brightness(1.08); }
@@ -167,71 +184,95 @@ dl.ifthen dt { font-weight: 600; padding-right: 16px; }
 .btn:disabled:hover { border-color: var(--rule); }
 
 /* Stage map on the start page */
-ol.stage-map { list-style: none; padding: 0; margin: 8px 0 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; }
+ol.stage-map { list-style: none; padding: 0; margin: 8px 0 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; }
 ol.stage-map li { padding: 12px 14px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); margin: -1px -1px 0 0; }
-ol.stage-map .sn { font-family: var(--mono); font-size: 0.75rem; color: var(--accent); }
+ol.stage-map .sn { font-family: var(--mono); font-size: 0.74rem; color: var(--accent); }
 ol.stage-map a { display: block; font-weight: 600; text-decoration: none; color: var(--ink); margin: 2px 0; }
 ol.stage-map a:hover { color: var(--accent); }
 ol.stage-map p { margin: 0; font-size: 0.86rem; color: var(--ink-2); line-height: 1.4; }
 
 /* Thresholds list */
-dl.figures { display: grid; grid-template-columns: max-content minmax(0, 1fr); margin: 6px 0 16px; border-top: 1px solid var(--rule); }
+dl.figures { display: grid; grid-template-columns: max-content minmax(0, 1fr); margin: 6px 0 14px; border-top: 1px solid var(--rule); }
 dl.figures dt, dl.figures dd { padding: 8px 0; border-bottom: 1px solid var(--rule); margin: 0; }
 dl.figures dt { font-family: var(--mono); font-weight: 500; color: var(--accent); padding-right: 18px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 dl.figures dd { font-size: 0.95rem; }
 
-/* Tables */
-.table-wrap { overflow-x: auto; margin: 8px 0 16px; border: 1px solid var(--rule); border-radius: var(--radius); max-width: 100% !important; }
+/* Tables: scroll on desktop, stack to cards on phones */
+.table-wrap { overflow-x: auto; margin: 8px 0 14px; border: 1px solid var(--rule); border-radius: var(--radius); max-width: 100% !important; }
 table { border-collapse: collapse; width: 100%; min-width: 540px; font-size: 0.9rem; }
 th, td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid var(--rule); }
-thead th { font-family: var(--mono); font-weight: 500; font-size: 0.76rem; color: var(--ink-2); background: var(--paper-2); }
+thead th { font-family: var(--mono); font-weight: 500; font-size: 0.74rem; color: var(--ink-2); background: var(--paper-2); }
 tbody th { font-weight: 600; width: 20%; }
 tr:last-child th, tr:last-child td { border-bottom: 0; }
 td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* Tools: calculators and checklists */
-.tool { border: 1px solid var(--rule); border-radius: var(--radius); padding: 14px 16px; margin: 14px 0 18px; background: var(--paper-2); }
+.tool { border: 1px solid var(--rule); border-radius: var(--radius); padding: 14px 16px; margin: 12px 0 16px; background: var(--paper-2); }
 .tool h3 { margin-top: 0 !important; }
 .field { display: grid; grid-template-columns: minmax(0, 1fr) 84px; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--rule); }
 .field label { font-size: 0.93rem; }
-.field input[type="number"] { font: 500 1rem var(--mono); width: 100%; padding: 6px 8px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper); color: var(--ink); text-align: right; }
-.check { display: flex; gap: 10px; align-items: flex-start; padding: 5px 0; font-size: 0.93rem; cursor: pointer; }
-.check input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); flex: none; }
+.field input[type="number"] { font: 500 1rem var(--mono); width: 100%; min-height: 40px; padding: 6px 8px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper); color: var(--ink); text-align: right; }
+.check { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; font-size: 0.95rem; cursor: pointer; }
+.check input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--accent); flex: none; }
 .result { margin-top: 10px; padding: 9px 13px; border-radius: var(--radius); font-weight: 500; border: 1px solid var(--rule); background: var(--paper); }
 .result.pos { background: var(--amber-soft); color: var(--amber); border-color: color-mix(in srgb, var(--amber) 35%, transparent); }
 .result.neg { background: var(--green-soft); color: var(--green); border-color: color-mix(in srgb, var(--green) 35%, transparent); }
 .copy-out { width: 100%; min-height: 120px; font: 0.85rem var(--mono); padding: 10px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper); color: var(--ink); margin-top: 10px; }
 
 /* Footer */
-.foot { max-width: 1180px; margin: 0 auto; padding-block: 16px 28px; border-top: 1px solid var(--rule); color: var(--ink-2); font-size: 0.85rem; display: flex; flex-wrap: wrap; gap: 6px 24px; justify-content: space-between; }
+.foot { max-width: 1180px; margin: 0 auto; padding-block: 14px 24px; border-top: 1px solid var(--rule); color: var(--ink-2); font-size: 0.84rem; display: flex; flex-wrap: wrap; gap: 6px 24px; justify-content: space-between; }
 .foot p { margin: 0; max-width: 70ch; }
 
+/* Tablet and phone */
 @media (max-width: 960px) {
   .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding-top: 14px; }
   .map-toggle { display: inline-flex; }
-  .map { position: static; max-height: none; overflow: visible; display: none; padding: 4px 0 22px; margin-bottom: 18px; border-bottom: 1px solid var(--rule); }
+  .map { position: static; max-height: none; overflow: visible; display: none; padding: 4px 0 20px; margin-bottom: 16px; border-bottom: 1px solid var(--rule); }
   .map.open { display: block; }
 }
+@media (max-width: 720px) {
+  /* Pin Back / Continue to the bottom of the screen while the step scrolls */
+  .stepper { position: sticky; bottom: 0; z-index: 5; background: var(--paper); box-shadow: var(--shadow); margin-top: 22px; margin-left: calc(-1 * var(--gutter-l)); margin-right: calc(-1 * var(--gutter-r)); padding: 10px var(--gutter-r) calc(10px + env(safe-area-inset-bottom, 0px)) var(--gutter-l); gap: 8px; }
+  .stepper .spacer { display: none; }
+  .stepper .btn { flex: 1 1 auto; padding-inline: 12px; }
+  .stepper .btn.primary { flex-basis: 100%; }
+  .btn.quiet { flex: 0 1 auto; }
+}
+@media (max-width: 600px) {
+  .table-wrap { border: 0; overflow: visible; }
+  table, tbody, tr, th, td { display: block; min-width: 0; width: auto; }
+  thead { display: none; }
+  tbody tr { border: 1px solid var(--rule); border-radius: var(--radius); padding: 8px 12px 6px; margin-bottom: 8px; background: var(--paper); }
+  tbody th { padding: 0 0 4px; border: 0; font-size: 1rem; }
+  td { padding: 3px 0; border: 0; display: grid; grid-template-columns: 6.2rem minmax(0, 1fr); gap: 8px; white-space: normal; }
+  td.n { white-space: normal; }
+  td::before { content: attr(data-label); font-family: var(--mono); font-size: 0.72rem; color: var(--ink-2); padding-top: 3px; }
+  td:empty { display: none; }
+}
 @media (max-width: 520px) {
+  .masthead { padding-block: 14px 12px; }
+  .masthead .where .long { display: none; }
+  .masthead .where .short { display: inline; }
+  .status { font-size: 0.68rem; padding: 3px 8px; }
   .route { grid-template-columns: minmax(0, 1fr); }
-  .route .r-side { grid-column: 1; grid-row: auto; justify-content: space-between; }
+  .route .r-side { grid-column: 1; grid-row: auto; justify-content: space-between; margin-top: 4px; }
   dl.figures, dl.ifthen { grid-template-columns: minmax(0, 1fr); }
   dl.figures dt, dl.ifthen dt { border-bottom: 0; padding-bottom: 0; }
-  .stepper .btn { flex: 1 1 auto; justify-content: center; }
-  .stepper .spacer { display: none; }
+  dl.ifthen dd { padding-top: 2px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
 </style>
-
+</head>
+<body>
 <header class="masthead">
   <div>
-    <p class="where">Queen Elizabeth Hospital Birmingham · Same day emergency care</p>
-    <p class="name">Headache <em>pathway</em></p>
+    <p class="where"><span class="long">Queen Elizabeth Hospital Birmingham · Same day emergency care</span><span class="short">QEHB · SDEC</span></p>
+    <div class="name-row"><p class="name">Headache <em>pathway</em></p><span class="status" id="status-pill">Draft for governance review</span></div>
   </div>
   <div class="mast-tools">
-    <span class="status" id="status-pill">Draft for governance review</span>
+    <a class="btn-ghost red" href="#screen">Red flags</a>
     <a class="btn-ghost" id="hub-link" href="#" hidden>Clinical hub</a>
-    <button class="btn-ghost map-toggle" id="map-toggle" type="button" aria-expanded="false" aria-controls="map">Pathway map</button>
+    <button class="btn-ghost map-toggle" id="map-toggle" type="button" aria-expanded="false" aria-controls="map">Map</button>
   </div>
 </header>
 
@@ -259,7 +300,7 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
    Leave a route empty ("") to show it as "route to confirm".
    ============================================================ */
 const META = {
-  version: "Draft 0.2",
+  version: "Draft 0.3",
   date: "22 October 2026",
   owner: "",            // for example, "SDEC clinical lead"
   approvedBy: "",       // governance group, once approved
@@ -292,6 +333,12 @@ const ul = items => "<ul>" + items.map(i => "<li>" + i + "</li>").join("") + "</
 const lead = (text, items) => "<p>" + text + "</p>" + ul(items);
 const steps = items => '<ol class="steps">' + items.map(i => "<li><div>" + i + "</div></li>").join("") + "</ol>";
 const ifthen = rows => '<dl class="ifthen">' + rows.map(([a, b]) => "<dt>" + a + "</dt><dd>" + b + "</dd>").join("") + "</dl>";
+const table = (head, rows, numCols) => '<div class="table-wrap"><table><thead><tr>' +
+  head.map(h => '<th scope="col">' + h + "</th>").join("") + "</tr></thead><tbody>" +
+  rows.map(r => "<tr>" + r.map((c, i) => i === 0
+    ? '<th scope="row">' + c + "</th>"
+    : '<td data-label="' + esc(head[i]) + '"' + ((numCols || []).includes(i) ? ' class="n"' : "") + ">" + c + "</td>").join("") + "</tr>").join("") +
+  "</tbody></table></div>";
 const panel = (label, html, tone) => '<section class="panel ' + (tone || "") + '"><p class="panel-label">' + label + "</p>" + html + "</section>";
 const go = (id, text) => '<a href="#' + id + '">' + text + "</a>";
 const ext = (url, text) => '<a href="' + url + '" target="_blank" rel="noopener">' + text + ' <span class="newtab">(opens in new tab)</span></a>';
@@ -321,8 +368,8 @@ const STAGES = [
   { id: "leave", name: "Leaving SDEC" },
   { id: "ref", name: "Reference" }
 ];
-
-const BACK_TO_SCREEN = { to: "screen", title: "Excluded: back to the screen", note: "" };
+const STAGE_COUNT = STAGES.filter(s => s.id !== "ref").length;
+const BACK_TO_SCREEN = { to: "screen", label: "Excluded: back to the screen" };
 
 const PAGES = [
 /* ---------------- Front door ---------------- */
@@ -460,9 +507,9 @@ const PAGES = [
       ${route({ to: "thunderclap", title: "Thunderclap headache", note: "Peak within 5 minutes", level: "emergency" })}
       ${route({ to: "focal", title: "Focal neurological deficit", note: "Including papilloedema or loss of consciousness", level: "emergency" })}
       ${route({ to: "systemic", title: "Systemic features", note: "Fever, meningism, rash, weight loss, immunosuppression", level: "emergency" })}
+      ${route({ to: "eye", title: "Painful red eye, blurred vision", note: "Angle-closure glaucoma", level: "emergency" })}
       ${route({ to: "gca", title: "Possible GCA", note: "50 or over, new persistent headache", level: "sameday" })}
       ${route({ to: "hypertension", title: "Severe hypertension", note: "180/120mmHg or higher", level: "sameday" })}
-      ${route({ to: "eye", title: "Painful red eye, blurred vision", note: "Angle-closure glaucoma", level: "emergency" })}
       ${route({ to: "pressure", title: "Raised or low pressure", note: "Postural headache, papilloedema", level: "sameday" })}
       ${route({ to: "pregnancy", title: "Pregnant or postpartum", note: "Up to 6 weeks after birth", level: "sameday" })}
     </div>
@@ -493,7 +540,7 @@ const PAGES = [
     ${ifthen([
       ["Blood on CT", "CT angiography now. Urgent neurosurgery discussion."],
       ["Normal CT within 6 hours of onset", "No routine LP. Senior review, consider other causes."],
-      ["Normal CT after 6 hours", "Consider LP at least 12 hours after onset, with spectrophotometry for xanthochromia."]
+      ["Normal CT after 6 hours", "Consider LP at least 12 hours after onset. Spectrophotometry for xanthochromia; protect the sample from light."]
     ])}
     <h2>SAH excluded: consider</h2>
     ${ul([
@@ -508,7 +555,7 @@ const PAGES = [
     <p>Discuss with neurology for vascular imaging or MRI.</p>
     ${local("sdecSenior", "radiology", "neurosurgery", "neurology")}
   `,
-  routes: [BACK_TO_SCREEN]
+  next: BACK_TO_SCREEN
 },
 {
   id: "focal", stage: "screen", nav: "Focal neurological deficit", sub: true, level: "emergency",
@@ -534,7 +581,7 @@ const PAGES = [
     ]), "stop")}
     ${local("stroke", "radiology", "neurology", "neurosurgery")}
   `,
-  routes: [BACK_TO_SCREEN]
+  next: BACK_TO_SCREEN
 },
 {
   id: "systemic", stage: "screen", nav: "Systemic features", sub: true, level: "emergency",
@@ -545,7 +592,7 @@ const PAGES = [
       "Resus and sepsis pathway. Do not delay antibiotics for CT or LP.",
       "Blood cultures.",
       "IV ceftriaxone 2g. Add amoxicillin 2g 4-hourly if 60 or over or immunocompromised. Add aciclovir 10mg/kg 8-hourly if encephalitis possible.",
-      "IV dexamethasone 10mg 6-hourly if bacterial meningitis suspected."
+      "IV dexamethasone 10mg 6-hourly if bacterial meningitis suspected, with or just before the first antibiotic dose."
     ]) + contacts("edResus", "infection"), "stop")}
     <h2>Other patterns</h2>
     ${ul([
@@ -554,7 +601,8 @@ const PAGES = [
       "carbon monoxide: COHb, high-flow oxygen, gas safety check"
     ])}
   `,
-  routes: [{ to: "gca", title: "Possible GCA", note: "", level: "sameday" }, BACK_TO_SCREEN]
+  routes: [{ to: "gca", title: "Possible GCA", note: "", level: "sameday" }],
+  next: BACK_TO_SCREEN
 },
 {
   id: "gca", stage: "screen", nav: "Possible GCA", sub: true, level: "sameday",
@@ -571,7 +619,7 @@ const PAGES = [
     ])}
     <h2>Act</h2>
     ${steps([
-      "FBC, CRP, ESR. Do not wait for results.",
+      "FBC, CRP, ESR before or straight after the first steroid dose. Do not wait for results; normal results do not exclude GCA.",
       "No visual symptoms: prednisolone 40mg to 60mg today.",
       "Visual symptoms: IV methylprednisolone 500mg to 1g daily for up to 3 days, or oral prednisolone without delay. Same-day ophthalmology.",
       "Fast-track GCA referral: same working day, always within 3 working days.",
@@ -580,7 +628,7 @@ const PAGES = [
     <p class="small">BSR guideline (2020).</p>
     ${local("gca", "ophthalmology")}
   `,
-  routes: [BACK_TO_SCREEN]
+  next: BACK_TO_SCREEN
 },
 {
   id: "hypertension", stage: "screen", nav: "Severe hypertension", sub: true, level: "sameday",
@@ -601,9 +649,10 @@ const PAGES = [
       ["No organ damage", "No rapid lowering. Oral treatment, review within days (NICE NG136)."],
       ["Pregnant or postpartum", "Lower threshold: " + go("pregnancy", "pregnancy and postpartum") + "."]
     ])}
+    <p class="small">Secondary causes: phaeochromocytoma, cocaine or amphetamines, MAOI interaction.</p>
     ${local("sdecSenior", "edResus")}
   `,
-  routes: [BACK_TO_SCREEN]
+  next: BACK_TO_SCREEN
 },
 {
   id: "eye", stage: "screen", nav: "Red eye, blurred vision", sub: true, level: "emergency",
@@ -622,7 +671,7 @@ const PAGES = [
     ])}
     ${local("ophthalmology")}
   `,
-  routes: [BACK_TO_SCREEN]
+  next: BACK_TO_SCREEN
 },
 {
   id: "pressure", stage: "screen", nav: "Raised or low pressure", sub: true, level: "sameday",
@@ -635,7 +684,7 @@ const PAGES = [
       ["All", "CT and CT venogram today."],
       ["Mass or hydrocephalus", "Neurosurgery."],
       ["Venous sinus thrombosis", "Anticoagulation via neurology or stroke team."],
-      ["Normal imaging with papilloedema", "Probable IIH. Urgent ophthalmology and neurology."]
+      ["Normal imaging with papilloedema", "Probable IIH. Urgent ophthalmology and neurology. Check for tetracyclines, retinoids, vitamin A."]
     ])}
     <h2>Low</h2>
     <p>Orthostatic headache, often after LP, epidural or spinal surgery.</p>
@@ -645,7 +694,7 @@ const PAGES = [
     ])}
     ${local("radiology", "neurology", "neurosurgery", "ophthalmology", "anaesthetics")}
   `,
-  routes: [BACK_TO_SCREEN]
+  next: BACK_TO_SCREEN
 },
 {
   id: "pregnancy", stage: "screen", nav: "Pregnant or postpartum", sub: true, level: "sameday",
@@ -671,7 +720,7 @@ const PAGES = [
     ])}
     ${local("obstetrics", "anaesthetics", "radiology")}
   `,
-  routes: [BACK_TO_SCREEN]
+  next: BACK_TO_SCREEN
 },
 
 /* ---------------- Medication overuse ---------------- */
@@ -691,7 +740,7 @@ const PAGES = [
     </div>
     <h2>Manage</h2>
     ${steps([
-      "Stop overused medicines abruptly for at least 1 month. Gradual withdrawal for high-dose opioids.",
+      "Stop overused medicines abruptly for at least 1 month. Gradual withdrawal for high-dose opioids. No opioids from SDEC.",
       "Warn of short-term worsening.",
       "Start prevention now.",
       "GP review at 4 to 8 weeks. Headache clinic if relapse."
@@ -742,18 +791,13 @@ const PAGES = [
       <label class="check"><input id="idm-3" type="checkbox"> Photophobia</label>
       <div class="result" id="idm-result" aria-live="polite"></div>
     </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th scope="col">Feature</th><th scope="col">Migraine</th><th scope="col">Tension-type</th><th scope="col">Cluster</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">Site</th><td>Unilateral or bilateral</td><td>Bilateral</td><td>Strictly unilateral, orbital</td></tr>
-          <tr><th scope="row">Severity</th><td>Moderate to severe</td><td>Mild to moderate</td><td>Very severe</td></tr>
-          <tr><th scope="row">Duration</th><td class="n">4 to 72 hours</td><td class="n">30 minutes to days</td><td class="n">15 to 180 minutes</td></tr>
-          <tr><th scope="row">Behaviour</th><td>Still, worse with activity</td><td>Carries on</td><td>Restless</td></tr>
-          <tr><th scope="row">Associated</th><td>Nausea, photophobia, phonophobia, aura</td><td>None</td><td>Ipsilateral autonomic features</td></tr>
-        </tbody>
-      </table>
-    </div>
+    ${table(["Feature", "Migraine", "Tension-type", "Cluster"], [
+      ["Site", "Unilateral or bilateral", "Bilateral", "Strictly unilateral, orbital"],
+      ["Severity", "Moderate to severe", "Mild to moderate", "Very severe"],
+      ["Duration", "4 to 72 hours", "30 minutes to days", "15 to 180 minutes"],
+      ["Behaviour", "Still, worse with activity", "Carries on", "Restless"],
+      ["Associated", "Nausea, photophobia, phonophobia, aura", "None", "Ipsilateral autonomic features"]
+    ])}
     <p class="small">Chronic tension-type headache is uncommon: consider overuse and chronic migraine.</p>
   `,
   mount: () => {
@@ -781,23 +825,23 @@ const PAGES = [
     <h2>Acute</h2>
     ${steps([
       "NSAID: aspirin 900mg, ibuprofen 400mg to 600mg or naproxen 250mg to 500mg. Paracetamol 1g if NSAID unsuitable.",
-      "Triptan: sumatriptan 50mg to 100mg orally. If vomiting: 6mg subcutaneous or zolmitriptan 5mg nasal.",
-      "Antiemetic: metoclopramide 10mg (5 days maximum), prochlorperazine 3mg buccal or domperidone 10mg.",
+      "Triptan: sumatriptan 50mg to 100mg orally; 6mg subcutaneous or zolmitriptan 5mg nasal if vomiting. Not with uncontrolled hypertension, ischaemic heart disease, previous stroke or TIA, or peripheral vascular disease.",
+      "Antiemetic: metoclopramide 10mg (5 days maximum, not in Parkinson’s), prochlorperazine 3mg buccal or domperidone 10mg.",
       "IV fluids if dehydrated. Over 72 hours or refractory: neurology."
+    ])}
+    <h2>For the GP letter</h2>
+    ${ul([
+      "no response at 2 hours: a different triptan next attack, each tried over 3 attacks",
+      "rimegepant 75mg if 2 triptans and NSAIDs fail"
     ])}
     <h2>Prevention</h2>
     <p>4 or more headache days a month. Titrate every 1 to 2 weeks, trial for at least 8 weeks.</p>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th scope="col">Medicine</th><th scope="col">Start</th><th scope="col">Target</th><th scope="col">Maximum</th><th scope="col">Note</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">Amitriptyline</th><td class="n">10mg nocte</td><td class="n">30mg to 75mg</td><td class="n">100mg</td><td></td></tr>
-          <tr><th scope="row">Candesartan</th><td class="n">4mg</td><td class="n">16mg</td><td class="n">16mg</td><td>U&E before and after titration</td></tr>
-          <tr><th scope="row">Propranolol</th><td class="n">40mg</td><td class="n">80mg bd</td><td class="n">120mg bd</td><td>Not in asthma</td></tr>
-          <tr><th scope="row">Topiramate</th><td class="n">25mg</td><td class="n">50mg bd</td><td class="n">100mg bd</td><td>Pregnancy Prevention Programme (MHRA 2024)</td></tr>
-        </tbody>
-      </table>
-    </div>
+    ${table(["Medicine", "Start", "Target", "Maximum", "Note"], [
+      ["Amitriptyline", "10mg nocte", "30mg to 75mg", "100mg", ""],
+      ["Candesartan", "4mg", "16mg", "16mg", "U&E before and after titration"],
+      ["Propranolol", "40mg", "80mg bd", "120mg bd", "Not in asthma"],
+      ["Topiramate", "25mg", "50mg bd", "100mg bd", "Pregnancy Prevention Programme (MHRA 2024)"]
+    ], [1, 2, 3])}
     ${ul([
       "gepants after 3 failed preventives (NICE TA906, TA973)",
       "no valproate if could become pregnant"
@@ -829,7 +873,7 @@ const PAGES = [
     <h2>Acute</h2>
     ${steps([
       "100% oxygen, 12 to 15 litres per minute, non-rebreather, 15 to 20 minutes.",
-      "Sumatriptan 6mg subcutaneous, or zolmitriptan 5mg or sumatriptan 20mg nasal.",
+      "Sumatriptan 6mg subcutaneous, or zolmitriptan 5mg or sumatriptan 20mg nasal. Daily use through a bout does not cause medication overuse headache.",
       "No oral triptans, NSAIDs, paracetamol or opioids."
     ])}
     <h2>Arrange</h2>
@@ -1032,16 +1076,16 @@ function render(id, opts) {
   if (STATE.log[STATE.log.length - 1] !== id) STATE.log.push(id);
   const stage = STAGES.find(s => s.id === p.stage);
   const stageNo = STAGES.indexOf(stage) + 1;
-  const kicker = p.stage === "ref" ? stage.name : "Stage " + stageNo + " · " + stage.name;
+  const kicker = p.stage === "ref" ? stage.name : "Stage " + stageNo + " of " + STAGE_COUNT + " · " + stage.name;
 
   let routes = "";
   if (p.routes && p.routes.length) {
-    routes = '<h2 class="routes-title">' + (p.id === "primary" ? "Which fits best?" : "Next") + '</h2><div class="routes">' + p.routes.map(route).join("") + "</div>";
+    routes = '<h2 class="routes-title">' + (p.id === "primary" ? "Which fits best?" : "Also consider") + '</h2><div class="routes">' + p.routes.map(route).join("") + "</div>";
   }
   const canBack = STATE.trail.length > 1;
   const footer = '<nav class="stepper" aria-label="Step navigation">' +
-    '<button class="btn" type="button" id="btn-back"' + (canBack ? "" : " disabled") + '>← Back</button>' +
-    (id !== "start" ? '<button class="btn" type="button" id="btn-restart">Restart</button>' : "") +
+    '<button class="btn quiet" type="button" id="btn-back"' + (canBack ? "" : " disabled") + '>← Back</button>' +
+    (id !== "start" ? '<button class="btn quiet" type="button" id="btn-restart">Restart</button>' : "") +
     '<span class="spacer"></span>' +
     (p.next ? '<a class="btn primary" href="#' + p.next.to + '">' + p.next.label + ' <span aria-hidden="true">→</span></a>' : "") +
     "</nav>";
@@ -1080,7 +1124,7 @@ function toggleMap(force) {
   const open = typeof force === "boolean" ? force : !map.classList.contains("open");
   map.classList.toggle("open", open);
   btn.setAttribute("aria-expanded", String(open));
-  btn.textContent = open ? "Close map" : "Pathway map";
+  btn.textContent = open ? "Close map" : "Map";
 }
 
 /* Intercept in-page links so navigation works in every host */
@@ -1125,3 +1169,5 @@ document.getElementById("find-step").addEventListener("input", e => {
   render(BY_ID[first] ? first : "start");
 })();
 </script>
+</body>
+</html>
