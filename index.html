@@ -576,7 +576,8 @@ button { font-family: inherit; }
 .deck .tb.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .deck .tb.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 .deck .tb:disabled { opacity: .45; cursor: default; }
-.deck .voice-pick { max-width: 230px; padding: 6px 8px; font-weight: 500; }
+.deck .voice-pick { max-width: 260px; padding: 6px 8px; font-weight: 500; }
+.deck .voice-hint { flex-basis: 100%; font-size: 13px; line-height: 1.4; color: var(--amber); background: var(--amber-soft); border: 1px solid color-mix(in srgb, var(--amber) 35%, transparent); border-radius: 8px; padding: 6px 10px; }
 .deck .counter { font-family: var(--mono); font-size: 15px; color: var(--ink-2); font-variant-numeric: tabular-nums; padding: 0 6px; }
 .deck .keys { font-family: var(--mono); font-size: 13px; color: var(--ink-2); }
 .deck /* Notes drawer */
@@ -1298,11 +1299,20 @@ EXTRA.forEach(([after, slide]) => {
   SLIDES.splice(at < 0 ? SLIDES.length - 1 : at + 1, 0, slide);
 });
 
+/* Recorded narration: one file per slide per voice, made with the Kokoro engine (Apache 2.0). Durations are filled in by the build; null means read them from the files. */
+const AUDIO = {
+  base: "audio/",
+  voices: { female: { name: "Emma", dir: "female" }, male: { name: "George", dir: "male" } },
+  durations: {"female": [36.9, 32.9, 27.6, 36.1, 37.2, 36.8, 37.8, 36.6, 51.6, 41.8, 42.4, 33.7, 51.0, 48.0, 51.8, 42.8, 57.4, 51.7, 45.3, 47.6, 41.6, 44.6, 39.1, 49.9, 40.8, 47.3, 41.5, 38.1, 40.1, 42.9, 35.8, 37.2], "male": [42.0, 36.2, 31.2, 40.1, 40.9, 40.4, 42.2, 41.9, 57.8, 47.5, 48.0, 37.8, 58.1, 54.1, 59.1, 47.7, 64.5, 57.2, 51.3, 54.9, 46.9, 50.6, 43.8, 56.4, 45.9, 53.5, 46.7, 42.3, 44.9, 48.5, 40.7, 42.0]}
+};
+const pad2 = n => String(n).padStart(2, "0");
+
 /* Timing: narration at 150 words a minute plus a pause per slide; exercises add room time */
 const WPM = 150, GAP = 0.7;
-SLIDES.forEach(sl => {
+SLIDES.forEach((sl, i) => {
   const words = sl.notes.trim().split(/\s+/).length;
-  sl.spoken = words / WPM * 60 + GAP;
+  const rec = AUDIO.durations && AUDIO.durations.female && AUDIO.durations.female[i];
+  sl.spoken = rec ? rec + 0.3 : words / WPM * 60 + GAP;
   const ex = /class="(?:q|flip|hot|step)"|class="hot sm"/.test(sl.html);
   const isCase = /class="case"/.test(sl.html);
   sl.exercise = isCase ? 150 : ex ? 90 : 0;
@@ -1333,6 +1343,7 @@ const TEMPLATE = `<div class="progress" aria-hidden="true"><i data-id="prog"></i
   <button class="tb" data-id="b-notes" type="button" aria-pressed="false">Notes</button>
   <button class="tb" data-id="b-voice" type="button" aria-pressed="false">Narrate</button>
   <select class="tb voice-pick" data-id="voice-pick" aria-label="Narration voice"></select>
+  <span class="voice-hint" hidden>A UK voice is missing on this device. iPhone or iPad: Settings → Accessibility → Spoken Content → Voices → English → English (UK), download Kate and Daniel (Premium). Mac: System Settings → Accessibility → Spoken Content → System voice → Manage voices. Windows: use Edge.</span>
   <button class="tb" data-id="b-full" type="button">Full screen</button>
   
   <span class="keys">→ next · ← back · N notes · V narrate all · F full screen</span>
@@ -1360,7 +1371,7 @@ function show(i, atEnd) {
   slides.forEach((e, k) => e.classList.toggle("active", k === i));
   ST.i = i; ST.step = atEnd ? frags(i).length : 0;
   applyStep(i); runEnter(i); buttons();
-  el.counter.textContent = (i + 1) + " / " + SLIDES.length + " · " + Math.round(SLIDES[i].startAt / 60) + " of " + TIMING.sessionMin + " min";
+  el.counter.textContent = (i + 1) + " / " + SLIDES.length + " · " + Math.min(TIMING.sessionMin, Math.round(SLIDES[i].startAt / 60)) + " of " + TIMING.sessionMin + " min";
   el.prog.style.width = ((i + 1) / SLIDES.length * 100) + "%";
   el.notesText.textContent = SLIDES[i].notes;
   el.notesLabel.textContent = "Narration · slide " + (i + 1) + " · " + mmss(SLIDES[i].spoken) + " spoken" + (SLIDES[i].exercise ? " · allow " + mmss(SLIDES[i].exercise) + " for the exercise" : "");
@@ -1406,30 +1417,53 @@ const VOICE_RANK = {
   female: [/Sonia.*Natural/i, /Libby.*Natural/i, /Kate.*Premium/i, /Serena.*Premium/i, /Google UK English Female/i, /Kate.*Enhanced/i, /Serena.*Enhanced/i, /^Kate\b/i, /Serena/i, /Martha/i, /Stephanie/i, /Microsoft Hazel/i, /Microsoft Susan/i, /Female/i],
   male:   [/Ryan.*Natural/i, /Thomas.*Natural/i, /Daniel.*Premium/i, /Oliver.*Premium/i, /Google UK English Male/i, /Daniel.*Enhanced/i, /Oliver.*Enhanced/i, /^Daniel\b/i, /Oliver/i, /Arthur/i, /Microsoft George/i, /Male/i]
 };
+/* If no UK voice of the right kind is installed, a female or male voice from another English region comes before the wrong gender */
+const ANY_RANK = {
+  female: [/Moira/i, /Karen/i, /Tessa/i, /Samantha/i, /Victoria/i, /Allison/i, /\bAva\b/i, /Zira/i, /Jenny/i, /Aria/i, /Emma/i, /Female/i],
+  male:   [/\bRishi\b/i, /\bLee\b/i, /\bTom\b/i, /\bAlex\b/i, /\bFred\b/i, /David/i, /\bMark\b/i, /\bGuy\b/i, /Male/i]
+};
+const REGION = { "en-IE": "Irish", "en-AU": "Australian", "en-ZA": "South African", "en-IN": "Indian", "en-US": "American", "en-CA": "Canadian", "en-NZ": "New Zealand" };
 const short = n => n.replace(/^Microsoft |^Google /, "").replace(/ Online \(Natural\)/, " (natural)").replace(/ - English \(.*\)$/, "").replace(/ \(en-GB\)$/, "");
-function bestVoice(vs, kind) {
+function findVoice(vs, kind) {
   const gb = vs.filter(v => /en[-_]GB/i.test(v.lang));
-  for (const re of VOICE_RANK[kind]) { const hit = gb.find(v => re.test(v.name)); if (hit) return hit; }
-  return gb[0] || vs.find(v => /^en/i.test(v.lang)) || null;
+  for (const re of VOICE_RANK[kind]) { const hit = gb.find(v => re.test(v.name)); if (hit) return { voice: hit, uk: true }; }
+  const en = vs.filter(v => /^en/i.test(v.lang));
+  for (const re of ANY_RANK[kind]) { const hit = en.find(v => re.test(v.name)); if (hit) return { voice: hit, uk: false }; }
+  return { voice: gb[0] || en[0] || null, uk: false, none: true };
 }
+function bestVoice(vs, kind) { return findVoice(vs, kind).voice; }
+function describe(vs, kind) {
+  const r = findVoice(vs, kind);
+  if (!r.voice) return "none available";
+  if (r.uk) return short(r.voice.name);
+  const region = REGION[(r.voice.lang || "").replace("_", "-")] || "";
+  return r.none ? "not installed, using " + short(r.voice.name) : short(r.voice.name) + (region ? " (" + region + ")" : "") + ", no UK " + kind + " voice installed";
+}
+let choice = "rec:female";
 function pickVoice() {
-  if (!synth) return;
-  const vs = synth.getVoices();
-  let saved = "female"; try { saved = localStorage.getItem("deckVoice") || "female"; } catch (e) {}
-  voice = (saved === "female" || saved === "male") ? bestVoice(vs, saved) : (vs.find(v => v.name === saved) || bestVoice(vs, "female"));
-  fillVoices(vs, saved);
+  const vs = synth ? synth.getVoices() : [];
+  try { choice = localStorage.getItem("deckVoice") || "rec:female"; } catch (e) {}
+  if (choice.startsWith("rec:") && !AUDIO.voices[choice.slice(4)]) choice = "rec:female";
+  const live = choice.startsWith("rec:") ? "female" : choice;
+  voice = (live === "female" || live === "male") ? bestVoice(vs, live) : (vs.find(v => v.name === live) || bestVoice(vs, "female"));
+  fillVoices(vs, choice);
 }
 function fillVoices(vs, saved) {
   const sel = el.voicePick;
   if (!sel) return;
-  const f = bestVoice(vs, "female"), m = bestVoice(vs, "male");
   const english = vs.filter(v => /^en/i.test(v.lang)).sort((a, b) => (/en[-_]GB/i.test(b.lang) - /en[-_]GB/i.test(a.lang)) || a.name.localeCompare(b.name));
-  let html = '<option value="female"' + (saved === "female" ? " selected" : "") + ">UK female" + (f ? " · " + esc(short(f.name)) : "") + "</option>" +
-             '<option value="male"' + (saved === "male" ? " selected" : "") + ">UK male" + (m ? " · " + esc(short(m.name)) : "") + "</option>";
-  if (english.length) html += '<optgroup label="All English voices">' + english.map(v => '<option value="' + esc(v.name) + '"' + (saved === v.name ? " selected" : "") + ">" + esc(short(v.name)) + (/en[-_]GB/i.test(v.lang) ? "" : " · " + v.lang) + "</option>").join("") + "</optgroup>";
+  let html = '<option value="rec:female"' + (saved === "rec:female" ? " selected" : "") + ">UK female · " + esc(AUDIO.voices.female.name) + " (recorded)</option>" +
+             '<option value="rec:male"' + (saved === "rec:male" ? " selected" : "") + ">UK male · " + esc(AUDIO.voices.male.name) + " (recorded)</option>" +
+             '<optgroup label="This device’s voices">' +
+             '<option value="female"' + (saved === "female" ? " selected" : "") + ">UK female · " + esc(describe(vs, "female")) + "</option>" +
+             '<option value="male"' + (saved === "male" ? " selected" : "") + ">UK male · " + esc(describe(vs, "male")) + "</option></optgroup>";
+  const missing = !saved.startsWith("rec:") && (!findVoice(vs, "female").uk || !findVoice(vs, "male").uk);
+  const hint = root.querySelector(".voice-hint"); if (hint) hint.hidden = !missing;
+  if (english.length && !synth) html = html; if (english.length) html += '<optgroup label="All English voices on this device">' + english.map(v => '<option value="' + esc(v.name) + '"' + (saved === v.name ? " selected" : "") + ">" + esc(short(v.name)) + (/en[-_]GB/i.test(v.lang) ? "" : " · " + v.lang) + "</option>").join("") + "</optgroup>";
   sel.innerHTML = html;
-  sel.hidden = !vs.length;
+  sel.hidden = false;
 }
+
 /* How the voice says things that are written as abbreviations. Spoken text only; the slides are unchanged. */
 const SAY = [
   [/\bSDEC\b/g, "ess dec"], [/\bQEHB\b/g, "Q E H B"], [/\bUHB\b/g, "U H B"],
@@ -1452,16 +1486,42 @@ let auto = false, run = 0;
 function stopVoice() {
   auto = false; run++;
   if (synth) synth.cancel();
+  if (el.audio) { try { el.audio.pause(); } catch (e) {} }
   if (!root) return;
   el.voice.classList.remove("on"); el.voice.setAttribute("aria-pressed", "false"); el.voice.textContent = "Narrate";
   el.notesText.classList.remove("speaking");
 }
 function speakCurrent() {
-  if (!synth || !root) return;
+  if (!root) return;
   const myRun = ++run;
-  synth.cancel();
+  if (synth) synth.cancel();
+  if (el.audio) { try { el.audio.pause(); } catch (e) {} }
   el.voice.classList.add("on"); el.voice.setAttribute("aria-pressed", "true"); el.voice.textContent = "Stop";
   el.notesText.classList.add("speaking");
+  if (choice.startsWith("rec:")) { playRecorded(myRun, choice.slice(4)); return; }
+  speakLive(myRun);
+}
+function playRecorded(myRun, kind) {
+  const a = el.audio, slideIndex = ST.i, F = frags(slideIndex).length;
+  a.dataset.run = String(myRun);
+  a.onended = () => {
+    if (String(myRun) !== a.dataset.run || myRun !== run) return;
+    ST.step = F; applyStep(slideIndex); buttons();
+    setTimeout(() => { if (myRun !== run || !auto) return; if (ST.i < SLIDES.length - 1) show(ST.i + 1); else stopVoice(); }, 700);
+  };
+  a.ontimeupdate = () => {
+    if (String(myRun) !== a.dataset.run || !a.duration) return;
+    const target = Math.min(F, Math.floor(a.currentTime / a.duration * (F + 1)));
+    if (target > ST.step) { ST.step = target; applyStep(slideIndex); buttons(); }
+  };
+  a.onerror = () => { if (myRun === run) speakLive(myRun); };
+  a.src = AUDIO.base + AUDIO.voices[kind].dir + "/s" + pad2(slideIndex + 1) + ".mp3";
+  const pr = a.play();
+  if (pr && pr.catch) pr.catch(() => { if (myRun === run) speakLive(myRun); });
+}
+function speakLive(myRun) {
+  if (!synth) { stopVoice(); return; }
+  synth.cancel();
   const slideIndex = ST.i, F = frags(slideIndex).length;
   const sentences = SLIDES[slideIndex].notes.match(/[^.!?]+[.!?]+["”]?\s*|[^.!?]+$/g) || [SLIDES[slideIndex].notes];
   const total = sentences.length;
@@ -1562,15 +1622,18 @@ function mount(container) {
   let tx = null;
   on(el.stage, "touchstart", e => { tx = e.touches[0].clientX; }, { passive: true });
   on(el.stage, "touchend", e => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 60) { if (dx < 0) next(); else prev(); } }, { passive: true });
-  if (synth) {
-    pickVoice(); on(synth, "voiceschanged", pickVoice);
-    on(el.voicePick, "change", () => {
-      const vs = synth.getVoices(), v = el.voicePick.value;
-      voice = (v === "female" || v === "male") ? bestVoice(vs, v) : (vs.find(x => x.name === v) || voice);
-      try { localStorage.setItem("deckVoice", v); } catch (e) {}
-      if (auto) speakCurrent();
-    });
-  } else { el.voice.hidden = true; el.voicePick.hidden = true; }
+  el.audio = document.createElement("audio"); el.audio.preload = "auto"; root.appendChild(el.audio);
+  pickVoice();
+  if (synth) on(synth, "voiceschanged", pickVoice);
+  on(el.voicePick, "change", () => {
+    const vs = synth ? synth.getVoices() : [], v = el.voicePick.value;
+    choice = v;
+    const live = v.startsWith("rec:") ? "female" : v;
+    voice = (live === "female" || live === "male") ? bestVoice(vs, live) : (vs.find(x => x.name === live) || voice);
+    try { localStorage.setItem("deckVoice", v); } catch (e) {}
+    fillVoices(vs, v);
+    if (auto) speakCurrent();
+  });
   let start = 0; try { start = parseInt(sessionStorage.getItem("deckSlide") || "0", 10) || 0; } catch (e) {}
   show(start); fit(); setTimeout(fit, 300);
 }
@@ -1580,7 +1643,7 @@ function unmount() {
   off.forEach(fn => fn()); off = [];
   root.innerHTML = ""; root.className = ""; root = null; slides = [];
 }
-return { mount, unmount, get mounted() { return !!root; }, show, timing: () => TIMING, count: () => SLIDES.length, say };
+return { mount, unmount, get mounted() { return !!root; }, show, timing: () => TIMING, count: () => SLIDES.length, say, slides: () => SLIDES };
 })();
 
 /* ============================================================
@@ -2433,10 +2496,10 @@ const PAGES = [
   body: () => `
     <dl class="figures" style="margin-top:0">
       <dt>${Deck.timing().sessionMin} minutes</dt><dd>A full teaching session: narration plus the ${Deck.timing().exercises} exercises, with time for the room to answer</dd>
-      <dt>${Deck.timing().narrationMin} minutes</dt><dd>Narration alone, if you press Narrate and let it play through all ${Deck.count()} slides</dd>
+      <dt>${Deck.timing().narrationMin} minutes</dt><dd>Narration alone, if you press Narrate and let it play through all ${Deck.count()} slides. Recorded in 2 voices, so it sounds the same on every device</dd>
     </dl>
     <div id="deck-root"></div>
-    <p class="small" style="margin-top:12px">The counter shows how far into the session each slide falls, and the notes drawer shows the spoken length of each slide. Arrow keys or the buttons move through the builds; swipe on a phone. N shows the presenter notes. V (or Narrate) plays the whole deck from the current slide with the device’s own voice, revealing each build as it is read; press again to stop. F goes full screen. The quizzes, flip cards and cases are for the room to answer before you tap.</p>
+    <p class="small" style="margin-top:12px">The counter shows how far into the session each slide falls, and the notes drawer shows the spoken length of each slide. Arrow keys or the buttons move through the builds; swipe on a phone. N shows the presenter notes. V (or Narrate) plays the whole deck from the current slide in a recorded voice, Emma or George, revealing each build as it is read; press again to stop. The device’s own voices are in the same menu if the recordings cannot load. F goes full screen. The quizzes, flip cards and cases are for the room to answer before you tap.</p>
     <p class="small">Maps to IM Clinical CiP 1 (Managing an acute unselected take), CiP 2 (Managing the acute care of patients within a medical specialty service), CiP 4 (Managing patients in an outpatient clinic, ambulatory or community setting) and CiP 7 (Delivering effective resuscitation and managing the acutely deteriorating patient).</p>
   `,
   mount: () => Deck.mount(document.getElementById("deck-root")),
@@ -2575,6 +2638,8 @@ const PAGES = [
       ext("https://doi.org/10.1001/archophthalmol.2010.94", "Modified Frisén scale for papilloedema") + ", Scott CJ and others, Archives of Ophthalmology 2010",
       ext("https://gettingitrightfirsttime.co.uk/wp-content/uploads/2022/11/Rheumatology-Giant-Cell-Arteritis-Pathway.html", "GIRFT rheumatology GCA pathway")
     ])}
+    <h2>Narration</h2>
+    ${ul([ext("https://huggingface.co/hexgrad/Kokoro-82M", "Kokoro-82M") + " open-source speech engine (Apache 2.0), voices Emma and George; recorded from the presenter scripts"])}
     <h2>Patient-facing</h2>
     ${ul([ext("https://migrainetrust.org/", "The Migraine Trust"), ext("https://ouchuk.org/", "OUCH (UK)"), ext("https://www.nhs.uk/conditions/migraine/", "NHS: migraine")])}
     <p class="small">Supports, does not replace, clinical judgement. Check doses against the BNF and trust formulary.</p>
