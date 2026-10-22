@@ -31,6 +31,8 @@
   --body: "Inter Tight", "Segoe UI", system-ui, -apple-system, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
   --radius: 6px;
+  --skin: #F1C9A5;
+  --deck-shadow: 0 18px 40px -24px rgba(11, 31, 51, 0.45);
   --gutter-l: max(16px, env(safe-area-inset-left, 0px));
   --gutter-r: max(16px, env(safe-area-inset-right, 0px));
 }
@@ -39,7 +41,7 @@
     --paper: #0E1824; --paper-2: #152232; --ink: #ECE7DC; --ink-2: #A8B3BE; --rule: #2A394A;
     --accent: #BCA7E2; --accent-ink: #1A1230; --accent-soft: #2A2340;
     --red: #F2A097; --red-soft: #3A1F1E; --amber: #E6BB66; --amber-soft: #33290F; --green: #8FCBA4; --green-soft: #183021;
-    --shadow: 0 -10px 18px -14px rgba(0, 0, 0, 0.8);
+    --shadow: 0 -10px 18px -14px rgba(0, 0, 0, 0.8); --skin: #D9A77E; --deck-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.9);
     color-scheme: dark;
   }
 }
@@ -47,7 +49,7 @@
   --paper: #0E1824; --paper-2: #152232; --ink: #ECE7DC; --ink-2: #A8B3BE; --rule: #2A394A;
   --accent: #BCA7E2; --accent-ink: #1A1230; --accent-soft: #2A2340;
   --red: #F2A097; --red-soft: #3A1F1E; --amber: #E6BB66; --amber-soft: #33290F; --green: #8FCBA4; --green-soft: #183021;
-  --shadow: 0 -10px 18px -14px rgba(0, 0, 0, 0.8);
+  --shadow: 0 -10px 18px -14px rgba(0, 0, 0, 0.8); --skin: #D9A77E; --deck-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.9);
   color-scheme: dark;
 }
 
@@ -84,6 +86,11 @@ button, input { font-family: inherit; }
 .btn-ghost:hover { border-color: var(--accent); }
 .btn-ghost.red { color: var(--red); border-color: color-mix(in srgb, var(--red) 45%, transparent); font-weight: 600; }
 .map-toggle { display: none; }
+.tabs { display: inline-flex; border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; }
+.tab { font: 600 0.9rem var(--body); color: var(--ink-2); text-decoration: none; padding: 9px 16px; min-height: 40px; display: inline-flex; align-items: center; background: var(--paper); }
+.tab + .tab { border-left: 1px solid var(--rule); }
+.tab:hover { color: var(--accent); }
+.tab[aria-current="page"] { background: var(--accent); color: var(--accent-ink); }
 
 /* Shell */
 .shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 256px minmax(0, 1fr); gap: 48px; padding-block: 22px 48px; }
@@ -242,6 +249,88 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
 .foot { max-width: 1180px; margin: 0 auto; padding-block: 14px 24px; border-top: 1px solid var(--rule); color: var(--ink-2); font-size: 0.84rem; display: flex; flex-wrap: wrap; gap: 6px 24px; justify-content: space-between; }
 .foot p { margin: 0; max-width: 70ch; }
 
+/* Desktop: each step fits one screen. Content flows into columns; nothing is hidden. */
+@media (min-width: 961px) {
+  html, body { height: 100%; }
+  body { overflow: hidden; display: flex; flex-direction: column; }
+  .masthead { flex: none; padding-block: 14px 10px; }
+  .masthead .name { font-size: 1.5rem; }
+  .shell { flex: 1 1 auto; min-height: 0; padding-block: 14px 0; gap: 32px; grid-template-columns: 220px minmax(0, 1fr); }
+  .map { max-height: 100%; top: 0; font-size: 0.9rem; }
+  .map li a { padding: 4px 0 4px 12px; font-size: 0.86rem; }
+  .map li a.sub { font-size: 0.82rem; padding-left: 22px; }
+  .map-stage { margin-top: 10px; }
+  main { max-width: none; height: 100%; overflow: hidden; display: flex; flex-direction: column; }
+  .trail { margin-bottom: 8px; font-size: 0.78rem; }
+  .kicker { margin-bottom: 4px; font-size: 0.72rem; }
+  h1 { font-size: 1.7rem; margin-bottom: 4px; }
+  .lede { font-size: 0.98rem; }
+  .head-row { margin-top: 6px; }
+  #page { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+  .prose { flex: 1 1 auto; min-height: 0; margin-top: 10px; font-size: 0.9rem; line-height: 1.45; columns: 2; column-gap: 32px; column-fill: auto; overflow: hidden; }
+  .prose.c1 { columns: 1; }
+  .prose.c3 { columns: 3; column-gap: 24px; font-size: 0.86rem; }
+  .prose > * { max-width: none; }
+  .prose h2 { font-size: 1.05rem; margin: 12px 0 4px; break-after: avoid; }
+  .prose > h2:first-child, .prose > .routes-title:first-child { margin-top: 0; }
+  .prose h3 { font-size: 0.92rem; margin: 8px 0 2px; break-after: avoid; }
+  .prose p { margin: 0 0 6px; }
+  .prose ul { margin: 0 0 8px; }
+  .prose ul li { margin: 0 0 2px; }
+  .panel, .tool, dl.ifthen, dl.figures, figure, ol.steps > li, .fundus-wrap, ol.stage-map, tr, .route, .contact, .sign, .tile { break-inside: avoid; }
+  .routes, .contacts, .signs { display: block; }
+  .route, .contact, .sign { margin-bottom: 6px; }
+  thead { break-after: avoid; }
+  .panel { padding: 8px 12px 2px; margin: 8px 0; }
+  .panel-label { margin-bottom: 4px !important; font-size: 0.68rem; }
+  .tool { padding: 10px 12px; margin: 8px 0 10px; }
+  .field { padding: 4px 0; }
+  .check { padding: 4px 0; font-size: 0.88rem; }
+  .result { margin-top: 6px; padding: 6px 10px; font-size: 0.9rem; }
+  ol.steps { gap: 4px; margin: 4px 0 8px; }
+  ol.steps > li::before { width: 20px; height: 20px; font-size: 0.7rem; }
+  dl.ifthen dt, dl.ifthen dd { padding: 5px 0; }
+  dl.figures dt, dl.figures dd { padding: 4px 0; }
+  .routes { gap: 6px; margin-top: 8px; grid-template-columns: minmax(0, 1fr); }
+  .routes-title { font-size: 1.05rem; margin: 12px 0 2px; }
+  .route { padding: 7px 12px; min-height: 0; gap: 0 10px; }
+  .route .r-title { font-size: 0.92rem; }
+  .route .r-note { font-size: 0.8rem; }
+  .chip { font-size: 0.66rem; padding: 2px 7px; }
+  .contacts { gap: 4px; margin: 2px 0 8px; }
+  .contact { padding: 5px 10px; font-size: 0.84rem; }
+  .table-wrap { margin: 6px 0 10px; overflow: visible; border: 0; }
+  table { min-width: 0; font-size: 0.8rem; border-top: 1px solid var(--rule); }
+  thead { display: table-header-group; }
+  th, td { padding: 5px 8px; }
+  .table-wrap.wide { column-span: all; }
+  .table-wrap.wide table { font-size: 0.82rem; }
+  .fundus-wrap { gap: 12px; margin: 4px 0 8px; }
+  .signs { gap: 6px; margin-bottom: 8px; }
+  .sign { padding: 5px 9px; font-size: 0.82rem; line-height: 1.3; }
+  ol.stage-map li { padding: 8px 10px; }
+  ol.stage-map a { font-size: 0.95rem; }
+  ol.stage-map p { font-size: 0.8rem; }
+  .stepper { flex: none; margin-top: 8px; padding-top: 8px; padding-bottom: 10px; }
+  .btn { min-height: 38px; padding: 8px 14px; font-size: 0.9rem; }
+  .foot { display: none; }
+  .prose.shrink { font-size: 0.78rem; line-height: 1.35; }
+  .prose.shrink h2 { font-size: 0.95rem; margin-top: 8px; }
+  .prose.shrink table { font-size: 0.72rem; }
+  .prose.shrink th, .prose.shrink td { padding: 3px 6px; line-height: 1.3; }
+  .prose.shrink .table-wrap { margin: 4px 0 6px; }
+  .prose.shrink .sign { padding: 3px 7px; font-size: 0.74rem; }
+  .fundus-wrap { max-width: 440px; }
+  .prose.c3 .fundus-wrap { column-span: all; max-width: 400px; margin: 0 0 6px; }
+  .prose .routes-title { font-size: 1.05rem; margin: 10px 0 4px; }
+  .prose.shrink .sign .d { display: none; }
+  .prose.shrink .sign strong { font-weight: 500; }
+  .prose.scroll { overflow-y: auto; }
+  .mode-deck .prose { columns: auto; display: flex; flex-direction: column; overflow: hidden; }
+  .mode-deck .prose > * { flex: none; }
+  .mode-deck .prose > .deck { flex: 1 1 auto; min-height: 0; height: auto; }
+}
+
 /* Tablet and phone */
 @media (max-width: 960px) {
   .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding-top: 14px; }
@@ -280,6 +369,214 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
   dl.ifthen dd { padding-top: 2px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+/* ===== Teaching deck (namespaced) ===== */
+.deck /* Layout: a fixed 1280 x 720 stage scaled to fit the window, .deck one slide at a time, .deck toolbar below, .deck presenter notes drawer at the foot. Same palette as the pathway site. */
+button { font-family: inherit; }
+.deck :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+.deck /* Progress */
+.progress { position: fixed; left: 0; right: 0; top: env(safe-area-inset-top, 0px); height: 4px; background: var(--rule); z-index: 20; }
+.deck .progress > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .35s ease; }
+.deck /* Stage */
+.viewport { flex: 1 1 auto; min-height: 0; display: grid; place-items: center; padding-block: 14px 8px; }
+.deck .stage-box { position: relative; }
+.deck .stage { width: 1280px; height: 720px; transform-origin: top left; position: absolute; top: 0; left: 0; background: var(--paper); border-radius: 12px; box-shadow: var(--deck-shadow); overflow: hidden; }
+.deck .slide { position: absolute; inset: 0; padding: 60px 72px 56px; display: none; }
+.deck .slide.active { display: block; }
+.deck .eyebrow { position: absolute; top: 28px; left: 72px; font-family: var(--mono); font-size: 15px; letter-spacing: .04em; color: var(--accent); }
+.deck .num { position: absolute; bottom: 22px; right: 72px; font-family: var(--mono); font-size: 14px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.deck .slide h1 { font-family: var(--display); font-weight: 560; font-size: 54px; line-height: 1.04; letter-spacing: -0.015em; margin: 0 0 14px; text-wrap: balance; }
+.deck .slide h2 { font-family: var(--display); font-weight: 560; font-size: 42px; line-height: 1.08; letter-spacing: -0.012em; margin: 0 0 16px; text-wrap: balance; }
+.deck .slide h3 { font-size: 22px; font-weight: 700; margin: 0 0 8px; }
+.deck .slide p { font-size: 23px; line-height: 1.45; margin: 0 0 12px; }
+.deck .slide .lede { font-size: 27px; color: var(--ink-2); max-width: 30ch; }
+.deck .slide ul { margin: 0; padding-left: 1.1em; font-size: 22px; line-height: 1.4; }
+.deck .slide li { margin: 0 0 8px; padding-left: 4px; }
+.deck .slide li::marker { color: var(--accent); }
+.deck .slide strong { font-weight: 700; }
+.deck .small { font-size: 17px !important; color: var(--ink-2); }
+.deck ol.steps { list-style: none; counter-reset: s; margin: 0 0 8px; padding: 0; display: grid; gap: 10px; font-size: 20px; line-height: 1.4; }
+.deck ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; align-items: start; }
+.deck ol.steps > li::before { content: counter(s); font-family: var(--mono); font-size: 14px; font-weight: 500; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); margin-top: 2px; }
+.deck .mono { font-family: var(--mono); }
+.deck .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+.deck .cols-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+.deck .cols.art { grid-template-columns: 1.15fr 0.85fr; align-items: center; }
+.deck .center { text-align: center; }
+.deck .big { font-family: var(--display); font-weight: 700; font-size: 120px; line-height: 1; color: var(--accent); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.deck .tag { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 14px; letter-spacing: .02em; padding: 4px 11px; border-radius: 99px; border: 1px solid transparent; white-space: nowrap; }
+.deck .tag::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.deck .tag.emergency { color: var(--red); background: var(--red-soft); border-color: color-mix(in srgb, var(--red) 30%, transparent); }
+.deck .tag.sameday { color: var(--amber); background: var(--amber-soft); border-color: color-mix(in srgb, var(--amber) 30%, transparent); }
+.deck .tag.routine { color: var(--green); background: var(--green-soft); border-color: color-mix(in srgb, var(--green) 30%, transparent); }
+.deck .hint { position: absolute; bottom: 22px; left: 72px; font-family: var(--mono); font-size: 14px; color: var(--ink-2); }
+.deck .hint::before { content: "↳ "; color: var(--accent); }
+.deck /* Fragments: build steps */
+.f { opacity: 0; transform: translateY(14px); transition: opacity .45s ease, transform .45s ease; }
+.deck .f.on { opacity: 1; transform: none; }
+.deck .f.dim { opacity: .35; }
+.deck /* Panels and cards */
+.panel { border: 1px solid var(--rule); border-radius: 10px; padding: 18px 22px; background: var(--paper); }
+.deck .panel.stop { background: var(--red-soft); border-color: color-mix(in srgb, var(--red) 35%, transparent); }
+.deck .panel.caution { background: var(--amber-soft); border-color: color-mix(in srgb, var(--amber) 35%, transparent); }
+.deck .panel.good { background: var(--green-soft); border-color: color-mix(in srgb, var(--green) 35%, transparent); }
+.deck .panel .lbl { font-family: var(--mono); font-size: 14px; letter-spacing: .03em; color: var(--ink-2); margin: 0 0 6px; }
+.deck .panel.stop .lbl { color: var(--red); }
+.deck .panel.caution .lbl { color: var(--amber); }
+.deck .panel.good .lbl { color: var(--green); }
+.deck /* Stage tiles */
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.deck .tile { border: 1px solid var(--rule); border-radius: 10px; padding: 18px 20px; background: var(--paper); }
+.deck .tile .sn { font-family: var(--mono); font-size: 14px; color: var(--accent); }
+.deck .tile b { display: block; font-size: 24px; margin: 4px 0 2px; }
+.deck .tile span { font-size: 18px; color: var(--ink-2); }
+.deck /* Flip cards */
+.flips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.deck .flips.four { grid-template-columns: repeat(4, 1fr); }
+.deck .flip { position: relative; min-height: 118px; perspective: 900px; cursor: pointer; border: 0; background: none; padding: 0; text-align: left; font: inherit; color: inherit; }
+.deck .flip .in { position: absolute; inset: 0; transition: transform .5s; transform-style: preserve-3d; }
+.deck .flip.flipped .in { transform: rotateY(180deg); }
+.deck .flip .face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 10px; border: 1px solid var(--rule); padding: 14px 16px; display: flex; flex-direction: column; justify-content: center; gap: 6px; background: var(--paper); }
+.deck .flip .face.back { transform: rotateY(180deg); background: var(--accent-soft); border-color: var(--accent); }
+.deck .flip .face b { font-size: 20px; line-height: 1.25; }
+.deck .flip .face span { font-size: 16px; color: var(--ink-2); line-height: 1.3; }
+.deck .flip .face.back span { color: var(--ink); }
+.deck .flip .face .tag { align-self: flex-start; margin-bottom: 2px; }
+.deck /* Quiz */
+.quiz { display: grid; gap: 12px; }
+.deck .q { display: grid; grid-template-columns: 1fr auto; gap: 10px 18px; align-items: center; border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; background: var(--paper); transition: background .25s, border-color .25s; }
+.deck .q .qt { font-size: 20px; line-height: 1.3; }
+.deck .q .ans { display: flex; gap: 8px; }
+.deck .q .fb { grid-column: 1 / -1; font-size: 17px; line-height: 1.35; color: var(--ink-2); display: none; }
+.deck .q.done .fb { display: block; }
+.deck .q.right { background: var(--green-soft); border-color: var(--green); }
+.deck .q.wrong { background: var(--red-soft); border-color: var(--red); }
+.deck .ob { font: 600 16px var(--body); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); cursor: pointer; }
+.deck .ob:hover { border-color: var(--accent); }
+.deck .ob.picked { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.deck .q.done .ob { cursor: default; }
+.deck /* Hotspots */
+.hotwrap { display: grid; grid-template-columns: 520px 1fr; gap: 36px; align-items: center; }
+.deck .hot { position: absolute; width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--accent); background: var(--paper); color: var(--accent); font: 600 18px var(--mono); cursor: pointer; display: grid; place-items: center; box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 40%, transparent); animation: pulse 2.2s infinite; }
+.deck .hot.on { background: var(--accent); color: var(--accent-ink); animation: none; }
+.deck .hot.sm { width: 32px; height: 32px; font-size: 15px; border-width: 2px; }
+@keyframes pulse {0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); }
+70% { box-shadow: 0 0 0 14px transparent; }
+100% { box-shadow: 0 0 0 0 transparent; }
+ }
+.deck .hotpanel { min-height: 220px; }
+.deck .hotpanel h3 { font-size: 26px; }
+.deck .hotpanel p { font-size: 21px; }
+.deck /* Dots crowd */
+.dots { display: grid; grid-template-columns: repeat(20, 1fr); gap: 8px; width: 560px; }
+.deck .dots i { display: block; aspect-ratio: 1; border-radius: 50%; background: var(--accent-soft); border: 2px solid var(--accent-soft); opacity: 0; transform: scale(.4); }
+.deck .slide.active .dots i { animation: pop .35s ease forwards; animation-delay: calc(var(--i) * 10ms); }
+.deck .dots i.sec { background: var(--red-soft); border-color: var(--red); }
+@keyframes pop {to { opacity: 1; transform: scale(1); }
+ }
+.deck /* Chart */
+.chart { width: 100%; height: auto; }
+.deck .chart text { font-family: var(--mono); font-size: 15px; fill: var(--ink-2); }
+.deck .chart .axis { stroke: var(--rule); stroke-width: 2; }
+.deck .chart .line { fill: none; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 1400; stroke-dashoffset: 1400; transition: stroke-dashoffset 1.8s ease; }
+.deck .chart .line.mig { stroke: var(--accent); }
+.deck .chart .line.tc { stroke: var(--red); }
+.deck .chart .on .line { stroke-dashoffset: 0; }
+.deck .chart .thresh { stroke: var(--red); stroke-width: 2; stroke-dasharray: 6 6; }
+.deck /* Timeline */
+.tl { position: relative; height: 150px; margin: 24px 0 8px; }
+.deck .tl .bar { position: absolute; left: 0; right: 0; top: 56px; height: 10px; background: var(--rule); border-radius: 5px; }
+.deck .tl .fill { position: absolute; left: 0; top: 56px; height: 10px; border-radius: 5px; background: var(--accent); width: 0; transition: width .8s ease; }
+.deck .tl .mk { position: absolute; top: 36px; width: 2px; transform: translateX(-50%); }
+.deck .tl .mk i { display: block; width: 22px; height: 22px; border-radius: 50%; background: var(--paper); border: 4px solid var(--accent); margin: 0 0 0 -10px; }
+.deck .tl .mk.red i { border-color: var(--red); }
+.deck .tl .mk b { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-family: var(--mono); font-size: 16px; color: var(--accent); }
+.deck .tl .mk.red b { color: var(--red); }
+.deck .tl .mk span { position: absolute; top: -34px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 17px; color: var(--ink-2); }
+.deck /* Calendar */
+.cal { display: grid; grid-template-columns: repeat(7, 44px); gap: 8px; }
+.deck .cal i { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 8px; border: 1px solid var(--rule); font: 500 15px var(--mono); color: var(--ink-2); background: var(--paper); }
+.deck .cal i.rx { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.deck .cal .dow { border: 0; background: none; font-size: 13px; }
+.deck /* Case walkthrough */
+.case { display: grid; gap: 12px; }
+.deck .step { border: 1px solid var(--rule); border-radius: 10px; padding: 14px 18px; background: var(--paper); }
+.deck .step[hidden] { display: none; }
+.deck .step .st { font-size: 20px; line-height: 1.35; margin-bottom: 10px; }
+.deck .step .opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.deck .step .fb { margin-top: 10px; font-size: 17px; line-height: 1.35; display: none; padding: 8px 12px; border-radius: 8px; }
+.deck .step.done .fb { display: block; }
+.deck .step.right .fb { background: var(--green-soft); color: var(--green); }
+.deck .step.wrong .fb { background: var(--red-soft); color: var(--red); }
+.deck /* Illustrations */
+.art svg { width: 100%; height: auto; display: block; }
+.deck .art .ink { stroke: var(--ink); fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.deck .art .fill-ink { fill: var(--ink); }
+.deck .art .fill-skin { fill: var(--skin); }
+.deck .art .fill-acc { fill: var(--accent); }
+.deck .art .fill-soft { fill: var(--accent-soft); }
+.deck .art .fill-red { fill: var(--red); }
+.deck .art .fill-paper { fill: var(--paper); }
+.deck .art .fill-rule { fill: var(--rule); }
+.deck .art .fill-amber { fill: var(--amber); }
+.deck .art .fill-amber-soft { fill: var(--amber-soft); }
+.deck .art .stroke-acc { stroke: var(--accent); fill: none; stroke-width: 3; stroke-linecap: round; }
+.deck .art .stroke-red { stroke: var(--red); fill: none; stroke-width: 3; stroke-linecap: round; }
+.deck .art text { font-family: var(--body); fill: var(--ink); }
+.deck .bolt { transform-origin: 50% 20%; animation: flash 1.6s ease-in-out infinite; }
+@keyframes flash {0%, 100% { opacity: .35; }
+50% { opacity: 1; }
+ }
+.deck .float { animation: float 4s ease-in-out infinite; }
+@keyframes float {0%, 100% { transform: translateY(0); }
+50% { transform: translateY(-8px); }
+ }
+.deck .tick { transform-origin: 220px 150px; animation: tick 2s linear infinite; }
+@keyframes tick {to { transform: rotate(360deg); }
+ }
+.deck /* Toolbar */
+.bar { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-block: 6px 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+.deck .bar .sp { flex: 1; }
+.deck .tb { appearance: none; -webkit-appearance: none; font: 600 15px var(--body); min-height: 40px; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.deck .tb:hover { border-color: var(--accent); }
+.deck .tb.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.deck .tb.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.deck .tb:disabled { opacity: .45; cursor: default; }
+.deck .counter { font-family: var(--mono); font-size: 15px; color: var(--ink-2); font-variant-numeric: tabular-nums; padding: 0 6px; }
+.deck .keys { font-family: var(--mono); font-size: 13px; color: var(--ink-2); }
+.deck /* Notes drawer */
+.notes { flex: none; max-height: 34vh; overflow: auto; border-top: 1px solid var(--rule); background: var(--paper); margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px))); padding: 12px max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px)); }
+.deck .notes .nl { font-family: var(--mono); font-size: 13px; color: var(--accent); margin: 0 0 6px; }
+.deck .notes p { margin: 0; font-size: 17px; line-height: 1.5; max-width: 80ch; }
+.deck .notes .speaking { background: var(--accent-soft); }
+@media (max-width: 700px) {.deck .keys { display: none; }
+.deck .bar .label { display: none; }
+.deck .tb { padding: 8px 11px; }
+}
+@media (prefers-reduced-motion: reduce) {.deck *, .deck *::before, .deck *::after { animation: none !important; transition: none !important; }
+.deck .f { transform: none; }
+.deck .dots i { opacity: 1; transform: none; }
+.deck .chart .line { stroke-dashoffset: 0; }
+}
+
+/* Deck container inside the pathway page */
+.deck { position: relative; display: flex; flex-direction: column; height: calc(100vh - 170px); min-height: 440px; background: var(--paper-2); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+.deck:fullscreen { height: 100vh; border: 0; border-radius: 0; padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); }
+.deck .progress { position: absolute; top: 0; left: 0; right: 0; }
+.deck .viewport { padding: 10px 10px 4px; }
+.deck .bar { padding-inline: 10px; padding-bottom: 8px; }
+.deck .notes { margin: 0; padding: 10px 14px; }
+.deck .tb.full-only { display: none; }
+.deck:fullscreen .tb.full-only { display: inline-flex; }
+.prose > .deck { max-width: none; }
+.mode-deck .shell { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.mode-deck main { max-width: none; }
+@media (min-width: 961px) { .mode-deck .map { display: none; } }
+@media (max-width: 600px) {
+  .deck .table-wrap { border: 1px solid var(--rule); overflow-x: auto; }
+  .deck table { display: table; min-width: 540px; } .deck thead { display: table-header-group; } .deck tbody { display: table-row-group; } .deck tr { display: table-row; border: 0; padding: 0; margin: 0; }
+  .deck th, .deck td { display: table-cell; border-bottom: 1px solid var(--rule); padding: 8px 12px; } .deck td::before { content: none; }
+}
 </style>
 </head>
 <body>
@@ -289,6 +586,10 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
     <div class="name-row"><p class="name">Headache <em>pathway</em></p><span class="status" id="status-pill">Draft for governance review</span></div>
   </div>
   <div class="mast-tools">
+    <nav class="tabs" aria-label="Site sections">
+      <a class="tab" id="tab-pathway" href="#start" aria-current="page">Pathway</a>
+      <a class="tab" id="tab-teaching" href="#teaching">Teaching</a>
+    </nav>
     <a class="btn-ghost red" href="#screen">Red flags</a>
     <a class="btn-ghost" id="hub-link" href="#" hidden>Clinical hub</a>
     <button class="btn-ghost map-toggle" id="map-toggle" type="button" aria-expanded="false" aria-controls="map">Map</button>
@@ -319,7 +620,7 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
    Leave a route empty ("") to show it as "route to confirm".
    ============================================================ */
 const META = {
-  version: "Draft 0.4",
+  version: "Draft 0.5",
   date: "22 October 2026",
   owner: "",            // for example, "SDEC clinical lead"
   approvedBy: "",       // governance group, once approved
@@ -346,6 +647,802 @@ const CONTACTS = {
 };
 
 /* ============================================================
+   Teaching deck module (Deck.mount / Deck.unmount)
+   ============================================================ */
+const Deck = (() => {
+/* ============================================================
+   Illustrations (inline SVG, drawn in the deck palette)
+   ============================================================ */
+const ART = {
+  // Head in profile, lightning bolt (secondary) and calm wave (primary)
+  title: `<svg viewBox="0 0 420 360" role="img" aria-label="Cartoon head with a lightning bolt and a calm wave">
+    <circle cx="210" cy="190" r="150" class="fill-soft"/>
+    <path class="fill-skin" d="M150 110c20-50 60-70 110-62 54 9 86 50 86 104 0 34-14 54-30 72l10 48c2 10-6 18-16 16l-50-10c-12 14-30 22-52 22-54 0-82-40-82-96 0-36 10-72 24-94z"/>
+    <path class="ink" d="M150 110c20-50 60-70 110-62 54 9 86 50 86 104 0 34-14 54-30 72l10 48c2 10-6 18-16 16l-50-10c-12 14-30 22-52 22-54 0-82-40-82-96 0-36 10-72 24-94z"/>
+    <path class="fill-ink" d="M146 112c30-56 92-80 150-56-34 8-56 22-70 46-10 18-14 40-30 52-20 16-44 10-50-42z"/>
+    <circle cx="300" cy="170" r="6" class="fill-ink"/>
+    <path class="ink" d="M286 150c10-8 24-8 34-2"/>
+    <path class="ink" d="M292 226c8 6 18 6 26 0"/>
+    <g class="bolt"><path class="fill-red" d="M330 30l-30 60h30l-18 54 60-74h-32l22-40z"/></g>
+    <path class="stroke-acc float" d="M40 300c20-24 40-24 60 0s40 24 60 0 40-24 60 0" stroke-width="5"/>
+  </svg>`,
+  // Clinician with stethoscope and clipboard
+  clinician: `<svg viewBox="0 0 320 400" role="img" aria-label="Cartoon clinician holding a clipboard">
+    <circle cx="160" cy="88" r="56" class="fill-skin"/><circle cx="160" cy="88" r="56" class="ink"/>
+    <path class="fill-ink" d="M106 80c6-40 36-60 70-56 24 4 38 20 40 40-26-14-56-8-110 16z"/>
+    <circle cx="142" cy="92" r="5" class="fill-ink"/><circle cx="178" cy="92" r="5" class="fill-ink"/>
+    <path class="ink" d="M146 118c8 7 20 7 28 0"/>
+    <path class="fill-paper" d="M70 390V210c0-40 36-70 90-70s90 30 90 70v180z"/>
+    <path class="ink" d="M70 390V210c0-40 36-70 90-70s90 30 90 70v180"/>
+    <path class="ink" d="M160 140v60"/>
+    <path class="stroke-acc" d="M128 150c-10 40-6 80 20 100M192 150c10 40 6 80-20 100" stroke-width="4"/>
+    <circle cx="150" cy="252" r="10" class="fill-acc"/>
+    <rect x="178" y="236" width="76" height="98" rx="8" class="fill-amber-soft"/><rect x="178" y="236" width="76" height="98" rx="8" class="ink"/>
+    <path class="ink" d="M192 262h48M192 282h48M192 302h30"/>
+    <rect x="200" y="226" width="32" height="18" rx="4" class="fill-ink"/>
+  </svg>`,
+  // Front-facing face with hotspot anchor points
+  face: `<svg viewBox="0 0 520 440" role="img" aria-label="Cartoon face used to place examination hotspots">
+    <rect x="228" y="330" width="64" height="70" class="fill-skin"/><path class="ink" d="M228 330v60M292 330v60"/>
+    <path class="fill-paper" d="M120 440c0-50 60-66 140-66s140 16 140 66z"/><path class="ink" d="M120 440c0-50 60-66 140-66s140 16 140 66"/>
+    <ellipse cx="260" cy="200" rx="120" ry="140" class="fill-skin"/><ellipse cx="260" cy="200" rx="120" ry="140" class="ink"/>
+    <path class="fill-ink" d="M142 180c6-70 50-110 118-110s112 40 118 110c-30-30-60-44-118-44s-88 14-118 44z"/>
+    <ellipse cx="214" cy="200" rx="18" ry="12" class="fill-paper"/><ellipse cx="306" cy="200" rx="18" ry="12" class="fill-paper"/>
+    <ellipse cx="214" cy="200" rx="18" ry="12" class="ink"/><ellipse cx="306" cy="200" rx="18" ry="12" class="ink"/>
+    <circle cx="214" cy="200" r="7" class="fill-ink"/><circle cx="306" cy="200" r="7" class="fill-ink"/>
+    <path class="ink" d="M260 215v30l-10 8"/>
+    <path class="ink" d="M236 276c14 10 34 10 48 0"/>
+    <path class="stroke-red" d="M150 150c-8 30-6 60 4 90M370 150c8 30 6 60-4 90" stroke-width="3" stroke-dasharray="4 5"/>
+    <circle cx="140" cy="200" r="16" class="fill-skin"/><circle cx="140" cy="200" r="16" class="ink"/>
+    <circle cx="380" cy="200" r="16" class="fill-skin"/><circle cx="380" cy="200" r="16" class="ink"/>
+  </svg>`,
+  // Scanner with a speech bubble
+  scanner: `<svg viewBox="0 0 460 300" role="img" aria-label="Cartoon scanner with a speech bubble saying incidental finding">
+    <rect x="40" y="120" width="300" height="150" rx="22" class="fill-soft"/><rect x="40" y="120" width="300" height="150" rx="22" class="ink"/>
+    <circle cx="190" cy="195" r="58" class="fill-paper"/><circle cx="190" cy="195" r="58" class="ink"/>
+    <circle cx="190" cy="195" r="34" class="fill-rule"/>
+    <rect x="150" y="238" width="260" height="18" rx="9" class="fill-rule"/><rect x="150" y="238" width="260" height="18" rx="9" class="ink"/>
+    <rect x="330" y="258" width="14" height="30" class="fill-ink"/><rect x="380" y="258" width="14" height="30" class="fill-ink"/>
+    <path class="fill-paper" d="M250 30h180a14 14 0 0 1 14 14v56a14 14 0 0 1-14 14h-120l-30 26v-26h-30a14 14 0 0 1-14-14V44a14 14 0 0 1 14-14z"/>
+    <path class="ink" d="M250 30h180a14 14 0 0 1 14 14v56a14 14 0 0 1-14 14h-120l-30 26v-26h-30a14 14 0 0 1-14-14V44a14 14 0 0 1 14-14z"/>
+    <text x="342" y="64" text-anchor="middle" font-size="19" font-weight="700">Incidental</text>
+    <text x="342" y="90" text-anchor="middle" font-size="19" font-weight="700">finding</text>
+    <circle cx="214" cy="186" r="5" class="fill-red"/>
+  </svg>`,
+  // Eye with a clock
+  eyeclock: `<svg viewBox="0 0 440 300" role="img" aria-label="Cartoon eye beside a ticking clock">
+    <path class="fill-paper" d="M30 150c50-70 110-100 170-100s120 30 170 100c-50 70-110 100-170 100S80 220 30 150z"/>
+    <path class="ink" d="M30 150c50-70 110-100 170-100s120 30 170 100c-50 70-110 100-170 100S80 220 30 150z"/>
+    <circle cx="200" cy="150" r="56" class="fill-acc"/><circle cx="200" cy="150" r="26" class="fill-ink"/><circle cx="218" cy="134" r="8" class="fill-paper"/>
+    <circle cx="370" cy="70" r="52" class="fill-amber-soft"/><circle cx="370" cy="70" r="52" class="ink"/>
+    <path class="ink" d="M370 40v30l20 12"/>
+    <g class="tick" style="transform-origin:370px 70px"><path class="stroke-red" d="M370 70v-40" stroke-width="4"/></g>
+  </svg>`,
+  // Speech bubble for the safety net
+  bubble: `<svg viewBox="0 0 420 260" role="img" aria-label="Cartoon speech bubble">
+    <path class="fill-amber-soft" d="M30 20h360a14 14 0 0 1 14 14v160a14 14 0 0 1-14 14H140l-50 44v-44H30a14 14 0 0 1-14-14V34a14 14 0 0 1 14-14z"/>
+    <path class="ink" d="M30 20h360a14 14 0 0 1 14 14v160a14 14 0 0 1-14 14H140l-50 44v-44H30a14 14 0 0 1-14-14V34a14 14 0 0 1 14-14z"/>
+    <text x="210" y="78" text-anchor="middle" font-size="26" font-weight="700">Come straight back if</text>
+    <text x="210" y="118" text-anchor="middle" font-size="21">sudden severe headache</text>
+    <text x="210" y="150" text-anchor="middle" font-size="21">weakness, speech or vision change</text>
+    <text x="210" y="182" text-anchor="middle" font-size="21">fever with stiff neck or rash</text>
+  </svg>`
+};
+
+/* ============================================================
+   Slide helpers
+   ============================================================ */
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const f = (html, extra) => '<div class="f' + (extra ? " " + extra : "") + '">' + html + "</div>";
+const ul = items => "<ul>" + items.map(i => "<li>" + i + "</li>").join("") + "</ul>";
+const steps = items => '<ol class="steps">' + items.map(i => "<li><div>" + i + "</div></li>").join("") + "</ol>";
+const tag = (lvl, text) => '<span class="tag ' + lvl + '">' + text + "</span>";
+const flip = (front, back, lvl) => '<button class="flip" type="button"><span class="in"><span class="face">' +
+  (lvl ? tag(lvl, lvl === "emergency" ? "Emergency" : lvl === "sameday" ? "Same day" : "Routine") : "") + "<b>" + front + "</b><span>Tap to reveal</span></span>" +
+  '<span class="face back"><b>' + back[0] + "</b><span>" + back[1] + "</span></span></span></button>";
+const quiz = (items, labels) => '<div class="quiz">' + items.map(q =>
+  '<div class="q" data-correct="' + q.a + '"><div class="qt">' + q.t + '</div><div class="ans">' +
+  labels.map(l => '<button class="ob" type="button" data-pick="' + l + '">' + l + "</button>").join("") +
+  '</div><div class="fb">' + q.fb + "</div></div>").join("") + "</div>";
+
+/* ============================================================
+   Slides
+   ============================================================ */
+const SLIDES = [
+{
+  eyebrow: "QEHB SDEC · teaching session",
+  html: `<div class="cols art" style="margin-top:40px">
+    <div><h1>Headache in SDEC</h1><p class="lede">Find the few. Don’t scan the many.</p>
+    <p class="small" style="margin-top:28px">About 40 minutes · interactive · narrated<br>Based on the QEHB SDEC headache pathway, adapted from GIRFT</p></div>
+    <div class="art">${ART.title}</div></div>
+    <p class="hint">Arrow keys or the buttons move on. Press N for notes, V for narration.</p>`,
+  notes: "Welcome. This session is about headache in same day emergency care. Most people who come to us with headache have migraine. They need a diagnosis and a plan, not a scan. A few have something dangerous, and they need action today. The whole pathway is built around telling those two groups apart. Use the arrow keys or the buttons to move through the slides. Some slides are interactive: tap the cards and answer the questions as we go."
+},
+{
+  eyebrow: "Learning outcomes",
+  html: `<h2>By the end you will be able to</h2>
+    <div class="cols">
+      <div>${ul([
+        "take a history that separates primary from secondary headache",
+        "recognise the 8 red flag presentations and act on each",
+        "decide who needs imaging today, and who needs none",
+        "treat migraine and medication overuse without opioids",
+        "discharge safely with a plan the GP can use"
+      ])}</div>
+      <div class="panel"><p class="lbl">Internal Medicine curriculum</p>${ul([
+        "<strong>IM Clinical CiP 1</strong> — Managing an acute unselected take",
+        "<strong>IM Clinical CiP 2</strong> — Managing the acute care of patients within a medical specialty service",
+        "<strong>IM Clinical CiP 4</strong> — Managing patients in an outpatient clinic, ambulatory or community setting (including management of long term conditions)",
+        "<strong>IM Clinical CiP 7</strong> — Delivering effective resuscitation and managing the acutely deteriorating patient"
+      ]).replace(/<ul>/, '<ul style="font-size:18px">')}</div>
+    </div>`,
+  notes: "Five outcomes. A history that sorts primary from secondary headache. The 8 red flag presentations, and what to do about each one. Imaging decisions, including the decision not to image. Treating migraine and medication overuse without opioids. And a safe discharge. The session maps to 4 Internal Medicine capabilities in practice: the acute unselected take, acute care within a specialty service, ambulatory care, and the deteriorating patient."
+},
+{
+  eyebrow: "The question at every step",
+  html: `<h2>Primary or secondary?</h2>
+    <div class="cols art">
+      <div><div class="dots" aria-label="100 figures, 92 shaded and 8 outlined in red">${Array.from({ length: 100 }, (_, i) => '<i style="--i:' + i + '"' + ([7, 23, 41, 48, 66, 77, 88, 95].includes(i) ? ' class="sec"' : "") + "></i>").join("")}</div></div>
+      <div>${f("<p><strong>More than 9 in 10</strong> headaches in primary care are migraine.</p>")}
+      ${f("<p>SDEC sees a richer mix, but the job is the same: find the few with a secondary cause without scanning everyone else.</p>")}
+      ${f('<p class="small">The 8 outlined figures stand for the secondary causes. They are what the red flag screen is for.</p>')}</div>
+    </div>`,
+  notes: "Here are 100 people with headache. In primary care, more than 90 of them have migraine. In SDEC the mix is richer, because people have already been filtered towards us, but the task is identical. Every step of the pathway asks one question: is this a primary headache, which we treat and send home with a plan, or a secondary headache, which needs action today? The red flag screen exists to find the outlined figures."
+},
+{
+  eyebrow: "The pathway",
+  html: `<h2>6 stages, 1 route</h2>
+    <div class="tiles">
+      ${[["1", "Front door", "Is SDEC the right place?"], ["2", "Assessment", "History, examination, tests"], ["3", "Secondary screen", "8 red flags, then amber flags"],
+         ["4", "Medication overuse", "Check before you diagnose"], ["5", "Primary headache", "Name it, treat it, plan prevention"], ["6", "Leaving SDEC", "Safety net, GP letter, follow-up"]]
+        .map(t => f('<div class="tile"><span class="sn">Stage ' + t[0] + "</span><b>" + t[1] + "</b><span>" + t[2] + "</span></div>")).join("")}
+    </div>
+    ${f('<p style="margin-top:28px">The website follows this order. So does this session.</p>')}`,
+  notes: "The pathway runs in 6 stages. First, the front door: a quick check that SDEC is the right place at all. Second, assessment: history, examination and a small number of tests. Third, the secondary headache screen: 8 red flags, each with its own page, and then the amber flags that lower your threshold. Fourth, medication overuse, which we check before naming any primary headache. Fifth, the primary headache itself: name it, treat it, plan prevention. Sixth, leaving SDEC safely. We will take them in that order."
+},
+{
+  eyebrow: "Stage 1 · Front door",
+  html: `<h2>Is SDEC the right place?</h2>
+    <p class="small" style="margin-bottom:14px">Tap each card to see where the patient goes instead.</p>
+    <div class="flips">
+      ${flip("GCS below 15 or new confusion", ["Resus", "Not an SDEC patient. Senior review and CT."], "emergency")}
+      ${flip("NEWS2 above the SDEC threshold", ["Resus or AMU", "Use the streaming tool; headache does not override it."], "emergency")}
+      ${flip("Fever with meningism or rash", ["Resus, antibiotics now", "Cultures, then ceftriaxone. Do not wait for CT."], "emergency")}
+      ${flip("Sudden focal deficit", ["Stroke team", "Minutes-tempo deficit is a stroke call, whatever the headache."], "emergency")}
+      ${flip("Pregnant or 6 weeks postpartum", ["Obstetrics in the loop", "BP and urine protein first. Pre-eclampsia until proven otherwise."], "sameday")}
+      ${flip("Painful red eye, blurred vision", ["Emergency eye service", "Angle-closure glaucoma. Sight is at risk within hours."], "emergency")}
+    </div>
+    <p class="hint">Record the time of onset for everyone. It decides scan and lumbar puncture timing later.</p>`,
+  notes: "Before any assessment, a quick check that SDEC is the right place. Tap the cards. A reduced conscious level, a NEWS2 above our threshold, fever with meningism, and a sudden focal deficit all leave SDEC straight away, to resus or the stroke team. Two groups stay, but with a different route from the start: anyone pregnant or within 6 weeks of birth, where pre-eclampsia is the first thought, and a painful red eye with blurred vision, which goes to the emergency eye service. One habit to build now: write down the time the headache started. It matters later."
+},
+{
+  eyebrow: "Stage 2 · History",
+  html: `<h2>The most useful question: how long to the worst?</h2>
+    <div class="cols art">
+      <div><svg class="chart" viewBox="0 0 640 340" role="img" aria-label="Sketch of pain against minutes from onset: migraine builds over 30 to 60 minutes; thunderclap headache peaks within 5 minutes">
+        <line class="axis" x1="60" y1="300" x2="620" y2="300"/><line class="axis" x1="60" y1="300" x2="60" y2="30"/>
+        <text x="340" y="338" text-anchor="middle">minutes from onset</text><text x="24" y="40" transform="rotate(-90 24 40)" text-anchor="end">pain</text>
+        <text x="60" y="320" text-anchor="middle">0</text><text x="340" y="320" text-anchor="middle">30</text><text x="620" y="320" text-anchor="middle">60</text>
+        <g class="f" id="c-mig"><path class="line mig" d="M60 300C200 290 300 200 400 130S560 60 620 56"/><text x="300" y="112" style="fill:var(--accent)">migraine builds over 30 to 60 minutes</text></g>
+        <g class="f" id="c-tc"><path class="line tc" d="M60 300L78 52L620 48"/><text x="150" y="44" style="fill:var(--red)">thunderclap: peak within 5 minutes</text></g>
+        <g class="f" id="c-th"><line class="thresh" x1="107" y1="300" x2="107" y2="30"/><text x="112" y="290" style="fill:var(--red)">5 min</text></g>
+      </svg></div>
+      <div>
+        ${f("<p><strong>“When it started, how long did it take to get to its worst?”</strong></p>")}
+        ${f("<p>Seconds to a few minutes: thunderclap. Subarachnoid haemorrhage until excluded.</p>")}
+        ${f("<p>Then the pattern: headache days a month, clear days, any recent change, and acute medicine days a month.</p>")}
+        ${f('<p class="small">Character (throbbing, pressing) rarely helps. Tempo does.</p>')}
+      </div>
+    </div>`,
+  notes: "If you ask one question well, ask this one: when the headache started, how long did it take to reach its worst? A migraine builds over 30 to 60 minutes. A thunderclap headache goes from nothing to its peak within 5 minutes, often within seconds, and that is subarachnoid haemorrhage until it is excluded. Then the pattern: how many headache days a month, whether there are completely clear days, whether anything has changed recently, and how many days a month the person takes something for it. The quality of the pain, throbbing or pressing, is rarely useful. Tempo is."
+},
+{
+  eyebrow: "Stage 2 · History",
+  html: `<h2>Ask everyone in SDEC</h2>
+    <div class="cols art">
+      <div>
+        <div class="cols" style="gap:28px">
+          <div>${f("<h3>Raises the risk</h3>" + ul(["50 or over with a new headache", "cancer, immunosuppression", "anticoagulants or bleeding tendency", "pregnant or 6 weeks postpartum", "recent LP, epidural or spinal surgery", "head or neck injury within 1 month"]))}</div>
+          <div>${f("<h3>Changes the diagnosis</h3>" + ul(["strictly one-sided with a watering eye: cluster", "aura: gradual, spreading, under 60 minutes", "worse upright, or worse lying flat", "brought on by coughing or straining", "others at home unwell: carbon monoxide"]))}</div>
+        </div>
+        ${f('<p class="panel caution" style="margin-top:18px;font-size:20px"><strong>And always: why today?</strong> A long-standing headache that brings someone to hospital has usually changed, or something has frightened them. Find out which.</p>')}
+      </div>
+      <div class="art" style="max-width:260px;justify-self:center">${ART.clinician}</div>
+    </div>`,
+  notes: "Two short lists to run through with everyone. The first raises the chance of a secondary cause: age 50 or over with a new headache, cancer, immunosuppression, anticoagulants, pregnancy or the 6 weeks after birth, a recent lumbar puncture or epidural, and head or neck injury in the past month. The second changes the diagnosis: a strictly one-sided headache with a watering eye points to cluster headache, a postural headache points to pressure problems, and a household where other people are unwell should make you think of carbon monoxide. And one question for every long-standing headache: why today?"
+},
+{
+  eyebrow: "Stage 2 · Examination",
+  html: `<h2>Examine with purpose</h2>
+    <div class="hotwrap">
+      <div class="art" style="position:relative">${ART.face}
+        <button class="hot" type="button" style="left:192px;top:178px" data-hot="0" aria-label="Fundi">1</button>
+        <button class="hot" type="button" style="left:284px;top:178px" data-hot="1" aria-label="Eyes">2</button>
+        <button class="hot" type="button" style="left:128px;top:168px" data-hot="2" aria-label="Temporal arteries">3</button>
+        <button class="hot" type="button" style="left:238px;top:328px" data-hot="3" aria-label="Neck">4</button>
+        <button class="hot" type="button" style="left:418px;top:38px" data-hot="4" aria-label="Observations">5</button>
+      </div>
+      <div class="hotpanel panel"><h3>Tap a number</h3><p>5 things to check in every headache. Papilloedema is the one people miss because they never looked.</p></div>
+    </div>`,
+  hots: [
+    ["1 · Fundi", "Papilloedema and hypertensive retinopathy. If you cannot get a view and raised pressure is possible, do not discharge until someone has. Ask a senior or the eye service."],
+    ["2 · Eyes", "Acuity in each eye, pupils, visual fields to confrontation, eye movements. A third nerve palsy with a dilated pupil is an aneurysm until proven otherwise. Horner syndrome with neck pain is a dissection."],
+    ["3 · Temporal arteries", "In anyone 50 or over: tenderness, thickening, nodules or a weak pulse. The headache of GCA is often not over the temple."],
+    ["4 · Neck", "Nuchal rigidity means meningism. Ordinary neck stiffness is common in migraine and does not make the headache cervicogenic."],
+    ["5 · Observations", "Blood pressure, repeated if high. Temperature, NEWS2, GCS. Weight if idiopathic intracranial hypertension is possible. If speech or thinking has changed, ask for as many animals as they can name in 1 minute: fewer than 17 is abnormal. The pathway website has a guide to papilloedema on a fundal photo."]
+  ],
+  notes: "Let the history guide the rest, but these 5 are for everyone. Tap each number. The fundi, because papilloedema is missed when nobody looks. The eyes: acuity, pupils, fields and movements, remembering that a third nerve palsy with a big pupil is an aneurysm until proven otherwise. The temporal arteries in anyone 50 or over. The neck, where nuchal rigidity means meningism, while ordinary stiffness is just common. And the observations, including a repeated blood pressure, and a 1-minute animal naming test if speech or thinking seems off."
+},
+{
+  eyebrow: "Stage 2 · Tests",
+  html: `<h2>CT today?</h2>
+    <p class="small" style="margin-bottom:12px">Decide for each patient. Normal examination unless stated.</p>
+    ${quiz([
+      { t: "34-year-old woman, known migraine, a typical attack lasting 10 hours.", a: "No", fb: "Typical primary headache with a normal examination. No imaging; treat the attack." },
+      { t: "61-year-old man on apixaban, new severe headache since yesterday.", a: "Yes", fb: "Anticoagulated with a new severe headache: CT today." },
+      { t: "28-year-old woman, 2 weeks postpartum, new daily headache that is worse lying flat.", a: "Yes", fb: "Postpartum with pressure features: CT and CT venogram today for venous sinus thrombosis." },
+      { t: "45-year-old man, 3 months of daily pressing headache, taking co-codamol most days.", a: "No", fb: "Think medication overuse first. Scanning for reassurance finds incidental abnormalities and reassures only briefly." }
+    ], ["Yes", "No"])}`,
+  notes: "A quick exercise. For each patient, does she or he need a CT today? Take a moment on each one before you tap. The first is a typical migraine in someone who has had them before, with a normal examination: no scan. The second is anticoagulated with a new severe headache: scan today. The third is 2 weeks postpartum with a headache worse lying flat, which is a pressure feature in someone at risk of venous sinus thrombosis: CT and venogram today. The fourth has a daily headache and daily co-codamol. That is medication overuse until proven otherwise, and a scan to reassure him will not reassure him."
+},
+{
+  eyebrow: "Stage 2 · Imaging",
+  html: `<h2>Why restraint matters</h2>
+    <div class="cols art">
+      <div class="cols-3" style="grid-template-columns:1fr 1fr;align-items:start">
+        <div class="center"><div class="big" data-count="0.1" data-suffix="%" data-dec="1">0%</div><p>chance that headache alone, referred for a suspected brain tumour, finds one</p></div>
+        <div class="center"><div class="big" data-count="15" data-suffix="%">0%</div><p>of brain MRI scans show an incidental finding, more with age</p></div>
+        <div style="grid-column:1/-1">${f('<p class="panel good" style="font-size:20px"><strong>Scan</strong> for thunderclap, a new deficit, pressure features, anticoagulation, cancer or immunosuppression with a new headache. <strong>Do not scan</strong> typical migraine or tension-type headache with a normal examination.</p>')}</div>
+      </div>
+      <div class="art">${ART.scanner}</div>
+    </div>`,
+  notes: "Two numbers explain the pathway's restraint. When headache is the only symptom and someone is referred for a suspected brain tumour, the chance of finding one is about 0.1%. And about 15% of brain MRI scans show something incidental, more as people get older. Most of those findings do not matter, but each one generates anxiety and more tests, and reassurance from a normal scan does not last. So the pathway scans for specific reasons: thunderclap, a new deficit, pressure features, anticoagulation, cancer or immunosuppression with a new headache. It does not scan typical migraine with a normal examination."
+},
+{
+  eyebrow: "Stage 3 · Secondary screen",
+  html: `<h2>The 8 red flags</h2>
+    <p class="small" style="margin-bottom:12px">Tap a flag for the key action.</p>
+    <div class="flips four">
+      ${flip("Thunderclap", ["CT now", "Normal CT within 6 hours: no routine LP. After 6 hours: LP at 12 hours or more."], "emergency")}
+      ${flip("Focal deficit", ["Tempo decides", "Minutes: stroke call. Hours to days: CT today and neurology."], "emergency")}
+      ${flip("Systemic features", ["Antibiotics before CT", "Meningitis: cultures, ceftriaxone, dexamethasone. Then think GCA if 50 or over."], "emergency")}
+      ${flip("Red eye, blurred vision", ["Eye service now", "Angle-closure glaucoma. Analgesia, antiemetic, lie flat."], "emergency")}
+      ${flip("Possible GCA", ["Steroids today", "Do not wait for bloods. Visual symptoms: IV methylprednisolone and same-day ophthalmology."], "sameday")}
+      ${flip("Severe hypertension", ["Organ damage?", "Yes: hypertensive emergency. No: oral treatment, no rapid lowering."], "sameday")}
+      ${flip("Pressure features", ["CT and venogram today", "Mass, hydrocephalus or thrombosis change the team. Normal scan with papilloedema: IIH."], "sameday")}
+      ${flip("Pregnant or postpartum", ["BP and urine first", "Pre-eclampsia until proven otherwise. Obstetrics now. Imaging is not withheld."], "sameday")}
+    </div>`,
+  notes: "The screen has 8 red flags. The GIRFT pathway has 6; we added pressure features and pregnancy because they walk into SDEC. Tap each one for its key action. Four are emergencies: thunderclap, a focal deficit, systemic features and the painful red eye. Four need action the same day: possible giant cell arteritis, severe hypertension, pressure features and pregnancy. We will look closely at 2 of them, thunderclap and GCA, because the timing rules are the ones people get wrong."
+},
+{
+  eyebrow: "Stage 3 · Thunderclap",
+  html: `<h2>Thunderclap: the clock starts at onset</h2>
+    <div class="tl">
+      <div class="bar"></div><div class="fill" id="tl-fill"></div>
+      <div class="mk" style="left:4%"><i></i><b>0 h</b><span>onset, time recorded</span></div>
+      <div class="mk f" style="left:34%"><i></i><b>6 h</b><span>CT most accurate before this</span></div>
+      <div class="mk f" style="left:64%"><i></i><b>12 h</b><span>earliest lumbar puncture</span></div>
+      <div class="mk f red" style="left:94%"><i></i><b>24 h</b><span>rebleed risk highest</span></div>
+    </div>
+    <div class="cols-3">
+      ${f('<div class="panel"><p class="lbl">Normal CT within 6 hours</p><p style="font-size:19px">Reported by a radiologist: no routine LP. Senior review and think about the other causes.</p></div>')}
+      ${f('<div class="panel"><p class="lbl">Normal CT after 6 hours</p><p style="font-size:19px">LP at 12 hours or more. Spectrophotometry for xanthochromia. Protect the sample from light.</p></div>')}
+      ${f('<div class="panel stop"><p class="lbl">Blood on CT</p><p style="font-size:19px">CT angiography now and urgent neurosurgical discussion. Rebleeding risk peaks in the first 24 hours.</p></div>')}
+    </div>
+    ${f('<p class="small" style="margin-top:14px">SAH excluded: RCVS, dissection, venous thrombosis, pituitary apoplexy. Discuss vascular imaging with neurology. Most thunderclap headaches are not SAH, but every one is investigated. NICE NG228.</p>')}`,
+  notes: "Thunderclap headache runs on a clock that starts at onset, which is why we record the time. A non-contrast CT is most accurate within 6 hours. If a radiologist reports a normal CT done within 6 hours, there is no routine lumbar puncture. If the CT was later than 6 hours and is normal, the lumbar puncture waits until at least 12 hours after onset, so that xanthochromia has time to appear, and the sample is protected from light. If there is blood, CT angiography follows straight away, with neurosurgery, because the risk of rebleeding is highest in the first 24 hours. And if subarachnoid haemorrhage is excluded, do not stop: reversible vasoconstriction, dissection and venous thrombosis all present this way."
+},
+{
+  eyebrow: "Stage 3 · Giant cell arteritis",
+  html: `<h2>GCA: treat on suspicion</h2>
+    <div class="cols art">
+      <div>
+        ${f("<p><strong>50 or over, new persistent headache.</strong> Ask about jaw claudication, visual symptoms and polymyalgia. Feel the temporal arteries.</p>")}
+        ${f('<div class="panel caution" style="margin-bottom:10px"><p class="lbl">No visual symptoms</p><p style="font-size:20px">Prednisolone 40mg to 60mg today. Bloods before or straight after the first dose, but do not wait for them.</p></div>')}
+        ${f('<div class="panel stop" style="margin-bottom:10px"><p class="lbl">Visual symptoms</p><p style="font-size:20px">IV methylprednisolone 500mg to 1g daily for up to 3 days, or oral prednisolone without delay. Same-day ophthalmology.</p></div>')}
+        ${f('<p class="small">Fast-track referral: same working day where possible, always within 3 working days. Normal CRP and ESR do not exclude GCA. BSR guideline 2020.</p>')}
+      </div>
+      <div class="art">${ART.eyeclock}</div>
+    </div>`,
+  notes: "Giant cell arteritis is the red flag where waiting costs sight. Anyone 50 or over with a new persistent headache: ask about jaw pain on chewing, visual symptoms and shoulder or hip girdle stiffness, and feel the temporal arteries. If you suspect it, treat. Take the bloods before or straight after the first dose, but do not wait for them, and remember that a normal CRP and ESR do not exclude the diagnosis. Without visual symptoms, prednisolone 40 to 60 milligrams today. With any visual symptom, intravenous methylprednisolone and same-day ophthalmology. Then the fast-track service, ideally the same working day."
+},
+{
+  eyebrow: "Stage 3 · Amber flags",
+  html: `<h2>Amber flags lower your threshold</h2>
+    <div class="cols">
+      <div>${ul([
+        "50 or over, no previous primary headache",
+        "active or recent cancer",
+        "immunosuppression, or HIV with CD4 below 200",
+        "anticoagulation or bleeding tendency",
+        "head injury within 1 month"
+      ].map(i => f(i)))}</div>
+      <div>${ul([
+        "postural, or triggered by coughing or straining",
+        "aura over 1 hour, or weakness for the first time",
+        "progressive over weeks, or daily from onset",
+        "repeated attendance with worsening headache"
+      ].map(i => f(i)))}
+      ${f('<div class="panel caution" style="margin-top:14px"><p class="lbl">Any one</p><p style="font-size:20px">Senior review before you diagnose a primary headache, and a lower threshold for imaging.</p></div>')}</div>
+    </div>`,
+  notes: "Amber flags do not send anyone down a branch, but they change the odds. A new headache at 50 or over in someone who has never had migraine. Cancer, immunosuppression, anticoagulation. A head injury in the past month. A headache that changes with posture or comes on with straining. An aura that lasts more than an hour, or weakness for the first time. A headache that has grown over weeks, or has been daily from the start. And repeated attendances with a worsening headache, where medication overuse is the usual answer but not the only one. Any single amber flag means a senior review before you call it primary."
+},
+{
+  eyebrow: "Stage 4 · Medication overuse",
+  html: `<h2>Medication overuse headache?</h2>
+    <p class="small" style="margin-bottom:12px">ICHD-3: 15 or more headache days a month, for more than 3 months, with simple analgesics on 15 or more days, or triptans, opioids, ergots or combinations on 10 or more days.</p>
+    ${quiz([
+      { t: "20 headache days a month. Ibuprofen on 16 days. 5 months.", a: "Overuse", fb: "Simple analgesics on 15 or more days: medication overuse headache." },
+      { t: "18 headache days a month. Sumatriptan on 12 days. 4 months.", a: "Overuse", fb: "Triptans on 10 or more days: medication overuse headache. The threshold is lower for triptans, opioids and combinations." },
+      { t: "10 headache days a month. Paracetamol on 10 days. 6 months.", a: "Not overuse", fb: "Fewer than 15 headache days: not medication overuse headache. But she is at the 10-day limit, so advise 2 days a week or fewer." }
+    ], ["Overuse", "Not overuse"])}
+    ${f('<div class="panel" style="margin-top:12px"><p class="lbl">Manage</p><p style="font-size:19px">Stop the overused medicines abruptly for at least 1 month (gradually for high-dose opioids). Warn of a worse fortnight. Start prevention now. GP review at 4 to 8 weeks. Target: acute medicines on 2 days a week or fewer.</p></div>')}`,
+  notes: "Before you name a primary headache, check for medication overuse. The criteria: 15 or more headache days a month for more than 3 months, with simple painkillers on 15 or more days, or triptans, opioids, ergots or combination products on 10 or more days. Three patients; decide for each. The first, ibuprofen on 16 days, meets it. The second, sumatriptan on 12 days, meets it too, because the threshold is lower for triptans. The third has only 10 headache days, so not yet, but she is at the limit. Management is withdrawal: stop abruptly for at least a month, warn that the first fortnight is worse, start prevention at the same time, and ask the GP to review."
+},
+{
+  eyebrow: "Stage 5 · Primary headache",
+  html: `<h2>Which headache is it?</h2>
+    ${quiz([
+      { t: "27-year-old woman. One-sided throbbing headache for 8 hours, nausea, light hurts, lying in a dark room.", a: "Migraine", fb: "Moderate to severe, 4 to 72 hours, nausea and photophobia, keeps still: migraine. 2 of 3 on the ID Migraine screen is enough." },
+      { t: "42-year-old man. 45-minute attacks around the right eye, 3 a day for 2 weeks, right eye watering, pacing the room.", a: "Cluster", fb: "Strictly one-sided, 15 to 180 minutes, same-side autonomic features, restless: cluster. Refer every new diagnosis." },
+      { t: "35-year-old woman. Bilateral pressing headache, mild, no nausea, carried on working.", a: "Tension-type", fb: "Bilateral, mild to moderate, no associated features, carries on: tension-type. It rarely brings people to hospital, so ask why today." }
+    ], ["Migraine", "Tension-type", "Cluster"])}
+    ${f('<p class="small" style="margin-top:12px">Episodic headache that stops daily life is usually migraine. Chronic tension-type headache is uncommon: think overuse and chronic migraine first.</p>')}`,
+  notes: "Red flags and overuse excluded, name the headache. Three patients. The first has a one-sided throbbing headache with nausea and light sensitivity and wants to lie still: migraine. The second has short attacks around one eye, several a day, with a watering eye, and paces: cluster headache, which we refer in every new case. The third has a mild bilateral pressing headache and carried on working: tension-type. Two patterns to hold on to: an episodic headache that stops normal life is usually migraine, and chronic tension-type headache is rare, so look for overuse or chronic migraine before you call it that."
+},
+{
+  eyebrow: "Stage 5 · Treatment",
+  html: `<h2>Treat early. No opioids. 2 days a week.</h2>
+    <div class="cols art">
+      <div>${ul([
+        "NSAID (aspirin 900mg, ibuprofen 400mg to 600mg or naproxen 500mg), with a triptan and an antiemetic, at the start of the pain",
+        "triptan by injection or nasal spray if vomiting. Not with uncontrolled hypertension, ischaemic heart disease, stroke or peripheral vascular disease",
+        "no opioids, no co-codamol: they feed overuse and do not work",
+        "prevention if 4 or more headache days a month: amitriptyline, candesartan, propranolol or topiramate, titrated over 8 weeks",
+        "migraine with aura: no oestrogen-containing contraception"
+      ].map(i => f(i)))}</div>
+      <div>${f('<div class="cal" aria-label="4-week calendar with 2 treatment days highlighted each week">' +
+        ["M", "T", "W", "T", "F", "S", "S"].map(d => '<i class="dow">' + d + "</i>").join("") +
+        Array.from({ length: 28 }, (_, i) => '<i class="' + ([1, 4, 9, 12, 16, 19, 23, 26].includes(i) ? "rx f" : "") + '" style="transition-delay:' + (i * 30) + 'ms">' + (i + 1) + "</i>").join("") + "</div>" +
+        '<p class="small" style="margin-top:10px">Acute medicines on 2 days a week or fewer. Below that line, overuse cannot start.</p>')}</div>
+    </div>`,
+  notes: "Treatment has 3 rules. Treat early: an NSAID, a triptan and an antiemetic together at the start of the pain, by injection or nasal spray if the person is vomiting, and remembering the triptan contraindications. No opioids: they do not work for migraine and they feed overuse. And 2 days a week: acute medicines on 2 days a week or fewer, which is the line below which medication overuse cannot start. Watch the calendar. Two days in each week, and never more. If someone needs more than that, the answer is prevention, not more painkillers, and migraine with aura rules out oestrogen-containing contraception."
+},
+{
+  eyebrow: "Stage 6 · Leaving SDEC",
+  html: `<h2>Discharge is part of treatment</h2>
+    <div class="cols art">
+      <div>${f("<h3>Before they leave</h3>" + ul(["red and amber flags documented", "fundi documented, normal or explained", "diagnosis explained in plain words", "acute plan with the 2-days-a-week limit", "safety-net advice in writing", "GP letter: diagnosis, flags excluded, prevention and how to titrate, contraception advice, referrals"]))}
+      ${f('<p class="small">The pathway has a checklist and a “copy route for the notes” button that records the branches you reviewed.</p>')}</div>
+      <div class="art">${ART.bubble}${f('<p class="small" style="margin-top:8px">Plus, if 50 or over: jaw claudication, scalp tenderness or any change in vision means see the GP today, or come back if vision is lost.</p>')}</div>
+    </div>`,
+  notes: "Discharge is part of the treatment, not an afterthought. Before someone leaves: the red and amber flags are documented, the fundi are documented as normal or the gap is explained, the diagnosis has been explained in plain words, the acute plan carries the 2-days-a-week limit, and the safety-net advice is written down. The GP letter should let the practice carry on without guessing: diagnosis, what was excluded, which preventive to start and how to increase it, contraception advice if there is aura, and any referrals. The website has a checklist for this, and a button that copies the route you took into the notes."
+},
+{
+  eyebrow: "Putting it together",
+  html: `<h2>Mrs K, 58</h2>
+    <p class="small" style="margin-bottom:12px">3 weeks of a new headache, worse in the mornings. Tired. Her jaw aches when she eats toast. Tap your choice at each step.</p>
+    <div class="case" id="case">
+      <div class="step" data-i="0"><div class="st">First thought?</div><div class="opts">
+        <button class="ob" type="button" data-ok="0">Migraine</button><button class="ob" type="button" data-ok="1">Giant cell arteritis</button><button class="ob" type="button" data-ok="0">Tension-type</button></div>
+        <div class="fb" data-r="New persistent headache at 58 with jaw claudication: GCA until proven otherwise. Feel the temporal arteries, check vision." data-w="New persistent headache at 58 with jaw claudication is GCA until proven otherwise. Migraine does not start like this at 58."></div></div>
+      <div class="step" data-i="1" hidden><div class="st">Bloods sent. CRP is back: normal. ESR pending. Now?</div><div class="opts">
+        <button class="ob" type="button" data-ok="0">Reassure and discharge</button><button class="ob" type="button" data-ok="1">Start prednisolone now</button><button class="ob" type="button" data-ok="0">Wait for the ESR</button></div>
+        <div class="fb" data-r="Treat on suspicion. A normal CRP does not exclude GCA. Prednisolone 40mg to 60mg today, and fast-track referral." data-w="A normal CRP does not exclude GCA, and waiting risks her sight. Start prednisolone now and refer."></div></div>
+      <div class="step" data-i="2" hidden><div class="st">She mentions that her right eye went blurred for 10 minutes this morning. Now?</div><div class="opts">
+        <button class="ob" type="button" data-ok="0">Oral prednisolone, routine eye clinic</button><button class="ob" type="button" data-ok="1">IV methylprednisolone, same-day ophthalmology</button><button class="ob" type="button" data-ok="0">CT head first</button></div>
+        <div class="fb" data-r="Amaurosis fugax is a visual symptom. IV methylprednisolone 500mg to 1g daily for up to 3 days, and the eye service today. If IV is not available at once, oral prednisolone without delay." data-w="Transient visual loss is a visual symptom: IV methylprednisolone and the eye service today. A CT does not help here and delays treatment."></div></div>
+      <div class="step" data-i="3" hidden><div class="st">Specialist review should happen within?</div><div class="opts">
+        <button class="ob" type="button" data-ok="0">2 weeks</button><button class="ob" type="button" data-ok="1">3 working days, ideally the same day</button><button class="ob" type="button" data-ok="0">Next available clinic</button></div>
+        <div class="fb" data-r="BSR: same working day where possible, always within 3 working days. Book ultrasound or biopsy promptly, as sensitivity falls after a few days of steroids." data-w="BSR: same working day where possible, and always within 3 working days."></div></div>
+    </div>`,
+  notes: "Let us run a case through the pathway. Mrs K is 58, with 3 weeks of a new headache, worse in the mornings, tired, and her jaw aches when she eats toast. Decide at each step before you tap. Jaw claudication at 58 with a new headache is giant cell arteritis until proven otherwise. When her CRP comes back normal, that does not exclude it, so she gets prednisolone now, not after the ESR. When she mentions 10 minutes of blurred vision this morning, that is a visual symptom, and the treatment changes to intravenous methylprednisolone with the eye service today. And the fast-track review is the same working day if possible, always within 3."
+},
+{
+  eyebrow: "Summary",
+  html: `<h2>6 principles</h2>
+    <div class="cols">
+      <div>${ul([
+        "<strong>Primary or secondary</strong> is the question at every step",
+        "<strong>Time to peak</strong> is the most useful question. Record the onset time",
+        "<strong>Look at the fundi.</strong> If you cannot, find someone who can"
+      ].map(i => f(i)))}</div>
+      <div>${ul([
+        "<strong>Scan for a reason,</strong> never for reassurance",
+        "<strong>Treat GCA on suspicion;</strong> do not wait for bloods",
+        "<strong>No opioids, 2 days a week,</strong> and a letter the GP can act on"
+      ].map(i => f(i)))}</div>
+    </div>
+    ${f('<div class="panel" style="margin-top:28px"><p class="lbl">The pathway</p><p style="font-size:20px"><a href="#start">Open the pathway from the start</a>. It has the doses, the contacts and the discharge checklist, and works on any phone.</p></div>')}
+    <p class="hint">Feedback on the pathway or this session goes to the SDEC clinical lead.</p>`,
+  notes: "Six principles to take back to the floor. Primary or secondary is the question at every step. Time to peak is the most useful question, and the onset time is worth writing down. Look at the fundi, and if you cannot, find someone who can. Scan for a reason, never for reassurance. Treat giant cell arteritis on suspicion, without waiting for bloods. And no opioids, 2 days a week, with a letter the GP can act on. The pathway itself lives on the website, with the doses, the contacts and the discharge checklist. Thank you."
+}
+];
+
+/* ============================================================
+   Additional slides, inserted after the slide whose heading matches
+   ============================================================ */
+const FUNDUS = {
+  normal: `<svg viewBox="0 0 320 340" role="img" aria-label="Drawing of a normal optic disc: crisp margin, visible cup, vessels clear as they cross the margin">
+    <defs><radialGradient id="dfgA" cx="50%" cy="50%" r="60%"><stop offset="0" stop-color="#D9743F"/><stop offset="1" stop-color="#A9472A"/></radialGradient></defs>
+    <circle cx="160" cy="160" r="152" fill="url(#dfgA)"/><circle cx="100" cy="162" r="24" fill="#9E3E24" opacity=".8"/><circle cx="100" cy="162" r="5" fill="#7E2C18"/>
+    <ellipse cx="218" cy="160" rx="30" ry="34" fill="#F1C58A" stroke="#D99A5A" stroke-width="1.5"/><ellipse cx="222" cy="160" rx="11" ry="13" fill="#F8E6C2"/>
+    <g fill="none" stroke="#6F1D1D" stroke-width="3.6" stroke-linecap="round"><path d="M216 148C212 122 188 98 140 86S70 82 40 96"/><path d="M216 172C212 198 188 222 140 234S70 238 40 224"/><path d="M226 150C240 136 258 128 282 120"/><path d="M226 170C240 184 258 192 282 200"/></g>
+    <g fill="none" stroke="#C94A33" stroke-width="2.4" stroke-linecap="round"><path d="M220 146C220 118 196 92 150 78S86 70 52 80"/><path d="M220 174C220 202 196 228 150 242S86 250 52 240"/><path d="M228 154C244 144 262 140 286 136"/><path d="M228 166C244 176 262 180 286 184"/></g>
+    <text x="40" y="332" style="font:500 13px var(--mono);fill:var(--ink-2)">temporal · macula</text><text x="232" y="332" style="font:500 13px var(--mono);fill:var(--ink-2)">nasal · disc</text></svg>`,
+  swollen: `<svg viewBox="0 0 320 340" role="img" aria-label="Drawing of papilloedema: blurred raised margin with a halo, hyperaemic disc without a cup, vessels obscured at the margin, engorged veins, flame haemorrhages and concentric folds on the temporal side">
+    <defs><radialGradient id="dfgB" cx="50%" cy="50%" r="60%"><stop offset="0" stop-color="#D9743F"/><stop offset="1" stop-color="#A9472A"/></radialGradient>
+      <filter id="dbl4" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="4"/></filter><filter id="dbl2" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.6"/></filter></defs>
+    <circle cx="160" cy="160" r="152" fill="url(#dfgB)"/><circle cx="100" cy="162" r="24" fill="#9E3E24" opacity=".8"/><circle cx="100" cy="162" r="5" fill="#7E2C18"/>
+    <g fill="none" stroke="#8F3620" stroke-width="1.4" opacity=".75"><path d="M168 120C158 140 158 180 168 200"/><path d="M160 112C148 138 148 182 160 208"/><path d="M152 106C138 136 138 184 152 214"/></g>
+    <path filter="url(#dbl4)" fill="#E9B88E" opacity=".9" d="M218 108C240 106 262 118 268 140 274 160 270 190 256 206 242 222 214 222 196 210 178 198 170 176 172 154 174 130 194 110 218 108Z"/>
+    <ellipse cx="218" cy="160" rx="36" ry="40" fill="#E58C66" filter="url(#dbl2)"/><ellipse cx="218" cy="160" rx="28" ry="32" fill="#E07A58" opacity=".7" filter="url(#dbl2)"/>
+    <g fill="none" stroke="#5E1616" stroke-width="4.8" stroke-linecap="round"><path d="M216 148C214 130 206 118 190 104 176 92 150 92 130 84S70 82 40 96"/><path d="M216 172C214 190 206 202 190 216 176 228 150 228 130 236S70 238 40 224"/><path d="M226 150C238 140 250 134 260 128 268 124 276 122 284 118"/><path d="M226 170C238 180 250 186 260 192 268 196 276 198 284 202"/></g>
+    <g fill="none" stroke="#C94A33" stroke-width="2.6" stroke-linecap="round"><path d="M220 146C220 118 196 92 150 78S86 70 52 80"/><path d="M220 174C220 202 196 228 150 242S86 250 52 240"/><path d="M228 154C244 144 262 140 286 136"/><path d="M228 166C244 176 262 180 286 184"/></g>
+    <ellipse cx="218" cy="160" rx="38" ry="42" fill="none" stroke="#E8AA82" stroke-width="12" opacity=".85" filter="url(#dbl4)"/>
+    <g stroke="#7E1414" stroke-width="2.6" stroke-linecap="round"><path d="M196 118l-12-10"/><path d="M252 124l12-9"/><path d="M262 178l12 8"/><path d="M190 196l-12 10"/><path d="M240 206l6 14"/></g>
+    <ellipse cx="248" cy="214" rx="9" ry="6" fill="#F6F0E4" opacity=".9" filter="url(#dbl2)"/>
+    <text x="40" y="332" style="font:500 13px var(--mono);fill:var(--ink-2)">temporal · macula</text><text x="232" y="332" style="font:500 13px var(--mono);fill:var(--ink-2)">nasal · disc</text></svg>`
+};
+const EXTRA = [
+["Examine with purpose", {
+  eyebrow: "Stage 2 · Examination",
+  html: `<h2>Papilloedema on a fundal photo</h2>
+    <div class="hotwrap" style="grid-template-columns:770px 1fr">
+      <div style="display:flex;gap:24px;align-items:flex-start">
+        <div class="art" style="width:370px"><div>${FUNDUS.normal}</div><p class="small center" style="margin-top:4px">Normal</p></div>
+        <div class="art" style="width:370px;position:relative"><div>${FUNDUS.swollen}</div><p class="small center" style="margin-top:4px">Papilloedema, Frisén grade 3</p>
+          <button class="hot sm" type="button" style="left:275px;top:111px" data-hot="0" aria-label="Blurred raised margin">1</button>
+          <button class="hot sm" type="button" style="left:236px;top:169px" data-hot="1" aria-label="Hyperaemic disc">2</button>
+          <button class="hot sm" type="button" style="left:194px;top:146px" data-hot="2" aria-label="Vessels obscured">3</button>
+          <button class="hot sm" type="button" style="left:146px;top:86px" data-hot="3" aria-label="Engorged veins">4</button>
+          <button class="hot sm" type="button" style="left:303px;top:211px" data-hot="4" aria-label="Haemorrhages">5</button>
+          <button class="hot sm" type="button" style="left:157px;top:169px" data-hot="5" aria-label="Paton’s lines">6</button>
+        </div>
+      </div>
+      <div class="hotpanel panel"><h3>Tap a number</h3><p>Both eyes, always. A photo flattens elevation and cannot show venous pulsation, so when the margin is in doubt, ask for OCT the same day rather than discharging on “probably normal”.</p></div>
+    </div>`,
+  hots: [
+    ["1 · Blurred, raised margin", "Nerve fibre layer oedema makes a feathery halo. It starts at the poles and the nasal side; the temporal margin goes last. A C-shaped halo sparing the temporal side is Frisén grade 1."],
+    ["2 · Hyperaemic disc, cup gone", "The disc turns pink or red and the central cup fills in as the nerve head swells."],
+    ["3 · Vessels obscured at the margin", "Swollen nerve fibres bury the vessels where they cross the edge. Obscuring a segment of a major vessel is the step to grade 3, and grades 3 and above are unmistakable."],
+    ["4 · Engorged, tortuous veins", "Venous congestion from raised pressure. The arteries stay thin, which is the comparison to make."],
+    ["5 · Haemorrhages and cotton wool spots", "Flame haemorrhages radiate from the margin; cotton wool spots are fluffy white infarcts of the nerve fibre layer. Both mean established or rapidly rising pressure. If they are the main feature, check the blood pressure."],
+    ["6 · Paton’s lines", "Concentric retinal folds on the temporal side, pushed up by the swollen disc."]
+  ],
+  notes: "Here is what you are looking for on a fundal photo. Tap the numbers on the swollen disc. The margin blurs and lifts, starting at the poles and the nasal side, with a feathery halo. The disc goes red and the cup disappears. Vessels vanish into the swollen nerve fibres where they cross the edge, which is the sign that makes grade 3 unmistakable. The veins are fat and tortuous while the arteries stay thin. Flame haemorrhages and cotton wool spots mean the pressure is high or rising fast, and if they dominate, check the blood pressure. The curved folds on the temporal side are Paton's lines. Two cautions: a photo flattens elevation and cannot show venous pulsation, so in doubt, get OCT the same day. And photograph both eyes, because papilloedema is bilateral."
+}],
+["The 8 red flags", {
+  eyebrow: "Stage 3 · Meningitis and encephalitis",
+  html: `<h2>Antibiotics first, scan second</h2>
+    <div class="cols">
+      <div>${f('<div class="panel stop"><p class="lbl">Within 1 hour of arrival</p>' + ul(["blood cultures, then IV ceftriaxone 2g", "add amoxicillin 2g 4-hourly if 60 or over, pregnant or immunocompromised", "dexamethasone 10mg IV with or just before the antibiotic", "aciclovir 10mg/kg only if herpes simplex encephalitis is strongly suspected: fever with confusion, seizures or focal signs"]).replace("<ul>", '<ul style="font-size:19px">') + "</div>")}
+      ${f('<p class="small" style="margin-top:10px">NICE NG240 (2024): lumbar puncture before antibiotics only when it causes no delay. Never let a CT delay the first dose.</p>')}</div>
+      <div>${f("<h3>CT before the lumbar puncture if</h3>" + ul(["new focal signs, seizures or posturing", "abnormal pupils", "GCS 9 or below, or falling fast", "and no LP at all with spreading purpura, infection at the site or uncorrected bleeding risk"]).replace("<ul>", '<ul style="font-size:20px">'))}
+      ${f("<h3>Send</h3><p style=\"font-size:19px\">Cells and differential, protein, glucose with a paired blood glucose, Gram stain, culture, PCR. Keep the spare sample.</p>")}</div>
+    </div>`,
+  notes: "Meningitis is the systemic-features branch where minutes matter. Antibiotics go in within an hour of arrival: blood cultures, then ceftriaxone, with amoxicillin added for anyone at risk of Listeria, which means 60 or over, pregnant or immunocompromised. Dexamethasone goes with or just before the first dose. Aciclovir is not routine; add it when herpes simplex encephalitis is strongly suspected, which is fever with confusion, seizures or focal signs. The 2024 NICE guideline is clear that the lumbar puncture only comes before antibiotics when it causes no delay, and that a CT scan must never delay the first dose. Scan before the lumbar puncture only for raised pressure features: new focal signs, abnormal pupils, or a GCS of 9 or below."
+}],
+["Thunderclap: the clock starts at onset", {
+  eyebrow: "Stage 3 · Thunderclap",
+  html: `<h2>Mr T, 41</h2>
+    <p class="small" style="margin-bottom:12px">Sudden headache while lifting weights at 07:30, worst within a minute, now easing. Normal examination. It is 14:45. Decide at each step.</p>
+    <div class="case">
+      <div class="step" data-i="0"><div class="st">His CT head, done at 14:00, is reported normal by a radiologist. Next?</div><div class="opts">
+        <button class="ob" type="button" data-ok="0">Discharge: normal CT excludes SAH</button><button class="ob" type="button" data-ok="1">Lumbar puncture at or after 19:30</button><button class="ob" type="button" data-ok="0">Lumbar puncture now</button></div>
+        <div class="fb" data-r="The CT was 6 and a half hours after onset, so a normal result does not exclude SAH. The LP waits until 12 hours after onset, 19:30, so that xanthochromia has time to form." data-w="The CT was more than 6 hours after onset, so it cannot exclude SAH on its own, and an LP before 12 hours can miss xanthochromia. LP at or after 19:30."></div></div>
+      <div class="step" data-i="1" hidden><div class="st">Spectrophotometry: no xanthochromia. He wants to go home. What else before he does?</div><div class="opts">
+        <button class="ob" type="button" data-ok="0">Nothing: SAH excluded, discharge</button><button class="ob" type="button" data-ok="1">Discuss vascular imaging with neurology</button><button class="ob" type="button" data-ok="0">Start a triptan for exertional migraine</button></div>
+        <div class="fb" data-r="SAH is excluded, but reversible cerebral vasoconstriction syndrome, dissection and venous thrombosis all present as thunderclap after exertion. Discuss CT angiography or MRI with neurology, and no triptans or other vasoconstrictors until that is done." data-w="Excluding SAH is not the end. Exertional thunderclap is typical of reversible cerebral vasoconstriction syndrome, where triptans are harmful. Discuss vascular imaging with neurology first."></div></div>
+    </div>`,
+  notes: "A second case, because the thunderclap timings are the ones that catch people out. Mr T is 41. The headache hit while he was lifting weights at half past 7 this morning and peaked within a minute. His CT at 2 o'clock is normal. Decide before you tap. The scan was 6 and a half hours after onset, so a normal result cannot exclude a bleed, and the lumbar puncture has to wait until 12 hours after onset, half past 7 this evening, for xanthochromia to appear. When the spectrophotometry is clear, the bleed is excluded, but the job is not done: a thunderclap on exertion is the classic story for reversible cerebral vasoconstriction syndrome, and dissection and venous thrombosis present this way too. So vascular imaging through neurology, and no triptans until then."
+}],
+["GCA: treat on suspicion", {
+  eyebrow: "Stage 3 · Pressure",
+  html: `<h2>Too much pressure, too little</h2>
+    <div class="cols">
+      <div>${f('<div class="panel"><p class="lbl">Raised: idiopathic intracranial hypertension and its mimics</p>' + ul(["worse lying flat or on waking, with coughing or straining", "visual obscurations on standing, pulsatile tinnitus, sixth nerve palsy", "papilloedema", "<strong>CT and CT venogram today.</strong> Mass or hydrocephalus: neurosurgery. Venous thrombosis: anticoagulate via neurology or stroke", "normal scan with papilloedema: IIH. Ophthalmology for fields, neurology, LP with opening pressure after imaging (over 25cmH2O)", "ask about tetracyclines, retinoids, vitamin A, lithium, steroid withdrawal"]).replace("<ul>", '<ul style="font-size:18px">') + "</div>")}</div>
+      <div>${f('<div class="panel"><p class="lbl">Low: CSF leak</p>' + ul(["comes on within minutes of standing, eases lying down", "tinnitus, muffled hearing, neck pain", "after a lumbar puncture, epidural or spinal surgery: anaesthetics for an epidural blood patch", "spontaneous: MRI brain with contrast (pachymeningeal enhancement, brain sag) and neurology", "fluids, simple analgesia and caffeine help in the meantime"]).replace("<ul>", '<ul style="font-size:18px">') + "</div>")}
+      ${f('<p class="small" style="margin-top:10px">Rapidly failing vision with papilloedema is fulminant IIH: same-day neurosurgery and ophthalmology.</p>')}</div>
+    </div>`,
+  notes: "Pressure problems come in two directions. Raised pressure gives a headache that is worse lying flat or on waking, worse with straining, with brief greying of vision on standing, pulsatile tinnitus, sometimes double vision from a sixth nerve palsy, and papilloedema. Everyone in this group gets a CT and a CT venogram today. A mass or hydrocephalus goes to neurosurgery; venous thrombosis is anticoagulated through neurology or the stroke team; and a normal scan with papilloedema is idiopathic intracranial hypertension, which needs ophthalmology for visual fields and a lumbar puncture with an opening pressure once imaging is done. Low pressure is the mirror image: a headache that arrives within minutes of standing and settles lying down, usually after a lumbar puncture or an epidural. Anaesthetics can offer a blood patch. The spontaneous form needs MRI with contrast."
+}],
+["Too much pressure, too little", {
+  eyebrow: "Stage 3 · Pregnancy and postpartum",
+  html: `<h2>Pregnant, or 6 weeks after birth</h2>
+    <div class="cols art">
+      <div>${steps([
+        "Blood pressure and urine protein before anything else.",
+        "140/90mmHg or higher after 20 weeks or after birth, or new proteinuria: pre-eclampsia until proven otherwise. 160/110mmHg or higher is severe: treat now and call obstetrics.",
+        "Think venous sinus thrombosis, PRES, reversible vasoconstriction, bleeding, pituitary apoplexy and post-dural puncture headache before you think migraine.",
+        "Image if imaging is needed. CT and CT venogram give the baby a very low dose; MRI without contrast is the alternative.",
+        "Check every drug: paracetamol first, ibuprofen only before 20 weeks, sumatriptan if needed, metoclopramide for nausea. Never topiramate or valproate."
+      ]).replace('<ol class="steps">', '<ol class="steps" style="font-size:19px">')}</div>
+      <div class="art" style="max-width:230px;justify-self:center">${ART.clinician}</div>
+    </div>`,
+  notes: "A new or changed headache in pregnancy or in the 6 weeks after birth starts with a blood pressure and a urine dipstick, because pre-eclampsia is the diagnosis you cannot afford to miss: 140 over 90 after 20 weeks, or any new proteinuria, is pre-eclampsia until proven otherwise, and 160 over 110 is severe and gets treated now with obstetrics on the phone. The secondary causes are over-represented in this group: venous sinus thrombosis, posterior reversible encephalopathy, reversible vasoconstriction, haemorrhage, pituitary apoplexy and the post-dural puncture headache. Do not withhold imaging that is needed; the fetal dose from a CT head is tiny. And check every drug: paracetamol first, no NSAIDs after 20 weeks, sumatriptan is acceptable, and never topiramate or valproate."
+}],
+["Pregnant, or 6 weeks after birth", {
+  eyebrow: "Stage 3 · Severe hypertension",
+  html: `<h2>180/120mmHg with headache</h2>
+    <div class="cols">
+      <div>${f("<h3>First, repeat it</h3><p>After analgesia and 10 minutes of rest. Pain raises blood pressure.</p>")}
+      ${f("<h3>Then look for acute organ damage</h3>" + ul(["encephalopathy, seizure, new confusion", "visual disturbance; papilloedema or retinal haemorrhages", "chest pain, breathlessness, heart failure", "acute kidney injury, haematuria, proteinuria", "ECG changes"]))}</div>
+      <div>${f('<div class="panel stop"><p class="lbl">Organ damage</p><p style="font-size:20px">Hypertensive emergency. Monitored bed and controlled IV reduction following BIHS 2022: no more than 25% in the first hour, then towards 160/100 over the next 2 to 6 hours. The hypertensive crisis tool on the hub has the drugs.</p></div>')}
+      ${f('<div class="panel good" style="margin-top:10px"><p class="lbl">No organ damage</p><p style="font-size:20px">Not an emergency. No rapid lowering. Start or adjust oral treatment and arrange review within days, following NICE NG136.</p></div>')}
+      ${f('<p class="small" style="margin-top:10px">Pregnant or postpartum: the threshold is 140/90mmHg. Episodic headache with sweating and palpitations: think phaeochromocytoma. Ask about cocaine and amphetamines.</p>')}</div>
+    </div>`,
+  notes: "Severe hypertension with headache is a question, not a diagnosis. First repeat the blood pressure after pain relief and 10 minutes of rest, because pain raises it. Then look for acute organ damage: encephalopathy or a seizure, visual disturbance with papilloedema or retinal haemorrhages, chest pain or heart failure, acute kidney injury, ECG changes. With organ damage this is a hypertensive emergency: a monitored bed and controlled intravenous reduction, no more than a quarter in the first hour. Without organ damage it is not an emergency, and rapid lowering does harm; adjust oral treatment and review within days. Remember the lower threshold in pregnancy, and ask about cocaine."
+}],
+["180/120mmHg with headache", {
+  eyebrow: "Stage 3 · Head injury",
+  html: `<h2>Head injury: who gets a CT</h2>
+    <p class="small" style="margin-bottom:12px">NICE NG232 (2023). Tap each card.</p>
+    <div class="flips four">
+      ${flip("GCS below 13, or below 15 at 2 hours", ["CT within 1 hour", "Also: open or depressed fracture, basal skull fracture signs, seizure, focal deficit, more than 1 vomit."], "emergency")}
+      ${flip("On apixaban, bumped head, feels fine", ["CT within 8 hours", "Anticoagulant or antiplatelet (aspirin alone excepted) earns a CT even with nothing else. Within 1 hour if presenting late."], "sameday")}
+      ${flip("72, fell, brief amnesia", ["CT within 8 hours", "Loss of consciousness or amnesia plus: 65 or over, clotting disorder, dangerous mechanism, or more than 30 minutes of retrograde amnesia."], "sameday")}
+      ${flip("Anticoagulated, minor fall 3 weeks ago, now drowsy", ["Chronic subdural: CT today", "Fluctuating confusion or drowsiness weeks after a minor injury in an older or anticoagulated person."], "sameday")}
+    </div>
+    ${f('<p style="margin-top:16px">Post-traumatic headache with a normal examination behaves like the primary headache it resembles. Treat it that way, avoid overuse, and say that most settle within 3 months.</p>')}`,
+  notes: "Head injury in the past month is an amber flag with its own rules. Tap the cards. A GCS below 13, or below 15 two hours after injury, a fracture, a seizure, a focal deficit or repeated vomiting means a CT within an hour. Anyone on an anticoagulant or antiplatelet, aspirin alone excepted, gets a CT within 8 hours even with no other feature. Loss of consciousness or amnesia plus age 65 or over, a clotting disorder, a dangerous mechanism or long amnesia also means a scan. And remember the late presenter: fluctuating confusion or drowsiness weeks after a minor fall in an older or anticoagulated person is a chronic subdural until the CT says otherwise."
+}],
+["Which headache is it?", {
+  eyebrow: "Stage 5 · Trigeminal autonomic cephalalgias",
+  html: `<h2>Cluster and its cousins</h2>
+    ${f('<div class="table-wrap" style="margin:0"><table style="font-size:17px"><thead><tr><th>Headache</th><th>Attack</th><th>Frequency</th><th>Clue</th><th>Treat</th></tr></thead><tbody>' +
+      [["Cluster", "15 to 180 minutes", "Every other day to 8 a day, in bouts", "Restless; red watering eye", "Oxygen 12 to 15 L/min; sumatriptan 6mg subcutaneous; verapamil via neurology"],
+       ["Paroxysmal hemicrania", "2 to 30 minutes", "5 to 40 a day", "Stops completely with indometacin", "Indometacin trial via neurology"],
+       ["Hemicrania continua", "Continuous, with flares", "Daily", "Indometacin-responsive", "Indometacin trial via neurology"],
+       ["SUNCT and SUNA", "Seconds", "Dozens to hundreds a day", "Triggered by touch; mimics trigeminal neuralgia", "Lamotrigine via neurology"],
+       ["Trigeminal neuralgia", "Seconds, electric", "Triggered by chewing, touch, cold", "No autonomic features", "Carbamazepine; MRI"]]
+      .map(r => "<tr>" + r.map((c, i) => (i ? "<td>" : '<th scope="row">') + c + (i ? "</td>" : "</th>")).join("") + "</tr>").join("") + "</tbody></table></div>")}
+    ${f('<p class="panel caution" style="margin-top:14px;font-size:19px"><strong>Every new trigeminal autonomic cephalalgia gets MRI brain and pituitary and a neurology referral.</strong> Pituitary tumours and vascular lesions can produce the whole picture.</p>')}`,
+  notes: "Cluster headache has cousins, and they are told apart by the clock. Cluster attacks last 15 minutes to 3 hours, up to 8 a day in bouts, with a restless patient and a red watering eye; treat with high-flow oxygen and subcutaneous sumatriptan, and refer. Paroxysmal hemicrania is shorter and more frequent, and it stops completely with indometacin, as does hemicrania continua, which is continuous with flares. SUNCT and SUNA are seconds-long stabs, dozens to hundreds a day, triggered by touch. Trigeminal neuralgia is also seconds-long and electric, but has no autonomic features. Every new trigeminal autonomic cephalalgia gets MRI of the brain and pituitary, because a pituitary tumour or a vascular lesion can produce the whole picture."
+}],
+["Treat early. No opioids. 2 days a week.", {
+  eyebrow: "Stage 5 · Migraine in SDEC",
+  html: `<h2>The attack that will not settle</h2>
+    <div class="cols">
+      <div>${f('<div class="panel caution"><p class="lbl">Before escalating</p>' + ul(["recheck the red flags and the fundi", "what has been taken in the last 24 hours?", "is this a frequent pattern? Think overuse"]).replace("<ul>", '<ul style="font-size:19px">') + "</div>")}
+      ${f("<p style=\"margin-top:14px\">Over 72 hours is status migrainosus. The plan is the same; the threshold for neurology is lower.</p>")}</div>
+      <div>${steps([
+        "IV fluids if dehydrated or vomiting.",
+        "IV metoclopramide 10mg or prochlorperazine 12.5mg, slowly. They treat the migraine, not only the nausea.",
+        "Ketorolac 30mg IM or IV if no NSAID yet.",
+        "Sumatriptan 6mg subcutaneous if none in 24 hours and no vascular contraindication.",
+        "Dexamethasone 10mg IV once, to cut recurrence after discharge.",
+        "Dark cubicle, reassess at 1 hour. Still stuck: neurology for a nerve block or admission. No opioids at any step."
+      ]).replace('<ol class="steps">', '<ol class="steps" style="font-size:18px">')}</div>
+    </div>`,
+  notes: "Some attacks do not settle with oral treatment, and some have gone on for more than 72 hours, which is status migrainosus. Before escalating, look again: recheck the red flags and the fundi, find out what has been taken in the last 24 hours, and ask whether this is a frequent pattern, because overuse is often the real diagnosis. Then the parenteral ladder: fluids, an intravenous antiemetic that also treats the migraine, ketorolac if no NSAID has been given, subcutaneous sumatriptan if none in the last day, and a single dose of dexamethasone to cut the chance of the headache coming back after discharge. A dark cubicle and an hour. If that fails, neurology for a nerve block or admission. There is no step at which opioids help."
+}],
+["The attack that will not settle", {
+  eyebrow: "Stage 5 · Prevention",
+  html: `<h2>The prevention ladder</h2>
+    <div class="cols">
+      <div>${f("<p><strong>Offer prevention</strong> with 4 or more headache days a month, poor response to acute treatment, or long severe attacks. Start low, step up every 1 to 2 weeks, and judge it only after 8 weeks at the full dose.</p>")}
+      ${f('<div class="table-wrap" style="margin:0"><table style="font-size:17px"><thead><tr><th>Medicine</th><th>Start</th><th>Target</th><th>Note</th></tr></thead><tbody>' +
+        [["Amitriptyline", "10mg at night", "30mg to 75mg", "Also helps sleep and tension-type headache"], ["Candesartan", "4mg", "16mg", "Check U&E; NICE is adding it to CG150"], ["Propranolol", "40mg", "80mg twice daily", "Not in asthma"], ["Topiramate", "25mg", "50mg twice daily", "Pregnancy Prevention Programme"]]
+        .map(r => "<tr>" + r.map((c, i) => (i ? "<td>" : '<th scope="row">') + c + (i ? "</td>" : "</th>")).join("") + "</tr>").join("") + "</tbody></table></div>")}</div>
+      <div>${f('<div class="panel"><p class="lbl">After 3 preventives have failed</p>' + ul(["atogepant 60mg daily (NICE TA973)", "rimegepant 75mg alternate days for episodic migraine (TA906)", "CGRP antibodies via the headache clinic: erenumab, fremanezumab, galcanezumab, eptinezumab", "a preventive that was not tolerated or was unsuitable counts as a failure"]).replace("<ul>", '<ul style="font-size:18px">') + "</div>")}
+      ${f('<div class="panel caution" style="margin-top:10px"><p class="lbl">Never</p><p style="font-size:19px">Valproate in anyone who could become pregnant. Topiramate without the Pregnancy Prevention Programme.</p></div>')}</div>
+    </div>`,
+  notes: "Prevention is the answer to frequent attacks, and SDEC can start it or recommend it in the letter. Offer it at 4 or more headache days a month, or when acute treatment is not working. Start low and step up every week or two, and do not judge a preventive until it has had 8 weeks at a proper dose. Amitriptyline, candesartan, propranolol and topiramate are the first rungs. After 3 have failed, or were not tolerated, the gepants and the CGRP antibodies come in, mostly through the headache clinic. Two absolute rules: no valproate in anyone who could become pregnant, and topiramate only within the Pregnancy Prevention Programme."
+}],
+["Discharge is part of treatment", {
+  eyebrow: "Putting it together",
+  html: `<h2>Red flag, or not?</h2>
+    <p class="small" style="margin-bottom:12px">Rapid round. Normal examination unless stated.</p>
+    ${quiz([
+      { t: "52, first-ever headache, 3 weeks, worse on waking, vomited twice this morning.", a: "Red flag", fb: "New headache at 50 or over, worse on waking, with vomiting: pressure features. CT and CT venogram today." },
+      { t: "24, known migraine, usual attack but with zigzag lines for 20 minutes beforehand, as before.", a: "Not a red flag", fb: "Typical, previously experienced aura under 60 minutes in an established migraineur. Treat the attack." },
+      { t: "67, migraine for 30 years, now a different headache for a fortnight and her scalp hurts when she brushes her hair.", a: "Red flag", fb: "A changed headache at 67 with scalp tenderness: GCA until proven otherwise. Bloods and prednisolone today." },
+      { t: "31, 2 weeks postpartum, headache like her usual migraine, blood pressure 128/78, no proteinuria.", a: "Not a red flag", fb: "Postpartum headache still needs the blood pressure and urine checked, which has been done. A typical migraine with normal findings can be treated, with a low threshold to return." }
+    ], ["Red flag", "Not a red flag"])}`,
+  notes: "A rapid round before the case. For each patient, red flag or not? A first headache at 52 that is worse on waking with vomiting has pressure features and gets a scan today. A 24-year-old with her usual migraine and her usual 20-minute aura does not. A 67-year-old whose 30-year migraine has changed, and whose scalp hurts when she brushes her hair, has giant cell arteritis until proven otherwise. And a postpartum headache that behaves exactly like her usual migraine, with a normal blood pressure and no proteinuria, can be treated as migraine, because the pre-eclampsia check has been done."
+}],
+["Mrs K, 58", {
+  eyebrow: "Making it stick",
+  html: `<h2>How we will know it is working</h2>
+    <div class="cols">
+      <div>${f("<h3>Process</h3>" + ul(["onset time recorded: 95%", "fundi documented, or photo, OCT or referral: 95%", "red flags documented as screened: 95%", "suspected GCA: steroid before leaving SDEC: 100%"]))}</div>
+      <div>${f("<h3>Outcome</h3>" + ul(["CT in typical migraine with a normal examination: under 5%", "opioids for migraine: 0%", "discharge letter states the 2-days-a-week limit: 90%", "reattendance within 30 days: monitored"]))}</div>
+    </div>
+    ${f('<p class="panel" style="margin-top:18px;font-size:20px">A 20-case sample each month is enough to see the curve move. The pathway’s “copy route for the notes” button makes the first 3 measures easy to find in the record.</p>')}`,
+  notes: "Finally, how we will know this is working. Four process measures: the onset time recorded, the fundi documented, the red flags documented as screened, and a steroid given before anyone with suspected giant cell arteritis leaves the unit. Four outcome measures: scans in typical migraine, which should be rare; opioids for migraine, which should be zero; discharge letters that carry the 2-days-a-week rule; and reattendance within a month. Twenty cases a month is enough to see the curve move, and the pathway's copy-route button puts the first three measures straight into the notes."
+}]
+];
+EXTRA.forEach(([after, slide]) => {
+  const at = SLIDES.findIndex(s => s.html.includes("<h2>" + after + "</h2>") || s.html.includes("<h1>" + after + "</h1>"));
+  SLIDES.splice(at < 0 ? SLIDES.length - 1 : at + 1, 0, slide);
+});
+
+
+/* ---- Engine: mounts into a container, unmounts on navigation ---- */
+const TEMPLATE = `<div class="progress" aria-hidden="true"><i data-id="prog"></i></div>
+<div class="viewport"><div class="stage-box" data-id="stage-box"><div class="stage" data-id="stage" aria-live="polite"></div></div></div>
+<div class="bar">
+  <button class="tb" data-id="b-prev" type="button" aria-label="Previous">←<span class="label"> Back</span></button>
+  <span class="counter" data-id="counter">1 / 1</span>
+  <button class="tb primary" data-id="b-next" type="button" aria-label="Next"><span class="label">Next </span>→</button>
+  <span class="sp"></span>
+  <button class="tb" data-id="b-notes" type="button" aria-pressed="false">Notes</button>
+  <button class="tb" data-id="b-voice" type="button" aria-pressed="false">Narrate</button>
+  <button class="tb" data-id="b-full" type="button">Full screen</button>
+  
+  <span class="keys">→ next · ← back · N notes · V narrate · F full screen</span>
+</div>
+<div class="notes" data-id="notes" hidden><p class="nl" data-id="notes-label">Narration</p><p data-id="notes-text"></p></div>`;
+let root = null, el = {}, slides = [], ST = { i: 0, step: 0 }, voice = null, off = [];
+const synth = window.speechSynthesis;
+const q = sel => root.querySelector(sel);
+const on = (target, type, fn, opts) => { target.addEventListener(type, fn, opts); off.push(() => target.removeEventListener(type, fn, opts)); };
+
+function frags(i) { return [...slides[i].querySelectorAll(".f")]; }
+function applyStep(i) {
+  frags(i).forEach((e, k) => e.classList.toggle("on", k < ST.step));
+  const fill = slides[i].querySelector(".tl .fill");
+  if (fill) fill.style.width = [4, 34, 64, 94][Math.min(ST.step, 3)] + "%";
+}
+function buttons() {
+  el.prev.disabled = ST.i === 0 && ST.step === 0;
+  el.next.disabled = ST.i === SLIDES.length - 1 && ST.step >= frags(ST.i).length;
+}
+function show(i, atEnd) {
+  i = Math.max(0, Math.min(SLIDES.length - 1, i));
+  stopVoice();
+  slides.forEach((e, k) => e.classList.toggle("active", k === i));
+  ST.i = i; ST.step = atEnd ? frags(i).length : 0;
+  applyStep(i); runEnter(i); buttons();
+  el.counter.textContent = (i + 1) + " / " + SLIDES.length;
+  el.prog.style.width = ((i + 1) / SLIDES.length * 100) + "%";
+  el.notesText.textContent = SLIDES[i].notes;
+  el.notesLabel.textContent = "Narration · slide " + (i + 1);
+  try { sessionStorage.setItem("deckSlide", String(i)); } catch (e) {}
+}
+function next() {
+  if (ST.step < frags(ST.i).length) { ST.step++; applyStep(ST.i); buttons(); return; }
+  if (ST.i < SLIDES.length - 1) show(ST.i + 1);
+}
+function prev() {
+  if (ST.step > 0) { ST.step--; applyStep(ST.i); buttons(); return; }
+  if (ST.i > 0) show(ST.i - 1, true);
+}
+function runEnter(i) {
+  const s = slides[i];
+  s.querySelectorAll("[data-count]").forEach(n => {
+    const target = parseFloat(n.dataset.count), dec = parseInt(n.dataset.dec || "0", 10), suffix = n.dataset.suffix || "";
+    const reduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    if (reduce) { n.textContent = target.toFixed(dec) + suffix; return; }
+    const t0 = performance.now(), dur = 1400;
+    const tick = t => { const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3); n.textContent = (target * e).toFixed(dec) + suffix; if (p < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  });
+  const d = s.querySelector(".dots"); if (d) { const c = d.cloneNode(true); d.replaceWith(c); }
+}
+function fit() {
+  if (!root) return;
+  const box = q(".stage-box"), vp = box.parentElement;
+  const w = vp.clientWidth - 8, h = vp.clientHeight - 8;
+  const sc = Math.max(0.2, Math.min(w / 1280, h / 720));
+  box.style.width = (1280 * sc) + "px"; box.style.height = (720 * sc) + "px";
+  el.stage.style.transform = "scale(" + sc + ")";
+}
+function toggleNotes(force) {
+  const open = typeof force === "boolean" ? force : el.notes.hidden;
+  el.notes.hidden = !open;
+  el.notesBtn.setAttribute("aria-pressed", String(open)); el.notesBtn.classList.toggle("on", open);
+  fit();
+}
+function pickVoice() {
+  if (!synth) return;
+  const vs = synth.getVoices();
+  voice = vs.find(v => /en[-_]GB/i.test(v.lang) && /female|Google UK English Female|Kate|Serena|Stephanie/i.test(v.name)) ||
+          vs.find(v => /en[-_]GB/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
+}
+function stopVoice() {
+  if (!synth || !root) return;
+  synth.cancel();
+  el.voice.classList.remove("on"); el.voice.setAttribute("aria-pressed", "false"); el.voice.textContent = "Narrate";
+  el.notesText.classList.remove("speaking");
+}
+function speak() {
+  if (!synth) return;
+  if (synth.speaking) { stopVoice(); return; }
+  const u = new SpeechSynthesisUtterance(SLIDES[ST.i].notes);
+  u.lang = "en-GB"; u.rate = 0.98; u.pitch = 1;
+  if (voice) u.voice = voice;
+  u.onend = u.onerror = () => stopVoice();
+  el.voice.classList.add("on"); el.voice.setAttribute("aria-pressed", "true"); el.voice.textContent = "Stop";
+  el.notesText.classList.add("speaking");
+  synth.speak(u);
+}
+function fullscreen() {
+  try {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (root.requestFullscreen) root.requestFullscreen().catch(() => {});
+  } catch (e) {}
+}
+function onKey(e) {
+  if (!root || e.target.matches("input, textarea")) return;
+  const k = e.key;
+  if (k === "ArrowRight" || k === "PageDown") { e.preventDefault(); next(); }
+  else if (k === " " && document.activeElement && root.contains(document.activeElement)) { e.preventDefault(); next(); }
+  else if (k === "ArrowLeft" || k === "PageUp") { e.preventDefault(); prev(); }
+  else if (k === "Home") show(0);
+  else if (k === "End") show(SLIDES.length - 1, true);
+  else if (k === "n" || k === "N") toggleNotes();
+  else if (k === "v" || k === "V") speak();
+  else if (k === "f" || k === "F") fullscreen();
+  else if (k === "Escape" && !el.notes.hidden) toggleNotes(false);
+}
+function onStageClick(e) {
+  const fl = e.target.closest(".flip");
+  if (fl) { fl.classList.toggle("flipped"); return; }
+  const h = e.target.closest(".hot");
+  if (h) {
+    const s = SLIDES[ST.i], item = s.hots && s.hots[parseInt(h.dataset.hot, 10)];
+    if (!item) return;
+    const sl = h.closest(".slide");
+    sl.querySelectorAll(".hot").forEach(b => b.classList.toggle("on", b === h));
+    sl.querySelector(".hotpanel").innerHTML = "<h3>" + item[0] + "</h3><p>" + item[1] + "</p>";
+    return;
+  }
+  const ob = e.target.closest(".ob");
+  if (!ob) return;
+  const qq = ob.closest(".q");
+  if (qq) {
+    if (qq.classList.contains("done")) return;
+    const right = ob.dataset.pick === qq.dataset.correct;
+    qq.classList.add("done", right ? "right" : "wrong"); ob.classList.add("picked");
+    if (!right) qq.querySelectorAll(".ob").forEach(b => { if (b.dataset.pick === qq.dataset.correct) b.classList.add("picked"); });
+    return;
+  }
+  const st = ob.closest(".step");
+  if (st) {
+    if (st.classList.contains("done")) return;
+    const right = ob.dataset.ok === "1", fb = st.querySelector(".fb");
+    fb.textContent = right ? fb.dataset.r : fb.dataset.w;
+    st.classList.add("done", right ? "right" : "wrong"); ob.classList.add("picked");
+    if (!right) st.querySelectorAll(".ob").forEach(b => { if (b.dataset.ok === "1") b.classList.add("picked"); });
+    const nxt = st.parentElement.querySelector('.step[data-i="' + (parseInt(st.dataset.i, 10) + 1) + '"]');
+    if (nxt) nxt.hidden = false;
+  }
+}
+function mount(container) {
+  if (root) unmount();
+  root = container; root.className = "deck"; root.innerHTML = TEMPLATE;
+  el = { stage: q('[data-id="stage"]'), prog: q('[data-id="prog"]'), counter: q('[data-id="counter"]'), prev: q('[data-id="b-prev"]'), next: q('[data-id="b-next"]'),
+         notesBtn: q('[data-id="b-notes"]'), voice: q('[data-id="b-voice"]'), full: q('[data-id="b-full"]'), notes: q('[data-id="notes"]'), notesText: q('[data-id="notes-text"]'), notesLabel: q('[data-id="notes-label"]') };
+  SLIDES.forEach((s, i) => {
+    const sec = document.createElement("section");
+    sec.className = "slide"; sec.setAttribute("aria-label", "Slide " + (i + 1));
+    sec.innerHTML = '<p class="eyebrow">' + esc(s.eyebrow) + "</p>" + s.html + '<p class="num">' + (i + 1) + " / " + SLIDES.length + "</p>";
+    el.stage.appendChild(sec);
+  });
+  slides = [...el.stage.querySelectorAll(".slide")];
+  on(el.next, "click", next); on(el.prev, "click", prev);
+  on(el.notesBtn, "click", () => toggleNotes()); on(el.voice, "click", speak); on(el.full, "click", fullscreen);
+  on(document, "keydown", onKey); on(window, "resize", fit); on(document, "fullscreenchange", () => setTimeout(fit, 50));
+  on(el.stage, "click", onStageClick);
+  let tx = null;
+  on(el.stage, "touchstart", e => { tx = e.touches[0].clientX; }, { passive: true });
+  on(el.stage, "touchend", e => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 60) { if (dx < 0) next(); else prev(); } }, { passive: true });
+  if (synth) { pickVoice(); on(synth, "voiceschanged", pickVoice); } else { el.voice.hidden = true; }
+  let start = 0; try { start = parseInt(sessionStorage.getItem("deckSlide") || "0", 10) || 0; } catch (e) {}
+  show(start); fit(); setTimeout(fit, 300);
+}
+function unmount() {
+  if (!root) return;
+  stopVoice();
+  off.forEach(fn => fn()); off = [];
+  root.innerHTML = ""; root.className = ""; root = null; slides = [];
+}
+return { mount, unmount, get mounted() { return !!root; }, show };
+})();
+
+/* ============================================================
    Helpers
    ============================================================ */
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -353,7 +1450,7 @@ const ul = items => "<ul>" + items.map(i => "<li>" + i + "</li>").join("") + "</
 const lead = (text, items) => "<p>" + text + "</p>" + ul(items);
 const steps = items => '<ol class="steps">' + items.map(i => "<li><div>" + i + "</div></li>").join("") + "</ol>";
 const ifthen = rows => '<dl class="ifthen">' + rows.map(([a, b]) => "<dt>" + a + "</dt><dd>" + b + "</dd>").join("") + "</dl>";
-const table = (head, rows, numCols) => '<div class="table-wrap"><table><thead><tr>' +
+const table = (head, rows, numCols) => '<div class="table-wrap' + (head.length >= 5 ? " wide" : "") + '"><table><thead><tr>' +
   head.map(h => '<th scope="col">' + h + "</th>").join("") + "</tr></thead><tbody>" +
   rows.map(r => "<tr>" + r.map((c, i) => i === 0
     ? '<th scope="row">' + c + "</th>"
@@ -534,16 +1631,16 @@ const PAGES = [
         ["Engorged, tortuous veins", "Venous congestion from raised pressure. Compare with the arteries, which stay thin."],
         ["Flame haemorrhages and cotton wool spots", "Radial haemorrhages at the margin and fluffy white infarcts of the nerve fibre layer. A feature of established or rapidly rising pressure."],
         ["Paton’s lines", "Concentric retinal folds on the temporal side, pushed up by the swollen disc."]
-      ].map((s, i) => '<button class="sign" type="button" data-n="' + (i + 1) + '"><span class="n">' + (i + 1) + "</span><span><strong>" + s[0] + "</strong><br>" + s[1] + "</span></button>").join("")}
+      ].map((s, i) => '<button class="sign" type="button" data-n="' + (i + 1) + '"><span class="n">' + (i + 1) + "</span><span><strong>" + s[0] + '</strong><span class="d"><br>' + s[1] + "</span></span></button>").join("")}
     </div>
     <h2>Frisén grade</h2>
-    ${table(["Grade", "Key feature", "Margin"], [
-      ["0", "Normal", "Crisp, nasal side may look slightly blurred by nerve fibres"],
-      ["1", "C-shaped halo sparing the temporal side", "Nasal margin obscured"],
-      ["2", "Halo all the way round, no vessel obscuration", "All margins obscured, nasal border raised"],
-      ["3", "At least 1 segment of a major vessel obscured as it leaves the disc", "All raised, halo has an irregular outer edge"],
-      ["4", "A major vessel segment totally obscured on the disc", "Whole nerve head raised, cup filled"],
-      ["5", "All vessels on and leaving the disc obscured", "Dome-shaped disc"]
+    ${table(["Grade", "Key feature"], [
+      ["0", "Normal. The nasal side can look slightly blurred by nerve fibres"],
+      ["1", "C-shaped halo sparing the temporal side; nasal margin obscured"],
+      ["2", "Halo all the way round, nasal border raised, no vessel obscured"],
+      ["3", "At least 1 segment of a major vessel obscured as it leaves the disc; irregular outer edge to the halo"],
+      ["4", "A major vessel segment totally obscured on the disc; whole nerve head raised, cup filled"],
+      ["5", "All vessels on and leaving the disc obscured; dome-shaped disc"]
     ])}
     <p class="small">Modified Frisén scale (Scott and others, Archives of Ophthalmology 2010). Grade 3 or more is unmistakable; grades 1 and 2 are where photos and OCT beat the ophthalmoscope.</p>
     <h2>What a photo cannot tell you</h2>
@@ -552,6 +1649,13 @@ const PAGES = [
       "elevation: a 2D photo flattens it. OCT measures the nerve fibre layer and separates drusen from oedema",
       "the other eye: papilloedema is bilateral, so photograph both"
     ])}
+    ${panel("If you are not sure", `<p>Do not discharge on “probably normal”. Ask the eye service for OCT the same day, and check the blood pressure while you wait.</p>` + contacts("ophthalmology", "fundus"), "caution")}
+    <h2 class="routes-title">Then</h2>
+    <div class="routes">
+      ${route({ to: "pressure", title: "Papilloedema in both eyes", note: "Raised pressure: CT and CT venogram today", level: "sameday" })}
+      ${route({ to: "gca", title: "Pale swollen disc, 50 or over", note: "Arteritic ischaemic optic neuropathy", level: "sameday" })}
+      ${route({ to: "hypertension", title: "Haemorrhages and cotton wool spots", note: "Check the blood pressure", level: "sameday" })}
+    </div>
     <h2>Swollen disc, but is it papilloedema?</h2>
     ${table(["", "Papilloedema", "Pseudopapilloedema", "Optic neuritis", "Arteritic AION (GCA)", "Hypertensive"], [
       ["Eyes", "Both", "Both, often small crowded discs", "Usually 1", "1, the other at risk", "Both"],
@@ -560,7 +1664,6 @@ const PAGES = [
       ["Disc", "Hyperaemic, haemorrhages, vessels obscured", "Lumpy margin, glistening drusen, odd vessel branching, no haemorrhage, vessels clear", "Swollen or normal, RAPD", "Pale, chalky swelling", "Swollen with flame haemorrhages, cotton wool spots, macular star"],
       ["Do", go("pressure", "CT and CT venogram today"), "OCT and autofluorescence via the eye service; no urgent imaging", "Same-day ophthalmology, MRI", go("gca", "IV methylprednisolone, same-day ophthalmology"), go("hypertension", "Hypertensive emergency")]
     ])}
-    ${panel("If you are not sure", `<p>Do not discharge on “probably normal”. Ask the eye service for OCT the same day, and check the blood pressure while you wait.</p>` + contacts("ophthalmology", "fundus"), "caution")}
   `,
   mount: () => {
     const fig = document.getElementById("pp-fig");
@@ -573,12 +1676,6 @@ const PAGES = [
     document.querySelectorAll("#pp-signs .sign").forEach(b => b.addEventListener("click", () => select(b.classList.contains("on") ? null : b.dataset.n)));
     fig.querySelectorAll(".mk").forEach(m => m.addEventListener("click", () => select(m.classList.contains("on") ? null : m.dataset.n)));
   },
-  routesTitle: "Then",
-  routes: [
-    { to: "pressure", title: "Papilloedema in both eyes", note: "Raised pressure: CT and CT venogram today", level: "sameday" },
-    { to: "gca", title: "Pale swollen disc, 50 or over", note: "Arteritic ischaemic optic neuropathy", level: "sameday" },
-    { to: "hypertension", title: "Haemorrhages and cotton wool spots", note: "Check the blood pressure", level: "sameday" }
-  ],
   next: { to: "tests", label: "Continue to tests" }
 },
 {
@@ -1180,7 +2277,7 @@ const PAGES = [
 
 /* ---------------- Reference ---------------- */
 {
-  id: "contacts", stage: "ref", nav: "Local contacts",
+  id: "contacts", stage: "ref", nav: "Local contacts", cols: 2,
   title: "Local contacts",
   lede: "Confirm each route before go-live.",
   body: () => `
@@ -1191,33 +2288,17 @@ const PAGES = [
 {
   id: "teaching", stage: "ref", nav: "Teaching session",
   title: "Teaching session",
-  lede: "A narrated, interactive deck that teaches the principles behind this pathway. About 40 minutes.",
+  lede: "A narrated, interactive deck on the principles behind this pathway. About 40 minutes. Full screen to present.",
   body: () => `
-    <div class="routes">
-      <a class="route" href="teaching.html" target="_blank" rel="noopener"><span class="r-title">Open the teaching deck</span><span class="r-note">32 slides with spoken narration, animated builds, quizzes and 2 case walkthroughs. Opens in a new tab.</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>
-    </div>
-    <h2>What it covers</h2>
-    ${ul([
-      "primary or secondary: the question at every step",
-      "time to peak, and the thunderclap clock (6 hours, 12 hours, 24 hours)",
-      "the 5 examination essentials, including the fundi",
-      "who needs a scan today and who needs none",
-      "the 8 red flags, with a closer look at thunderclap and GCA",
-      "medication overuse, naming the primary headache, and treatment without opioids",
-      "safe discharge and the GP letter"
-    ])}
-    <h2>How to use it</h2>
-    ${ul([
-      "arrow keys or the on-screen buttons move through the builds; swipe on a phone",
-      "N shows the presenter notes; V reads them aloud using the device’s own voice",
-      "F goes full screen for projection",
-      "the quizzes, flip cards and case are for the room to answer before you tap"
-    ])}
+    <div id="deck-root"></div>
+    <p class="small" style="margin-top:12px">Arrow keys or the buttons move through the builds; swipe on a phone. N shows the presenter notes, V reads them aloud with the device’s own voice, F goes full screen. The quizzes, flip cards and cases are for the room to answer before you tap.</p>
     <p class="small">Maps to IM Clinical CiP 1 (Managing an acute unselected take), CiP 2 (Managing the acute care of patients within a medical specialty service), CiP 4 (Managing patients in an outpatient clinic, ambulatory or community setting) and CiP 7 (Delivering effective resuscitation and managing the acutely deteriorating patient).</p>
-  `
+  `,
+  mount: () => Deck.mount(document.getElementById("deck-root")),
+  cols: 1
 },
 {
-  id: "doses", stage: "ref", nav: "Dose sheet",
+  id: "doses", stage: "ref", nav: "Dose sheet", cols: 3,
   title: "Dose sheet",
   lede: "Every adult dose used in this pathway, in one place. Check against the BNF and the trust formulary.",
   body: () => `
@@ -1318,24 +2399,39 @@ const PAGES = [
       <dt>Approved by</dt><dd>${META.approvedBy ? esc(META.approvedBy) : "Not yet approved"}</dd>
       <dt>Review due</dt><dd>${META.reviewDue ? esc(META.reviewDue) : "To set at approval"}</dd>
     </dl>
+    <h2>Adapted from</h2>
+    ${ul([ext("https://girft-interactivepathways.org.uk/headache/", "GIRFT headache interactive pathway") + ", general practice stage, adapted and rewritten for SDEC"])}
+    <h2>NICE</h2>
     ${ul([
-      ext("https://girft-interactivepathways.org.uk/headache/", "GIRFT headache pathway") + ", adapted and rewritten",
-      ext("https://www.nice.org.uk/guidance/cg150", "NICE CG150") + ", prevention update with candesartan agreed December 2025",
-      ext("https://www.nice.org.uk/guidance/ng228", "NICE NG228") + ", subarachnoid haemorrhage (2022)",
-      ext("https://www.nice.org.uk/guidance/ng232", "NICE NG232") + ", head injury (2023)",
-      ext("https://www.nice.org.uk/guidance/ng240", "NICE NG240") + ", bacterial meningitis and meningococcal disease (2024)",
-      "NICE technology appraisals: rimegepant acute TA919 and prevention TA906; atogepant TA973; erenumab TA682; fremanezumab TA631; galcanezumab TA659; eptinezumab TA871",
-      ext("https://bash.org.uk/", "BASH National Headache Management System for Adults") + " (2019)",
-      "Modified Frisén scale: Scott CJ and others, Archives of Ophthalmology 2010",
-      ext("https://www.nice.org.uk/guidance/ng136", "NICE NG136") + ", hypertension",
-      ext("https://www.nice.org.uk/guidance/ng133", "NICE NG133") + ", hypertension in pregnancy",
-      "BSR guideline on giant cell arteritis (Mackie and others, Rheumatology 2020)",
-      "BIHS hypertensive emergencies (Kulkarni and others, J Hum Hypertens 2023;37:863 to 879)",
-      "UK meningitis guideline (McGill and others, J Infect 2016)",
-      ext("https://www.gov.uk/government/news/new-pregnancy-prevention-measures-introduced-for-topiramate", "MHRA topiramate") + " (20 June 2024)",
-      ext("https://ichd-3.org/", "ICHD-3"),
-      "ID Migraine (Lipton and others, Neurology 2003)"
+      ext("https://www.nice.org.uk/guidance/cg150", "CG150 Headaches in over 12s") + "; " + ext("https://www.nice.org.uk/guidance/cg150/resources/december-2025-exceptional-surveillance-of-headaches-in-over-12s-diagnosis-and-management-nice-guideline-cg150-pdf-20300929001413", "December 2025 surveillance decision") + " to add candesartan",
+      ext("https://www.nice.org.uk/guidance/ng228", "NG228 Subarachnoid haemorrhage caused by a ruptured aneurysm") + " (2022)",
+      ext("https://www.nice.org.uk/guidance/ng232", "NG232 Head injury") + " (2023)",
+      ext("https://www.nice.org.uk/guidance/ng240", "NG240 Bacterial meningitis and meningococcal disease") + " (2024)",
+      ext("https://www.nice.org.uk/guidance/ng136", "NG136 Hypertension in adults"),
+      ext("https://www.nice.org.uk/guidance/ng133", "NG133 Hypertension in pregnancy"),
+      ext("https://www.nice.org.uk/guidance/ta919", "TA919 rimegepant, acute migraine") + " · " + ext("https://www.nice.org.uk/guidance/ta906", "TA906 rimegepant, prevention") + " · " + ext("https://www.nice.org.uk/guidance/ta973", "TA973 atogepant"),
+      ext("https://www.nice.org.uk/guidance/ta682", "TA682 erenumab") + " · " + ext("https://www.nice.org.uk/guidance/ta631", "TA631 fremanezumab") + " · " + ext("https://www.nice.org.uk/guidance/ta659", "TA659 galcanezumab") + " · " + ext("https://www.nice.org.uk/guidance/ta871", "TA871 eptinezumab")
     ])}
+    <h2>Specialist societies and regulators</h2>
+    ${ul([
+      ext("https://doi.org/10.1093/rheumatology/kez672", "BSR guideline on giant cell arteritis") + ", Mackie SL and others, Rheumatology 2020",
+      ext("https://doi.org/10.1038/s41371-022-00776-9", "BIHS position document on hypertensive crisis") + ", Kulkarni S and others, J Hum Hypertens 2023;37:863 to 879",
+      ext("https://doi.org/10.1016/j.jinf.2016.01.007", "UK joint specialist societies guideline on meningitis and meningococcal sepsis in adults") + ", McGill F and others, J Infect 2016",
+      ext("https://bash.org.uk/guidelines/", "BASH National Headache Management System for Adults") + " (2019) and " + ext("https://bash.org.uk/wp-content/uploads/brizy/custom_files/BASHIncidentals.pdf", "BASH note on incidental findings"),
+      ext("https://www.gov.uk/government/news/new-pregnancy-prevention-measures-introduced-for-topiramate", "MHRA pregnancy prevention measures for topiramate") + " (20 June 2024)",
+      ext("https://www.fsrh.org/ukmec", "FSRH UK Medical Eligibility Criteria for contraceptive use") + " (migraine with aura and oestrogen)",
+      ext("https://www.gov.uk/guidance/neurological-disorders-assessing-fitness-to-drive", "DVLA: neurological disorders and fitness to drive"),
+      ext("https://www.england.nhs.uk/long-read/urgent-gp-direct-access-to-diagnostic-services-for-people-with-symptoms-not-meeting-the-threshold-for-an-urgent-suspected-cancer-referral/", "NHS England: direct access to diagnostics, including brain MRI")
+    ])}
+    <h2>Classification and evidence</h2>
+    ${ul([
+      ext("https://ichd-3.org/", "International Classification of Headache Disorders, 3rd edition"),
+      ext("https://doi.org/10.1212/01.WNL.0000078940.53438.83", "ID Migraine validation study") + ", Lipton RB and others, Neurology 2003",
+      ext("https://doi.org/10.1001/archophthalmol.2010.94", "Modified Frisén scale for papilloedema") + ", Scott CJ and others, Archives of Ophthalmology 2010",
+      ext("https://gettingitrightfirsttime.co.uk/wp-content/uploads/2022/11/Rheumatology-Giant-Cell-Arteritis-Pathway.html", "GIRFT rheumatology GCA pathway")
+    ])}
+    <h2>Patient-facing</h2>
+    ${ul([ext("https://migrainetrust.org/", "The Migraine Trust"), ext("https://ouchuk.org/", "OUCH (UK)"), ext("https://www.nhs.uk/conditions/migraine/", "NHS: migraine")])}
     <p class="small">Supports, does not replace, clinical judgement. Check doses against the BNF and trust formulary.</p>
   `
 }
@@ -1398,6 +2494,11 @@ function renderTrail(id) {
 function render(id, opts) {
   const p = BY_ID[id] || BY_ID.start;
   id = p.id;
+  if (Deck.mounted) Deck.unmount();
+  document.body.classList.toggle("mode-deck", id === "teaching");
+  document.getElementById("tab-teaching").toggleAttribute("aria-current", id === "teaching");
+  document.getElementById("tab-pathway").toggleAttribute("aria-current", id !== "teaching");
+  if (id === "teaching") document.getElementById("tab-teaching").setAttribute("aria-current", "page"); else document.getElementById("tab-pathway").setAttribute("aria-current", "page");
   if (!(opts && opts.keepTrail)) {
     const at = STATE.trail.indexOf(id);
     if (id === "start") STATE.trail = ["start"];
@@ -1426,7 +2527,7 @@ function render(id, opts) {
   document.getElementById("page").innerHTML =
     '<header><p class="kicker">' + kicker + '</p><h1 tabindex="-1">' + p.title + "</h1>" +
     (p.lede ? '<p class="lede">' + p.lede + "</p>" : "") + (p.level ? '<div class="head-row">' + chip(p.level) + "</div>" : "") + "</header>" +
-    '<div class="prose">' + p.body() + "</div>" + routes + footer;
+    '<div class="prose' + (p.cols ? " c" + p.cols : "") + '">' + p.body() + "</div>" + routes + footer;
 
   if (p.mount) p.mount();
   const back = document.getElementById("btn-back");
@@ -1439,7 +2540,22 @@ function render(id, opts) {
   renderTrail(id);
   updateMap(id);
   document.title = (id === "start" ? "" : p.nav + " · ") + "QEHB SDEC headache pathway";
+  fitPage();
 }
+
+/* Desktop: step through column count and type size until the step fits the screen; scroll only as a last resort */
+function fitPage() {
+  const pr = document.querySelector("#page .prose");
+  if (!pr || window.innerWidth < 961 || document.body.classList.contains("mode-deck")) return;
+  pr.classList.remove("c3", "shrink", "scroll");
+  const base = pr.classList.contains("c1");
+  const over = () => pr.scrollWidth > pr.clientWidth + 2 || pr.scrollHeight > pr.clientHeight + 2;
+  if (!over()) return;
+  if (!base) { pr.classList.add("c3"); if (!over()) return; }
+  pr.classList.add("shrink"); if (!over()) return;
+  pr.classList.add("scroll");
+}
+window.addEventListener("resize", () => { clearTimeout(window.__fitT); window.__fitT = setTimeout(fitPage, 120); });
 
 function navigate(id, push) {
   render(id);
