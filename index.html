@@ -1,0 +1,1326 @@
+<title>QEHB SDEC headache pathway</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Step-by-step headache pathway for same day emergency care at Queen Elizabeth Hospital Birmingham, adapted from the GIRFT headache pathway.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,560&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: clinical hub system. Sticky pathway map on the left, one decision step at a time on the right, Back / Restart / Continue at the foot of every step. */
+:root {
+  --paper: #F7F4EE;
+  --paper-2: #EFEAE1;
+  --ink: #0B1F33;
+  --ink-2: #4B5A69;
+  --rule: #D8D1C3;
+  --accent: #4F3A78;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E8E2F0;
+  --red: #A1231D;
+  --red-soft: #F5E0DC;
+  --amber: #82560A;
+  --amber-soft: #F4E7CC;
+  --green: #2C6E49;
+  --green-soft: #DFECE3;
+  --display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --body: "Inter Tight", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --radius: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0E1824; --paper-2: #152232; --ink: #ECE7DC; --ink-2: #A8B3BE; --rule: #2A394A;
+    --accent: #BCA7E2; --accent-ink: #1A1230; --accent-soft: #2A2340;
+    --red: #F2A097; --red-soft: #3A1F1E; --amber: #E6BB66; --amber-soft: #33290F; --green: #8FCBA4; --green-soft: #183021;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0E1824; --paper-2: #152232; --ink: #ECE7DC; --ink-2: #A8B3BE; --rule: #2A394A;
+  --accent: #BCA7E2; --accent-ink: #1A1230; --accent-soft: #2A2340;
+  --red: #F2A097; --red-soft: #3A1F1E; --amber: #E6BB66; --amber-soft: #33290F; --green: #8FCBA4; --green-soft: #183021;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+.newtab { font-size: 0.8em; color: var(--ink-2); }
+
+/* Masthead */
+.masthead { max-width: 1180px; margin: 0 auto; padding-block: 28px 18px; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; border-bottom: 1px solid var(--rule); }
+.masthead .where { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.04em; color: var(--ink-2); margin: 0 0 6px; }
+.masthead .name { font-family: var(--display); font-weight: 560; font-size: clamp(1.7rem, 4vw, 2.35rem); line-height: 1.05; margin: 0; letter-spacing: -0.01em; }
+.masthead .name em { font-style: normal; color: var(--accent); }
+.mast-tools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.status { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.03em; color: var(--amber); background: var(--amber-soft); border: 1px solid color-mix(in srgb, var(--amber) 35%, transparent); padding: 4px 10px; border-radius: 99px; white-space: nowrap; }
+.btn-ghost { font: 500 0.9rem var(--body); color: var(--ink); background: transparent; border: 1px solid var(--rule); border-radius: var(--radius); padding: 8px 14px; cursor: pointer; text-decoration: none; }
+.btn-ghost:hover { border-color: var(--accent); }
+.map-toggle { display: none; }
+
+/* Shell */
+.shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 272px minmax(0, 1fr); gap: 48px; padding-block: 28px 64px; }
+
+/* Pathway map */
+.map { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; max-height: calc(100vh - 32px); overflow-y: auto; padding-right: 6px; }
+.map label { display: block; font-family: var(--mono); font-size: 0.75rem; color: var(--ink-2); margin-bottom: 6px; }
+.map input { width: 100%; font: 0.95rem var(--body); color: var(--ink); background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); padding: 8px 10px; }
+.map-stage { margin-top: 20px; }
+.map-stage h2 { font-family: var(--mono); font-weight: 500; font-size: 0.75rem; letter-spacing: 0.04em; color: var(--ink-2); margin: 0 0 6px; display: flex; gap: 8px; }
+.map-stage h2 .n { color: var(--accent); font-variant-numeric: tabular-nums; }
+.map ul { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--rule); }
+.map li a { display: flex; align-items: baseline; gap: 8px; padding: 5px 0 5px 14px; margin-left: -1px; border-left: 2px solid transparent; color: var(--ink); text-decoration: none; font-size: 0.93rem; line-height: 1.35; }
+.map li a:hover { color: var(--accent); }
+.map li a[aria-current="page"] { border-left-color: var(--accent); color: var(--accent); font-weight: 600; }
+.map li a.sub { padding-left: 26px; font-size: 0.88rem; color: var(--ink-2); }
+.map li a.visited::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); opacity: 0.55; flex: none; margin-left: auto; align-self: center; }
+.map .none { color: var(--ink-2); font-size: 0.9rem; margin-top: 16px; }
+
+/* Main */
+main { min-width: 0; max-width: 46rem; }
+.trail { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 22px; font-size: 0.82rem; }
+.trail .lbl { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-2); margin-right: 4px; }
+.trail a { color: var(--ink-2); text-decoration: none; background: var(--paper-2); border: 1px solid var(--rule); border-radius: 99px; padding: 2px 10px; }
+.trail a:hover { color: var(--accent); border-color: var(--accent); }
+.trail .sep { color: var(--rule); }
+.trail .here { color: var(--accent); font-weight: 600; padding: 2px 4px; }
+
+.kicker { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.03em; color: var(--accent); margin: 0 0 10px; }
+h1 { font-family: var(--display); font-weight: 560; font-size: clamp(1.9rem, 4.2vw, 2.6rem); line-height: 1.08; letter-spacing: -0.015em; margin: 0 0 14px; text-wrap: balance; }
+h1:focus { outline: none; }
+.lede { font-size: 1.14rem; color: var(--ink-2); margin: 0 0 8px; max-width: 62ch; }
+.head-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+.prose { margin-top: 26px; }
+.prose > * { max-width: 65ch; }
+.prose h2 { font-family: var(--display); font-weight: 560; font-size: 1.38rem; line-height: 1.2; margin: 34px 0 10px; text-wrap: balance; }
+.prose h3 { font-size: 1rem; font-weight: 600; margin: 22px 0 6px; }
+.prose p { margin: 0 0 12px; }
+.prose ul { margin: 0 0 16px; padding-left: 1.2em; }
+.prose ul li { margin: 0 0 6px; padding-left: 4px; }
+.prose ul li::marker { color: var(--accent); }
+.prose strong { font-weight: 600; }
+.mono { font-family: var(--mono); font-size: 0.92em; font-variant-numeric: tabular-nums; }
+
+/* Numbered actions: a real sequence */
+ol.steps { list-style: none; counter-reset: s; margin: 6px 0 18px; padding: 0; display: grid; gap: 12px; }
+ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; align-items: start; }
+ol.steps > li::before { content: counter(s); font-family: var(--mono); font-size: 0.8rem; font-weight: 500; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); margin-top: 1px; }
+ol.steps ul { margin-top: 6px; }
+
+/* Urgency chips */
+.chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.02em; padding: 3px 9px; border-radius: 99px; white-space: nowrap; border: 1px solid transparent; }
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip.emergency { color: var(--red); background: var(--red-soft); border-color: color-mix(in srgb, var(--red) 30%, transparent); }
+.chip.sameday { color: var(--amber); background: var(--amber-soft); border-color: color-mix(in srgb, var(--amber) 30%, transparent); }
+.chip.routine { color: var(--green); background: var(--green-soft); border-color: color-mix(in srgb, var(--green) 30%, transparent); }
+
+/* Panels: set apart by role only */
+.panel { border: 1px solid var(--rule); border-radius: var(--radius); padding: 14px 18px 6px; margin: 18px 0; background: var(--paper); }
+.panel-label { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.03em; color: var(--ink-2); margin: 0 0 8px !important; }
+.panel.stop { background: var(--red-soft); border-color: color-mix(in srgb, var(--red) 35%, transparent); }
+.panel.stop .panel-label { color: var(--red); }
+.panel.caution { background: var(--amber-soft); border-color: color-mix(in srgb, var(--amber) 35%, transparent); }
+.panel.caution .panel-label { color: var(--amber); }
+.panel.local { background: var(--paper-2); }
+
+/* Local contacts */
+.contacts { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 12px; }
+.contact { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; padding: 8px 12px; border-radius: var(--radius); border: 1px solid var(--rule); background: var(--paper); font-size: 0.93rem; }
+.contact-name { font-weight: 500; }
+.contact-route { font-family: var(--mono); font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+.contact.unset { border-style: dashed; border-color: color-mix(in srgb, var(--amber) 55%, transparent); }
+.contact.unset .contact-route { color: var(--amber); }
+
+/* Decision routes */
+.routes { display: grid; gap: 10px; margin: 26px 0 0; }
+.routes-title { font-family: var(--display); font-weight: 560; font-size: 1.38rem; margin: 34px 0 4px; }
+.route { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 14px; align-items: center; text-decoration: none; color: var(--ink); border: 1px solid var(--rule); border-radius: var(--radius); padding: 13px 16px; background: var(--paper); transition: border-color .15s, background .15s; }
+.route:hover { border-color: var(--accent); background: var(--accent-soft); }
+.route .r-title { font-weight: 600; font-size: 1rem; }
+.route .r-note { grid-column: 1; color: var(--ink-2); font-size: 0.9rem; line-height: 1.45; }
+.route .r-side { grid-column: 2; grid-row: 1 / span 2; display: flex; align-items: center; gap: 10px; }
+.route .arrow { font-family: var(--mono); color: var(--accent); font-size: 1.05rem; }
+
+/* Step footer */
+.stepper { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--rule); }
+.stepper .spacer { flex: 1; }
+.btn { font: 600 0.95rem var(--body); border-radius: var(--radius); padding: 11px 18px; cursor: pointer; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn:disabled:hover { border-color: var(--rule); }
+
+/* Stage map on the start page */
+ol.stage-map { list-style: none; padding: 0; margin: 8px 0 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0; border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; }
+ol.stage-map li { padding: 14px 16px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); margin: -1px -1px 0 0; }
+ol.stage-map .sn { font-family: var(--mono); font-size: 0.75rem; color: var(--accent); }
+ol.stage-map a { display: block; font-weight: 600; text-decoration: none; color: var(--ink); margin: 2px 0; }
+ol.stage-map a:hover { color: var(--accent); }
+ol.stage-map p { margin: 0; font-size: 0.88rem; color: var(--ink-2); line-height: 1.4; }
+
+/* Thresholds list */
+dl.figures { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0; margin: 8px 0 18px; border-top: 1px solid var(--rule); }
+dl.figures dt, dl.figures dd { padding: 10px 0; border-bottom: 1px solid var(--rule); margin: 0; }
+dl.figures dt { font-family: var(--mono); font-weight: 500; color: var(--accent); padding-right: 18px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+dl.figures dd { font-size: 0.95rem; }
+
+/* Feature groups */
+.groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0 28px; }
+.groups > div { min-width: 0; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; margin: 10px 0 20px; border: 1px solid var(--rule); border-radius: var(--radius); max-width: 100% !important; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.9rem; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--rule); }
+thead th { font-family: var(--mono); font-weight: 500; font-size: 0.76rem; color: var(--ink-2); background: var(--paper-2); }
+tbody th { font-weight: 600; width: 22%; }
+tr:last-child th, tr:last-child td { border-bottom: 0; }
+td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Tools: calculators and checklists */
+.tool { border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px 18px; margin: 16px 0 20px; background: var(--paper-2); }
+.tool h3 { margin-top: 0 !important; }
+.field { display: grid; grid-template-columns: minmax(0, 1fr) 88px; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--rule); }
+.field:last-of-type { border-bottom: 0; }
+.field label { font-size: 0.95rem; }
+.field input[type="number"] { font: 500 1rem var(--mono); width: 100%; padding: 7px 8px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper); color: var(--ink); text-align: right; }
+.check { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0; font-size: 0.95rem; cursor: pointer; }
+.check input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--accent); flex: none; }
+.result { margin-top: 12px; padding: 10px 14px; border-radius: var(--radius); font-weight: 500; border: 1px solid var(--rule); background: var(--paper); }
+.result.pos { background: var(--amber-soft); color: var(--amber); border-color: color-mix(in srgb, var(--amber) 35%, transparent); }
+.result.neg { background: var(--green-soft); color: var(--green); border-color: color-mix(in srgb, var(--green) 35%, transparent); }
+.copy-out { width: 100%; min-height: 120px; font: 0.85rem var(--mono); padding: 10px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper); color: var(--ink); margin-top: 10px; }
+
+/* Footer */
+.foot { max-width: 1180px; margin: 0 auto; padding-block: 18px 32px; border-top: 1px solid var(--rule); color: var(--ink-2); font-size: 0.85rem; display: flex; flex-wrap: wrap; gap: 6px 24px; justify-content: space-between; }
+.foot p { margin: 0; max-width: 70ch; }
+
+@media (max-width: 960px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding-top: 16px; }
+  .map-toggle { display: inline-flex; }
+  .map { position: static; max-height: none; overflow: visible; display: none; padding: 4px 0 24px; margin-bottom: 20px; border-bottom: 1px solid var(--rule); }
+  .map.open { display: block; }
+}
+@media (max-width: 520px) {
+  .route { grid-template-columns: minmax(0, 1fr); }
+  .route .r-side { grid-column: 1; grid-row: auto; justify-content: space-between; }
+  dl.figures { grid-template-columns: minmax(0, 1fr); }
+  dl.figures dt { border-bottom: 0; padding-bottom: 0; }
+  .stepper .btn { flex: 1 1 auto; justify-content: center; }
+  .stepper .spacer { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+
+<header class="masthead">
+  <div>
+    <p class="where">Queen Elizabeth Hospital Birmingham · Same day emergency care</p>
+    <p class="name">Headache <em>pathway</em></p>
+  </div>
+  <div class="mast-tools">
+    <span class="status" id="status-pill">Draft for governance review</span>
+    <a class="btn-ghost" id="hub-link" href="#" hidden>Clinical hub</a>
+    <button class="btn-ghost map-toggle" id="map-toggle" type="button" aria-expanded="false" aria-controls="map">Pathway map</button>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="map" id="map" aria-label="Pathway map">
+    <label for="find-step">Find a step</label>
+    <input id="find-step" type="search" placeholder="For example, GCA" autocomplete="off">
+    <div id="map-list"></div>
+    <p class="none" id="map-none" hidden>No steps match. Clear the search to see the full pathway.</p>
+  </nav>
+  <main id="main">
+    <div class="trail" id="trail" aria-label="Your route through the pathway"></div>
+    <article id="page"></article>
+  </main>
+</div>
+
+<footer class="foot">
+  <p>Adapted for local use from the GIRFT headache interactive pathway. This is not an official GIRFT or NHS England product. Content has been rewritten for the acute setting. <a href="#sources">Sources and governance</a></p>
+  <p class="mono" id="version-line"></p>
+</footer>
+
+<script>
+/* ============================================================
+   LOCAL SETTINGS — edit these before go-live.
+   Leave a route empty ("") to show it as "route to confirm".
+   ============================================================ */
+const META = {
+  version: "Draft 0.1",
+  date: "22 October 2026",
+  owner: "",            // for example, "SDEC clinical lead"
+  approvedBy: "",       // governance group, once approved
+  reviewDue: ""         // set at approval
+};
+const LINKS = {
+  hub: "",              // URL of the clinical hub, shows a Clinical hub button when set
+  hypertensionTool: ""  // URL of the hub's hypertensive crisis tool
+};
+const CONTACTS = {
+  sdecSenior:    { service: "SDEC consultant or senior decision-maker", route: "" },
+  edResus:       { service: "Emergency department resus", route: "" },
+  stroke:        { service: "Stroke team (hyperacute)", route: "" },
+  neurosurgery:  { service: "Neurosurgery on call", route: "" },
+  neurology:     { service: "Neurology on call or advice line", route: "" },
+  radiology:     { service: "CT and MRI requests, radiology advice", route: "" },
+  ophthalmology: { service: "Emergency eye service", route: "" },
+  gca:           { service: "GCA fast-track (rheumatology)", route: "" },
+  obstetrics:    { service: "Obstetric on call or maternity assessment", route: "" },
+  anaesthetics:  { service: "Obstetric anaesthetist", route: "" },
+  infection:     { service: "Microbiology or infectious diseases advice", route: "" },
+  headacheClinic:{ service: "Headache clinic or neurology outpatient referral", route: "" }
+};
+
+/* ============================================================
+   Helpers
+   ============================================================ */
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const ul = items => "<ul>" + items.map(i => "<li>" + i + "</li>").join("") + "</ul>";
+const lead = (text, items) => "<p>" + text + "</p>" + ul(items);
+const steps = items => '<ol class="steps">' + items.map(i => "<li><div>" + i + "</div></li>").join("") + "</ol>";
+const panel = (label, html, tone) => '<section class="panel ' + (tone || "") + '"><p class="panel-label">' + label + "</p>" + html + "</section>";
+const go = (id, text) => '<a href="#' + id + '">' + text + "</a>";
+const ext = (url, text) => '<a href="' + url + '" target="_blank" rel="noopener">' + text + ' <span class="newtab">(opens in new tab)</span></a>';
+const LEVELS = { emergency: "Emergency", sameday: "Same day", routine: "Routine" };
+const chip = lvl => '<span class="chip ' + lvl + '">' + LEVELS[lvl] + "</span>";
+const contact = key => {
+  const c = CONTACTS[key];
+  const set = c.route && c.route.trim();
+  return '<div class="contact' + (set ? "" : " unset") + '"><span class="contact-name">' + esc(c.service) +
+    '</span><span class="contact-route">' + (set ? esc(c.route) : "route to confirm") + "</span></div>";
+};
+const contacts = (...keys) => '<div class="contacts">' + keys.map(contact).join("") + "</div>";
+const local = (...keys) => panel("Local route", contacts(...keys), "local");
+const hyperLink = () => LINKS.hypertensionTool
+  ? ext(LINKS.hypertensionTool, "hypertensive crisis tool")
+  : "hypertensive crisis tool in the clinical hub";
+
+/* ============================================================
+   Pathway content
+   ============================================================ */
+const STAGES = [
+  { id: "front", name: "Front door" },
+  { id: "assess", name: "Assessment" },
+  { id: "screen", name: "Secondary headache screen" },
+  { id: "moh", name: "Medication overuse" },
+  { id: "primary", name: "Primary headache" },
+  { id: "leave", name: "Leaving SDEC" },
+  { id: "ref", name: "Reference" }
+];
+
+const BACK_TO_SCREEN = { to: "screen", title: "Excluded: back to the screen", note: "Return to the remaining red and amber flags." };
+
+const PAGES = [
+/* ---------------- Front door ---------------- */
+{
+  id: "start", stage: "front", nav: "Start",
+  title: "Headache in same day emergency care",
+  lede: "A step-by-step pathway for adults who come to SDEC at Queen Elizabeth Hospital Birmingham with headache. It adapts the GIRFT headache pathway for general practice to an acute hospital setting.",
+  body: () => `
+    <h2>The question at every step</h2>
+    <p>Is this a primary headache that can be treated and followed up in the community, or a secondary headache that needs action today?</p>
+    <p>Most headaches are primary. Studies suggest more than 90% of headaches seen in general practice are migraine. The pathway is built to find the few that are not, without scanning everyone else.</p>
+    <h2>How the pathway runs</h2>
+    <ol class="stage-map">
+      <li><span class="sn">Stage 1</span>${go("streaming", "Front door")}<p>Check SDEC is the right place</p></li>
+      <li><span class="sn">Stage 2</span>${go("history", "Assessment")}<p>History, examination, tests and imaging</p></li>
+      <li><span class="sn">Stage 3</span>${go("screen", "Secondary screen")}<p>Red flags with their own pages, then amber flags</p></li>
+      <li><span class="sn">Stage 4</span>${go("moh", "Medication overuse")}<p>Check before naming a primary headache</p></li>
+      <li><span class="sn">Stage 5</span>${go("primary", "Primary headache")}<p>Name it, treat the attack, plan prevention</p></li>
+      <li><span class="sn">Stage 6</span>${go("discharge", "Leaving SDEC")}<p>Safety netting, GP letter and follow-up</p></li>
+    </ol>
+    <h2>Thresholds that change decisions</h2>
+    <dl class="figures">
+      <dt>5 minutes</dt><dd>Headache that reaches its peak within this time is thunderclap. Treat it as subarachnoid haemorrhage until that is excluded.</dd>
+      <dt>6 hours</dt><dd>CT head is most accurate for subarachnoid haemorrhage within 6 hours of onset (NICE NG228).</dd>
+      <dt>12 hours</dt><dd>If a lumbar puncture is needed, do it no earlier than 12 hours after onset.</dd>
+      <dt>180/120mmHg</dt><dd>Severe hypertension with headache. Look for acute organ damage.</dd>
+      <dt>50 years</dt><dd>New persistent headache at 50 or over: think of giant cell arteritis.</dd>
+      <dt>2 days a week</dt><dd>Keep acute headache medicines to this or less to avoid medication overuse headache.</dd>
+    </dl>
+    ${panel("Before you use this pathway", `<p>This is a draft for clinical governance review at University Hospitals Birmingham. Contacts shown as “route to confirm” have not been checked (see ${go("contacts", "local contacts")}). Use clinical judgement and current national guidance alongside it.</p>`, "caution")}
+  `,
+  next: { to: "streaming", label: "Start: is SDEC the right place?" }
+},
+{
+  id: "streaming", stage: "front", nav: "Is SDEC the right place?",
+  title: "Is SDEC the right place?",
+  lede: "Check this before the full assessment. Some people with headache need resuscitation, the stroke team or another specialty straight away.",
+  body: () => `
+    ${panel("Move to resus or call the team now if any apply", ul([
+      "reduced consciousness (GCS below 15) or new confusion",
+      "NEWS2 at or above the SDEC exclusion threshold in the streaming tool",
+      "suspected meningitis or encephalitis: fever with neck stiffness, a non-blanching rash, altered behaviour or a seizure",
+      "sudden focal neurological deficit: call the stroke team (see " + go("focal", "focal neurological deficit") + ")",
+      "thunderclap onset with a deficit, repeated vomiting or a falling conscious level",
+      "headache after a head injury: use the emergency department head injury pathway (NICE NG232)"
+    ]) + contacts("edResus", "stroke"), "stop")}
+    ${panel("Check the route before assessing if", ul([
+      "pregnant or within 6 weeks of giving birth: see " + go("pregnancy", "pregnancy and postpartum") + " and contact the obstetric team",
+      "painful red eye with blurred vision: see " + go("eye", "red eye with blurred vision") + " and contact the emergency eye service"
+    ]), "caution")}
+    <p>If none apply, assess in SDEC. Record the time the headache started. It decides the timing of imaging and lumbar puncture if subarachnoid haemorrhage is possible.</p>
+  `,
+  next: { to: "history", label: "None apply: take the history" }
+},
+
+/* ---------------- Assessment ---------------- */
+{
+  id: "history", stage: "assess", nav: "History",
+  title: "Take a structured history",
+  lede: "The history does most of the diagnostic work. It tells you which examination findings matter and which tests you can avoid.",
+  body: () => `
+    <h2>Timing and pattern</h2>
+    ${ul([
+      "<strong>Onset:</strong> ask how long the headache took to reach its worst. Seconds to a few minutes is thunderclap (see " + go("thunderclap", "thunderclap headache") + ")",
+      "<strong>Frequency:</strong> attacks a day, headache days a month, and whether there are any completely clear days",
+      "<strong>Change:</strong> a new pattern in an established headache that does not behave like migraine needs a fresh look, and medication overuse should be excluded first",
+      "<strong>Duration:</strong> how long each attack lasts with and without treatment, and whether it settles on its own",
+      "<strong>Severity:</strong> on what share of days the headache stops normal activity",
+      "<strong>Site:</strong> one side or both, and whether the side changes. A headache always on the same side raises cluster headache or another trigeminal autonomic cephalalgia, although most people with this still have migraine",
+      "<strong>Character:</strong> descriptions such as throbbing or pressing rarely help with diagnosis"
+    ])}
+    <h2>Associated features</h2>
+    <div class="groups">
+      <div>
+        <h3>Migraine features</h3>
+        ${ul([
+          "nausea or vomiting",
+          "sensitivity to light, sound, smell or movement",
+          "aura in fewer than 1 in 3 people: temporary visual, sensory, motor or speech symptoms that build gradually and spread",
+          "keeping still during attacks, because movement makes migraine worse"
+        ])}
+      </div>
+      <div>
+        <h3>Pressure features</h3>
+        ${ul([
+          "raised pressure has no single telltale sign. Suspect it when a new or changing headache is worse lying flat, bending, coughing or straining, especially with brief visual greying or pulsatile tinnitus",
+          "low pressure usually starts as a new daily headache that is worse upright and eases lying down, sometimes with tinnitus, vertigo or muffled hearing",
+          "migraine can share some of these features (see " + go("pressure", "raised or low pressure") + ")"
+        ])}
+      </div>
+      <div>
+        <h3>Autonomic features</h3>
+        ${ul([
+          "on the side of the pain: watering eye, red eye, runny or blocked nostril, drooping lid",
+          "these point to cluster headache or another trigeminal autonomic cephalalgia",
+          "migraine can cause autonomic symptoms, but usually on both sides",
+          "restlessness and pacing during attacks suggest cluster headache"
+        ])}
+      </div>
+      <div>
+        <h3>Neck features</h3>
+        ${ul([
+          "neck pain is common in migraine and does not on its own mean the neck is the cause",
+          "consider cervicogenic headache only if neck movement is reduced and moving the neck brings on the usual headache",
+          "general neck stiffness is different from nuchal rigidity, which is resistance to passive neck flexion caused by meningism"
+        ])}
+      </div>
+    </div>
+    <h2>Background</h2>
+    ${ul([
+      "<strong>Headache history:</strong> previous headaches, a link with periods, and childhood periodic syndromes such as recurrent abdominal pain or cyclical vomiting",
+      "<strong>Triggers:</strong> periods, missed meals, alcohol, poor sleep, stress and caffeine",
+      "<strong>Medicines:</strong> every acute and preventive treatment tried, doses and side effects, including over-the-counter products, caffeine and alcohol. Count the days a month acute medicines are taken",
+      "<strong>Family history:</strong> ask about disabling headaches that affected work or school rather than about migraine by name, and about bleeding in the brain or aneurysm",
+      "<strong>Social history:</strong> the effect on work, home and leisure",
+      "<strong>Neurodivergence:</strong> autism and ADHD are linked with more migraine. Differences in sensory processing can change how pain is described and how treatment works, so watch for diagnostic overshadowing"
+    ])}
+    <h2>Questions for every SDEC patient</h2>
+    ${lead("Ask about:", [
+      "cancer, active or treated",
+      "immunosuppression, including drugs and HIV",
+      "anticoagulants or a bleeding tendency",
+      "pregnancy, or giving birth in the last 6 weeks",
+      "a recent lumbar puncture, epidural or spinal surgery",
+      "head or neck injury in the past month",
+      "other people at home with headache, which may point to carbon monoxide",
+      "why they have come to hospital today, especially with a long-standing headache"
+    ])}
+  `,
+  next: { to: "examination", label: "Continue to examination" }
+},
+{
+  id: "examination", stage: "assess", nav: "Examination",
+  title: "Examine with purpose",
+  lede: "Let the history guide the examination, but always check the observations, the neck, the cranial nerves and the fundi.",
+  body: () => `
+    ${lead("Examine:", [
+      "<strong>observations:</strong> blood pressure (repeat it if high), pulse, temperature, oxygen saturation, respiratory rate, NEWS2 and GCS",
+      "<strong>weight and BMI</strong> if idiopathic intracranial hypertension is possible",
+      "<strong>general appearance:</strong> rash, including a non-blanching rash, and signs of systemic illness",
+      "<strong>neck:</strong> test for nuchal rigidity and note the range of movement",
+      "<strong>temporal arteries</strong> in anyone 50 or over: tenderness, thickening, nodules or a weak pulse",
+      "<strong>eyes:</strong> visual acuity in each eye, redness and the pupils",
+      "<strong>cranial nerves:</strong> pupils, eye movements, visual fields to confrontation, facial sensation and facial movement",
+      "<strong>limbs and gait:</strong> led by symptoms, including pronator drift, power, coordination and gait",
+      "<strong>fundi:</strong> look for papilloedema and hypertensive retinopathy"
+    ])}
+    <h2>Quick bedside tests</h2>
+    ${ul([
+      "if speech or thinking seems changed, ask the person to name as many animals as they can in 1 minute. Fewer than 17 is abnormal (semantic verbal fluency)",
+      "if the headache is one-sided with eye symptoms, look for a drooping lid and small pupil on that side (Horner syndrome), which can point to carotid dissection"
+    ])}
+    ${panel("If you cannot see the fundi", `<p>Get a clear view before discharge whenever raised pressure is possible. Ask a senior colleague or arrange same-day ophthalmology review.</p>` + contacts("sdecSenior", "ophthalmology"), "caution")}
+  `,
+  next: { to: "investigations", label: "Continue to investigations" }
+},
+{
+  id: "investigations", stage: "assess", nav: "Investigations",
+  title: "Choose tests that change management",
+  lede: "Blood tests add little to routine headache assessment. Order the ones that answer a specific question.",
+  body: () => `
+    <h2>Blood tests</h2>
+    ${lead("Request:", [
+      "FBC, CRP and ESR (or plasma viscosity) for anyone 50 or over with a new persistent headache, to screen for giant cell arteritis. Take them before steroids or straight after the first dose",
+      "a pregnancy test for anyone who could be pregnant, before imaging or new medicines",
+      "U&E and glucose if there is vomiting, systemic illness or severe hypertension",
+      "a venous blood gas with carboxyhaemoglobin if carbon monoxide exposure is possible (smokers have a higher baseline)",
+      "blood cultures and lactate if there is fever, following the sepsis pathway"
+    ])}
+    <h2>Other tests</h2>
+    ${ul([
+      "urine for protein if pregnant, recently pregnant or severely hypertensive",
+      "ECG if blood pressure is 180/120mmHg or higher, or before starting a triptan in someone with cardiac risk factors",
+      "lumbar puncture only for a defined question, such as suspected subarachnoid haemorrhage after a late CT, or suspected meningitis (see " + go("thunderclap", "thunderclap headache") + " and " + go("systemic", "systemic features") + ")"
+    ])}
+  `,
+  next: { to: "imaging", label: "Continue to imaging" }
+},
+{
+  id: "imaging", stage: "assess", nav: "Imaging",
+  title: "Decide who needs a scan",
+  lede: "Most people with headache do not need a scan. Scanning for reassurance finds incidental abnormalities, reassures only briefly and can strengthen worries about illness.",
+  body: () => `
+    <h2>Scan today</h2>
+    ${lead("Arrange CT today, with further imaging as directed, for:", [
+      "thunderclap onset: urgent non-contrast CT head (see " + go("thunderclap", "thunderclap headache") + ")",
+      "a new focal neurological deficit or reduced consciousness",
+      "papilloedema or other signs of raised pressure: CT head and CT venogram",
+      "suspected cerebral venous sinus thrombosis, for example pregnancy, the postpartum period, oestrogen treatment or a clotting disorder: CT venogram",
+      "a new severe headache in someone taking anticoagulants or with a bleeding tendency",
+      "a new headache with a history of cancer, especially lung, breast, melanoma or renal, or with significant immunosuppression"
+    ])}
+    <h2>Discuss MRI with neurology</h2>
+    ${lead("Consider MRI brain for a new persistent or progressive headache with any new or worsening:", [
+      "change in thinking or memory",
+      "speech change, such as word-finding difficulty or a low verbal fluency score",
+      "personality change",
+      "visual field loss that has been confirmed on testing",
+      "weakness of one arm or leg",
+      "sensory change on one side"
+    ])}
+    <h2>Do not scan</h2>
+    ${lead("Imaging is not needed when there is a normal neurological examination and:", [
+      "typical migraine or tension-type headache",
+      "a stable episodic pattern with clear headache-free days",
+      "a long history with no change in character",
+      "known migraine that has gradually worsened over time"
+    ])}
+    <h2>Why restraint matters</h2>
+    ${ul([
+      "when headache is the only symptom, the chance that a suspected brain tumour referral finds a tumour is about 0.1%",
+      "about 15% of brain MRI scans show an incidental finding, more with age. Most do not matter but can cause anxiety and further tests"
+    ])}
+    <p>Further reading: ${ext("https://www.england.nhs.uk/long-read/urgent-gp-direct-access-to-diagnostic-services-for-people-with-symptoms-not-meeting-the-threshold-for-an-urgent-suspected-cancer-referral/", "NHS England guidance on direct access to brain MRI")} and ${ext("https://bash.org.uk/wp-content/uploads/brizy/custom_files/BASHIncidentals.pdf", "BASH advice on incidental findings")}.</p>
+    ${local("radiology", "neurology")}
+  `,
+  next: { to: "screen", label: "Continue to the secondary headache screen" }
+},
+
+/* ---------------- Secondary screen ---------------- */
+{
+  id: "screen", stage: "screen", nav: "Red and amber flags",
+  title: "Screen for secondary headache",
+  lede: "Check every red flag and open the page for any that apply. Then check the amber flags, which lower your threshold for senior review and imaging.",
+  body: () => `
+    <h2 class="routes-title">Red flags</h2>
+    <div class="routes">
+      ${route({ to: "thunderclap", title: "Thunderclap headache", note: "Reaches its peak within 5 minutes", level: "emergency" })}
+      ${route({ to: "focal", title: "Focal neurological deficit", note: "Weakness, speech or visual loss, double vision, ataxia, papilloedema or loss of consciousness", level: "emergency" })}
+      ${route({ to: "systemic", title: "Systemic features", note: "Fever, neck stiffness, rash, weight loss or immunosuppression", level: "emergency" })}
+      ${route({ to: "gca", title: "Possible giant cell arteritis", note: "50 or over with a new persistent headache", level: "sameday" })}
+      ${route({ to: "hypertension", title: "Severe hypertension", note: "180/120mmHg or higher with headache", level: "sameday" })}
+      ${route({ to: "eye", title: "Painful red eye with blurred vision", note: "Possible acute angle-closure glaucoma", level: "emergency" })}
+      ${route({ to: "pressure", title: "Raised or low pressure features", note: "Postural headache, papilloedema, visual greying, pulsatile tinnitus", level: "sameday" })}
+      ${route({ to: "pregnancy", title: "Pregnant or postpartum", note: "Any stage of pregnancy, or within 6 weeks of giving birth", level: "sameday" })}
+    </div>
+    <h2>Amber flags</h2>
+    ${lead("These make a secondary cause more likely in a new persistent headache:", [
+      "new persistent headache at 50 or over with no previous migraine or tension-type headache. Check FBC, CRP and ESR. Changes in migraine pattern around the menopause are common",
+      "active or recently treated cancer",
+      "immunosuppression, including drug-induced, or HIV with a CD4 count below 200",
+      "a clotting disorder, anticoagulation or a bleeding tendency",
+      "head injury in the past month. Scan urgently if anticoagulated or with a bleeding tendency",
+      "headache that changes with posture: worse upright suggests low pressure, worse lying flat suggests raised pressure",
+      "headache brought on by coughing, straining or exertion",
+      "atypical aura: lasting more than 1 hour, or weakness for the first time",
+      "headache that has progressed over weeks or more, or has been daily from the start",
+      "repeated attendances with worsening headache. Check for medication overuse first, as most will still be primary"
+    ])}
+    ${panel("One or more amber flags", `<p>Discuss with a senior decision-maker and review the ${go("imaging", "imaging criteria")} before diagnosing a primary headache.</p>` + contacts("sdecSenior"), "caution")}
+  `,
+  next: { to: "moh", label: "No red flags: check for medication overuse" }
+},
+{
+  id: "thunderclap", stage: "screen", nav: "Thunderclap headache", sub: true, level: "emergency",
+  title: "Thunderclap headache",
+  lede: "A severe headache that reaches its peak within 1 to 5 minutes. Most are not subarachnoid haemorrhage, but every one needs investigating.",
+  body: () => `
+    <h2>Recognise</h2>
+    ${ul([
+      "ask exactly how quickly it peaked. If the person cannot say, ask anyone who saw it start, without delaying the next step",
+      "supporting features: neck pain or stiffness, light sensitivity, nausea or vomiting, painful neck flexion, onset during exertion, reduced consciousness"
+    ])}
+    <h2>Act now</h2>
+    ${steps([
+      "Get urgent review by a senior decision-maker.",
+      "Request an urgent non-contrast CT head. Record the onset time: CT is most accurate within 6 hours of onset.",
+      "<strong>CT shows blood:</strong> diagnose subarachnoid haemorrhage. Request CT angiography without delay and discuss urgently with neurosurgery. The risk of rebleeding is highest in the first 24 hours.",
+      "<strong>CT within 6 hours of onset, reported normal by a radiologist:</strong> do not routinely do a lumbar puncture. Think about other diagnoses, discuss with a senior and seek specialist advice.",
+      "<strong>CT more than 6 hours after onset, normal:</strong> consider a lumbar puncture at least 12 hours after onset, with spectrophotometry for xanthochromia. Protect the sample from light. Xanthochromia means subarachnoid haemorrhage: request CT angiography."
+    ])}
+    <h2>If subarachnoid haemorrhage is excluded</h2>
+    ${lead("Consider, and discuss with neurology:", [
+      "reversible cerebral vasoconstriction syndrome: repeated thunderclap headaches over days, often after exertion, sex, straining, giving birth or vasoactive drugs",
+      "cervical artery dissection: neck pain, Horner syndrome or recent neck strain",
+      "cerebral venous sinus thrombosis",
+      "pituitary apoplexy: visual loss, eye movement problems or low blood pressure",
+      "intracerebral haemorrhage",
+      "spontaneous intracranial hypotension",
+      "primary thunderclap headache, but only once secondary causes are excluded"
+    ])}
+    <p>These usually need vascular imaging (CT angiography or venography) or MRI.</p>
+    ${local("sdecSenior", "radiology", "neurosurgery", "neurology")}
+  `,
+  routes: [BACK_TO_SCREEN]
+},
+{
+  id: "focal", stage: "screen", nav: "Focal neurological deficit", sub: true, level: "emergency",
+  title: "Headache with a focal neurological deficit",
+  lede: "A new focal deficit with headache makes an intracranial cause likely. How fast it developed decides the urgency.",
+  body: () => `
+    <h2>Recognise</h2>
+    ${ul([
+      "limb weakness or one-sided sensory change",
+      "speech or language disturbance",
+      "visual loss, visual field loss or double vision",
+      "ataxia",
+      "papilloedema",
+      "loss of consciousness"
+    ])}
+    <h2>Act by tempo</h2>
+    ${steps([
+      "<strong>Developed over minutes:</strong> treat as stroke. Call the stroke team now and check glucose.",
+      "<strong>Developing over hours to days:</strong> this is the SDEC group. Arrange CT head today, with CT angiography or venography if dissection or venous thrombosis is possible, and discuss with neurology the same day.",
+      "<strong>Developing over weeks:</strong> arrange CT head with contrast or MRI, then use the rapid-access neurology route, or the suspected cancer pathway if a mass is found."
+    ])}
+    <h2>Migraine aura or something else?</h2>
+    ${lead("Aura typically:", [
+      "builds over 5 minutes or more and spreads",
+      "has positive symptoms such as zigzag lines or tingling",
+      "fully resolves within 60 minutes"
+    ])}
+    ${lead("Treat as TIA or stroke until proven otherwise if:", [
+      "it started suddenly",
+      "it began with loss of function, such as visual loss or numbness, rather than positive symptoms",
+      "there is weakness, which in aura is rare",
+      "it is a first-ever aura at 50 or over",
+      "it lasts more than 60 minutes"
+    ])}
+    ${panel("Cranial nerve signs that need vascular imaging today", ul([
+      "third nerve palsy with a dilated pupil: aneurysm until proven otherwise",
+      "Horner syndrome with neck or face pain: carotid dissection"
+    ]), "stop")}
+    ${local("stroke", "radiology", "neurology", "neurosurgery")}
+  `,
+  routes: [BACK_TO_SCREEN]
+},
+{
+  id: "systemic", stage: "screen", nav: "Systemic features", sub: true, level: "emergency",
+  title: "Headache with systemic features",
+  lede: "Fever, neck stiffness, rash, weight loss or immunosuppression point to infection, inflammation or cancer.",
+  body: () => `
+    ${panel("Suspected meningitis or encephalitis", steps([
+      "Move to resus and follow the sepsis pathway. Do not delay antibiotics for imaging or lumbar puncture.",
+      "Take blood cultures.",
+      "Give IV ceftriaxone 2g. Add IV amoxicillin 2g 4-hourly if 60 or over or immunocompromised. Add IV aciclovir 10mg/kg 8-hourly if encephalitis is possible.",
+      "Give IV dexamethasone 10mg 6-hourly if bacterial meningitis is suspected, ideally with or just before the first antibiotic dose.",
+      "Check the trust antimicrobial guide and adjust for allergy and kidney function."
+    ]) + contacts("edResus", "infection"), "stop")}
+    <h2>Other systemic patterns</h2>
+    ${ul([
+      "<strong>50 or over</strong> with a new persistent headache plus weight loss, fever, night sweats or fatigue: consider " + go("gca", "giant cell arteritis"),
+      "<strong>cancer or immunosuppression:</strong> lower your threshold for CT with contrast or MRI, and discuss opportunistic infection with the infection team",
+      "<strong>fever without meningism</strong> in someone otherwise well: look for a source, as headache is common with any infection, and reassess",
+      "<strong>carbon monoxide:</strong> suspect it when the headache is worse at home and better away, or others in the household (including pets) are unwell. Check carboxyhaemoglobin, give high-flow oxygen and advise a gas safety check before they return home"
+    ])}
+    <p>For other patterns without an emergency, discuss with acute medicine or neurology for same-day assessment and imaging.</p>
+    ${local("neurology", "infection")}
+  `,
+  routes: [{ to: "gca", title: "Go to possible giant cell arteritis", note: "50 or over with systemic features", level: "sameday" }, BACK_TO_SCREEN]
+},
+{
+  id: "gca", stage: "screen", nav: "Possible giant cell arteritis", sub: true, level: "sameday",
+  title: "Possible giant cell arteritis",
+  lede: "Consider in anyone 50 or over with a new persistent headache, especially with systemic features. Visual loss can happen fast and may not recover.",
+  body: () => `
+    <h2>Recognise</h2>
+    ${lead("Ask about:", [
+      "jaw or tongue pain on chewing (claudication)",
+      "visual symptoms: loss of vision, field loss, transient blindness (amaurosis fugax) or double vision",
+      "shoulder and hip girdle pain and stiffness, which about half of people with GCA have",
+      "fever, weight loss, night sweats or fatigue"
+    ])}
+    ${ul([
+      "examine the temporal arteries for tenderness, thickening, nodules or a weak pulse",
+      "the headache is often not over the temple",
+      "scalp tenderness alone is not specific and is common in migraine, unless it is directly over the artery"
+    ])}
+    <h2>Act now</h2>
+    ${steps([
+      "Take FBC, CRP and ESR (or plasma viscosity) before steroids or straight after the first dose. A normal result does not exclude GCA.",
+      "<strong>Strong suspicion, no visual symptoms:</strong> start prednisolone 40mg to 60mg once daily today. Do not wait for results or a specialist.",
+      "<strong>Visual loss or amaurosis fugax:</strong> give IV methylprednisolone 500mg to 1g daily for up to 3 days before oral prednisolone. If IV treatment is not immediately available, start oral prednisolone without delay. Arrange ophthalmology review the same day.",
+      "Refer to the GCA fast-track service. Specialist review should be the same working day where possible and always within 3 working days.",
+      "Confirmation is by ultrasound of the temporal and axillary arteries, a temporal artery biopsy of at least 1cm, or both. Book promptly, as ultrasound becomes less sensitive after a few days of steroids.",
+      "Consider gastroprotection and bone protection, and check glucose."
+    ])}
+    <p>Doses follow the BSR guideline (2020). Further detail is in the ${ext("https://gettingitrightfirsttime.co.uk/wp-content/uploads/2022/11/Rheumatology-Giant-Cell-Arteritis-Pathway.html", "GIRFT GCA pathway")}.</p>
+    ${local("gca", "ophthalmology")}
+  `,
+  routes: [BACK_TO_SCREEN]
+},
+{
+  id: "hypertension", stage: "screen", nav: "Severe hypertension", sub: true, level: "sameday",
+  title: "Severe hypertension with headache",
+  lede: "Blood pressure of 180/120mmHg or higher with headache. Repeat it after rest and pain relief, as pain can raise blood pressure.",
+  body: () => `
+    <h2>Look for acute organ damage</h2>
+    ${ul([
+      "new confusion, reduced consciousness or a seizure",
+      "new significant visual disturbance",
+      "papilloedema, retinal haemorrhages or exudates on fundoscopy",
+      "chest pain, breathlessness or signs of heart failure",
+      "acute kidney injury, blood or protein in the urine",
+      "ECG changes"
+    ])}
+    <h2>Act</h2>
+    ${steps([
+      "<strong>Organ damage present:</strong> this is a hypertensive emergency. Move to resus or a monitored bed and lower blood pressure in a controlled way with IV treatment, following BIHS guidance (2022). Use the " + hyperLink() + ".",
+      "<strong>No organ damage:</strong> do not lower blood pressure quickly. Start or adjust oral treatment, recheck, and arrange review within days, following NICE NG136.",
+      "<strong>Pregnant or within 6 weeks of birth:</strong> the threshold is lower. Go to " + go("pregnancy", "pregnancy and postpartum") + ".",
+      "Think about secondary causes: phaeochromocytoma (episodes of headache, sweating and palpitations) and drugs such as cocaine, amphetamines or interactions with monoamine oxidase inhibitors."
+    ])}
+    ${local("sdecSenior", "edResus")}
+  `,
+  routes: [BACK_TO_SCREEN]
+},
+{
+  id: "eye", stage: "screen", nav: "Red eye with blurred vision", sub: true, level: "emergency",
+  title: "Painful red eye with blurred vision",
+  lede: "Severe eye pain, a red eye and blurred vision with headache is acute angle-closure glaucoma until proven otherwise. Sight is at risk within hours.",
+  body: () => `
+    <h2>Recognise</h2>
+    ${ul([
+      "haloes around lights, nausea and vomiting",
+      "a hazy cornea and a mid-dilated pupil that reacts poorly",
+      "an eye that feels hard compared with the other",
+      "more likely in older, long-sighted people, in dim light, or after dilating drops or anticholinergic medicines"
+    ])}
+    <h2>Act now</h2>
+    ${steps([
+      "Contact the emergency eye service immediately. Do not delay for imaging.",
+      "Give pain relief and an antiemetic, and keep the person lying flat.",
+      "Start eye drops or acetazolamide only on ophthalmology advice."
+    ])}
+    <h2>Other causes to consider</h2>
+    ${ul([
+      "anterior uveitis, scleritis or keratitis",
+      "giant cell arteritis in anyone 50 or over with visual loss (see " + go("gca", "possible giant cell arteritis") + ")",
+      "cluster headache can cause a red, watering eye with pain behind it, but attacks recur in a fixed pattern and vision is not lost"
+    ])}
+    ${local("ophthalmology")}
+  `,
+  routes: [BACK_TO_SCREEN]
+},
+{
+  id: "pressure", stage: "screen", nav: "Raised or low pressure", sub: true, level: "sameday",
+  title: "Raised or low pressure features",
+  lede: "Headache that changes with posture, or comes with papilloedema, needs imaging today.",
+  body: () => `
+    <h2>Raised pressure</h2>
+    ${lead("Features:", [
+      "headache worse lying flat, on waking, or with coughing, straining or bending",
+      "vomiting",
+      "brief greying or loss of vision on standing (visual obscurations)",
+      "pulsatile tinnitus",
+      "double vision from a sixth nerve palsy",
+      "papilloedema"
+    ])}
+    ${steps([
+      "Arrange CT head and CT venogram today.",
+      "<strong>Mass or hydrocephalus:</strong> discuss with neurosurgery.",
+      "<strong>Venous sinus thrombosis:</strong> discuss anticoagulation with neurology or the stroke team.",
+      "<strong>Normal imaging with papilloedema:</strong> likely idiopathic intracranial hypertension. Arrange urgent ophthalmology review (acuity and visual fields) and discuss with neurology. Lumbar puncture with opening pressure follows imaging and is usually specialist-led. Rapidly worsening vision needs same-day specialist care.",
+      "Check for causes: tetracyclines, retinoids, high-dose vitamin A and recent steroid withdrawal."
+    ])}
+    <h2>Low pressure</h2>
+    ${lead("Features:", [
+      "headache that comes on within minutes to hours of being upright and eases lying down",
+      "tinnitus, muffled hearing or neck pain",
+      "a recent lumbar puncture, epidural or spinal surgery, or no cause at all (spontaneous)"
+    ])}
+    ${ul([
+      "<strong>after a dural puncture:</strong> discuss with anaesthetics, who may offer an epidural blood patch",
+      "<strong>spontaneous:</strong> MRI brain with contrast and neurology review",
+      "fluids, simple pain relief and caffeine can ease symptoms in the short term"
+    ])}
+    ${local("radiology", "neurology", "neurosurgery", "ophthalmology", "anaesthetics")}
+  `,
+  routes: [BACK_TO_SCREEN]
+},
+{
+  id: "pregnancy", stage: "screen", nav: "Pregnant or postpartum", sub: true, level: "sameday",
+  title: "Headache in pregnancy or after birth",
+  lede: "A new or severe headache during pregnancy or within 6 weeks of giving birth needs urgent assessment. Most will still be migraine or tension-type headache.",
+  body: () => `
+    <h2>Causes to exclude</h2>
+    ${ul([
+      "pre-eclampsia, from 20 weeks of pregnancy and after birth",
+      "cerebral venous sinus thrombosis",
+      "posterior reversible encephalopathy syndrome and reversible cerebral vasoconstriction syndrome",
+      "subarachnoid or intracerebral haemorrhage",
+      "pituitary apoplexy",
+      "post-dural puncture headache after an epidural or spinal anaesthetic"
+    ])}
+    <h2>Act</h2>
+    ${steps([
+      "Check blood pressure and test urine for protein.",
+      "<strong>Blood pressure 140/90mmHg or higher after 20 weeks or after birth, or new proteinuria:</strong> treat as pre-eclampsia until proven otherwise. 160/110mmHg or higher is severe and needs treatment now.",
+      "Contact the obstetric team now through the local route.",
+      "Do not withhold imaging that is needed. CT head and CT venography give a very low dose to the baby, and MRI without contrast is an alternative.",
+      "Check every medicine for safety in pregnancy or breastfeeding before prescribing. Do not start topiramate or valproate."
+    ])}
+    ${local("obstetrics", "anaesthetics", "radiology")}
+  `,
+  routes: [BACK_TO_SCREEN]
+},
+
+/* ---------------- Medication overuse ---------------- */
+{
+  id: "moh", stage: "moh", nav: "Medication overuse headache",
+  title: "Check for medication overuse",
+  lede: "Frequent use of acute headache medicines can itself cause daily headache. Check for it in everyone before settling on a primary headache diagnosis.",
+  body: () => `
+    <p>Medication overuse headache affects 1% to 2% of the population and 30% to 50% of people seen in headache clinics. It is common in people with migraine or tension-type headache who take painkillers often, including painkillers prescribed for something else such as arthritis.</p>
+    <div class="tool">
+      <h3>Overuse check (ICHD-3 criteria)</h3>
+      <div class="field"><label for="moh-days">Headache days a month</label><input id="moh-days" type="number" min="0" max="31" inputmode="numeric" value="18"></div>
+      <div class="field"><label for="moh-simple">Days a month taking paracetamol, aspirin or an NSAID</label><input id="moh-simple" type="number" min="0" max="31" inputmode="numeric" value="16"></div>
+      <div class="field"><label for="moh-other">Days a month taking a triptan, opioid, ergot or combination painkiller</label><input id="moh-other" type="number" min="0" max="31" inputmode="numeric" value="0"></div>
+      <label class="check"><input id="moh-3m" type="checkbox" checked> This pattern has lasted more than 3 months</label>
+      <div class="result" id="moh-result" aria-live="polite"></div>
+      <p class="mono" style="margin:10px 0 0;font-size:0.8rem;color:var(--ink-2)">Example values shown. Replace them with the patient’s own.</p>
+    </div>
+    <h2>Manage</h2>
+    ${steps([
+      "Explain how overuse keeps the headache going, without blame.",
+      "Advise stopping all overused acute medicines for at least 1 month. Stop them abruptly. Withdrawal can be gradual for high-dose opioids or for people who cannot manage abrupt withdrawal.",
+      "Warn that the headache often gets worse for days to weeks before it improves. Full benefit can take up to 12 weeks.",
+      "Start or continue preventive treatment for the underlying headache now. Overuse stops prevention from working.",
+      "Offer an antiemetic if needed, encourage fluids, and give a written plan and a headache diary.",
+      "Do not start opioids in SDEC. Consider specialist referral for people using strong opioids.",
+      "Ask the GP to review 4 to 8 weeks after withdrawal starts. Refer to a headache clinic if overuse returns despite this."
+    ])}
+    <p>Long-term target: acute medicines on no more than 2 days a week, which is about 10 days a month.</p>
+  `,
+  mount: () => {
+    const ids = ["moh-days", "moh-simple", "moh-other", "moh-3m"];
+    const out = document.getElementById("moh-result");
+    const num = id => Math.max(0, Math.min(31, parseInt(document.getElementById(id).value, 10) || 0));
+    const update = () => {
+      const days = num("moh-days"), simple = num("moh-simple"), other = num("moh-other");
+      const long = document.getElementById("moh-3m").checked;
+      const reasons = [];
+      if (simple >= 15) reasons.push("simple painkillers on 15 or more days a month");
+      if (other >= 10) reasons.push("triptans, opioids, ergots or combination painkillers on 10 or more days a month");
+      if (!reasons.length && simple > 0 && other > 0 && Math.min(31, simple + other) >= 10) reasons.push("a mix of medicine types on about 10 or more days a month");
+      if (days < 15) {
+        out.className = "result neg";
+        out.textContent = "Below the threshold: fewer than 15 headache days a month. Still advise keeping acute medicines to 2 days a week or less.";
+      } else if (!reasons.length) {
+        out.className = "result neg";
+        out.textContent = "Medicine use is below the overuse thresholds. Look for another cause of frequent headache, including chronic migraine.";
+      } else if (!long) {
+        out.className = "result pos";
+        out.textContent = "Overuse pattern (" + reasons.join("; ") + "), but under 3 months. Advise cutting down now and review.";
+      } else {
+        out.className = "result pos";
+        out.textContent = "Meets the criteria for medication overuse headache: " + reasons.join("; ") + ". Manage as below.";
+      }
+    };
+    ids.forEach(id => document.getElementById(id).addEventListener("input", update));
+    update();
+  },
+  next: { to: "primary", label: "Continue to primary headache" }
+},
+
+/* ---------------- Primary headache ---------------- */
+{
+  id: "primary", stage: "primary", nav: "Name the primary headache",
+  title: "Name the primary headache",
+  lede: "With red flags and medication overuse dealt with, use the features below to name the headache. A positive diagnosis is itself part of treatment.",
+  body: () => `
+    <div class="tool">
+      <h3>ID Migraine screen</h3>
+      <p style="margin:0 0 6px">In the past 3 months, with headaches:</p>
+      <label class="check"><input id="idm-1" type="checkbox"> a headache has limited work, study or daily activity on at least 1 day</label>
+      <label class="check"><input id="idm-2" type="checkbox"> they have felt sick or been sick</label>
+      <label class="check"><input id="idm-3" type="checkbox"> light has bothered them much more than usual</label>
+      <div class="result" id="idm-result" aria-live="polite"></div>
+    </div>
+    <h2>Compare the features</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">Feature</th><th scope="col">Migraine</th><th scope="col">Tension-type</th><th scope="col">Cluster</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Site</th><td>One or both sides. Up to 40% are on both sides</td><td>Both sides</td><td>Always the same side, around the eye or temple</td></tr>
+          <tr><th scope="row">Character</th><td>Often throbbing, but not always</td><td>Pressing or tight</td><td>Boring, stabbing or burning</td></tr>
+          <tr><th scope="row">Severity</th><td>Moderate to severe</td><td>Mild to moderate</td><td>Severe to very severe</td></tr>
+          <tr><th scope="row">Attack length</th><td class="n">4 to 72 hours</td><td class="n">30 minutes to days</td><td class="n">15 to 180 minutes</td></tr>
+          <tr><th scope="row">Frequency</th><td>Episodic, or chronic at 15 or more days a month</td><td>Episodic or chronic</td><td>Every other day to 8 a day, in bouts</td></tr>
+          <tr><th scope="row">Behaviour</th><td>Keeps still, worse with activity</td><td>Carries on</td><td>Restless and agitated</td></tr>
+          <tr><th scope="row">Other features</th><td>Nausea, light and sound sensitivity, aura in about 1 in 3</td><td>Usually none</td><td>Watering, red eye, runny or blocked nose, drooping lid, all on the painful side</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Episodic headache that disrupts daily life is more likely to be migraine than tension-type headache. Chronic tension-type headache is uncommon: consider medication overuse and chronic migraine first. Criteria in full: ${ext("https://ichd-3.org/", "ICHD-3")}.</p>
+  `,
+  mount: () => {
+    const out = document.getElementById("idm-result");
+    const update = () => {
+      const n = ["idm-1", "idm-2", "idm-3"].filter(id => document.getElementById(id).checked).length;
+      if (n >= 2) { out.className = "result pos"; out.textContent = n + " of 3: migraine is likely (positive predictive value about 93%)."; }
+      else { out.className = "result"; out.textContent = n + " of 3: screen not positive. Use the full features below."; }
+    };
+    ["idm-1", "idm-2", "idm-3"].forEach(id => document.getElementById(id).addEventListener("change", update));
+    update();
+  },
+  routes: [
+    { to: "migraine", title: "Migraine", note: "Treat the attack, plan prevention", level: "routine" },
+    { to: "tension", title: "Tension-type headache", note: "Reassure, simple pain relief, limit days", level: "routine" },
+    { to: "cluster", title: "Cluster headache", note: "Oxygen and injected or nasal triptan", level: "sameday" },
+    { to: "unclear", title: "Diagnosis unclear", note: "Diary, second review, referral", level: "routine" }
+  ]
+},
+{
+  id: "migraine", stage: "primary", nav: "Migraine", sub: true, level: "routine",
+  title: "Migraine",
+  lede: "Treat the attack early, avoid opioids and plan prevention. Give the medicines singly or together, at the start of the pain rather than during aura.",
+  body: () => `
+    <h2>Treat the attack in SDEC</h2>
+    ${steps([
+      "<strong>NSAID:</strong> aspirin 900mg, ibuprofen 400mg to 600mg or naproxen 250mg to 500mg by mouth with food. If NSAIDs are unsuitable, paracetamol 1g, which is rarely enough alone.",
+      "<strong>Triptan</strong> (follow the formulary): sumatriptan 50mg to 100mg by mouth. If vomiting or the attack builds fast, use sumatriptan 6mg by subcutaneous injection or zolmitriptan 5mg nasal spray. Avoid with uncontrolled hypertension, ischaemic heart disease, previous heart attack, stroke or TIA, or peripheral vascular disease.",
+      "<strong>Antiemetic</strong>, which also helps absorption: metoclopramide 10mg, prochlorperazine 3mg buccal or domperidone 10mg. Use metoclopramide for no more than 5 days, avoid it in young people and in Parkinson’s disease.",
+      "Give IV fluids if dehydrated.",
+      "Do not give opioids or compound painkillers."
+    ])}
+    <p>If an attack has lasted more than 72 hours, or does not respond, discuss with neurology.</p>
+    <h2>Plan for the GP letter</h2>
+    ${ul([
+      "if 1 triptan does not work by 2 hours, the next attack can use a different triptan. Try each one over 3 attacks",
+      "gepants, such as rimegepant 75mg (at most 1 dose in 24 hours), are an acute option when 2 triptans have failed or are unsuitable and NSAIDs have also failed or are unsuitable",
+      "menstrual migraine with regular periods: frovatriptan 2.5mg twice daily, naratriptan 2.5mg twice daily or zolmitriptan 2.5mg 2 or 3 times daily, from 2 days before to 3 days after bleeding starts"
+    ])}
+    <h2>Prevention</h2>
+    <p>Offer it with 4 or more headache days a month for more than 3 months, a poor response to acute treatment, or long severe attacks. Start low, increase every 1 to 2 weeks, then continue for at least 8 weeks at the dose that works or the highest tolerated dose.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">Medicine</th><th scope="col">Start</th><th scope="col">Target</th><th scope="col">Maximum</th><th scope="col">Notes</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Amitriptyline</th><td class="n">10mg at night</td><td class="n">30mg to 75mg</td><td class="n">100mg</td><td>Increase by 10mg to 25mg</td></tr>
+          <tr><th scope="row">Candesartan</th><td class="n">4mg daily</td><td class="n">16mg</td><td class="n">16mg</td><td>Check kidney function and electrolytes before and after increases. NICE is updating CG150 to add it</td></tr>
+          <tr><th scope="row">Propranolol</th><td class="n">40mg daily</td><td class="n">80mg twice daily</td><td class="n">120mg twice daily</td><td>Avoid in asthma</td></tr>
+          <tr><th scope="row">Topiramate</th><td class="n">25mg daily</td><td class="n">50mg twice daily</td><td class="n">100mg twice daily</td><td>Pregnancy Prevention Programme required for anyone who could become pregnant (MHRA, 2024)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    ${ul([
+      "do not use valproate for migraine in anyone who could become pregnant",
+      "after 3 preventives have failed, were not tolerated or were unsuitable, atogepant (NICE TA973) or rimegepant every other day (NICE TA906) may be offered, in primary care where commissioned or through the headache clinic"
+    ])}
+    ${panel("Contraception", `<p>In migraine with aura, advise against oestrogen-containing contraception (pill, patch or ring) because of the stroke risk. Progestogen-only or non-hormonal methods are suitable.</p>`, "caution")}
+    <p>Lifestyle advice: regular sleep, meals and fluids, steady caffeine within recommended limits, and gradually increasing exercise. Screen for anxiety and low mood. Point people to ${ext("https://migrainetrust.org/", "the Migraine Trust")}.</p>
+    ${local("headacheClinic")}
+  `,
+  next: { to: "discharge", label: "Continue to leaving SDEC" }
+},
+{
+  id: "tension", stage: "primary", nav: "Tension-type headache", sub: true, level: "routine",
+  title: "Tension-type headache",
+  lede: "Give a positive diagnosis and reassurance. Tension-type headache rarely brings people to hospital, so check that migraine or medication overuse has not been missed.",
+  body: () => `
+    <h2>Treat</h2>
+    ${ul([
+      "aspirin 300mg to 900mg, ibuprofen 400mg or paracetamol 1g, taken early",
+      "no opioids or combination painkillers",
+      "acute medicines on no more than 10 days a month"
+    ])}
+    <h2>Plan for the GP letter</h2>
+    ${ul([
+      "advice on sleep, regular meals and fluids, stress and exercise, and a headache diary",
+      "amitriptyline if tension-type headache is confirmed on 8 or more days a month: 10mg at night, target 75mg, maximum 100mg",
+      "for chronic tension-type headache (15 or more days a month for at least 3 months), a course of up to 10 acupuncture sessions over 5 to 8 weeks where available"
+    ])}
+  `,
+  next: { to: "discharge", label: "Continue to leaving SDEC" }
+},
+{
+  id: "cluster", stage: "primary", nav: "Cluster headache", sub: true, level: "sameday",
+  title: "Cluster headache",
+  lede: "Strictly one-sided attacks around the eye lasting 15 to 180 minutes, with same-side autonomic features and restlessness. Treat the attack and refer every new diagnosis.",
+  body: () => `
+    <h2>Treat the attack</h2>
+    ${steps([
+      "<strong>Oxygen:</strong> 100% at 12 to 15 litres per minute through a non-rebreathing mask with a reservoir bag, for 15 to 20 minutes. A clear response supports the diagnosis.",
+      "<strong>Triptan by injection or nose:</strong> sumatriptan 6mg subcutaneous (up to twice a day) is the most effective. If injection is unsuitable, zolmitriptan 5mg nasal or sumatriptan 20mg nasal.",
+      "Do not use paracetamol, NSAIDs, opioids or oral triptans for the attack. Oral triptans usually do not work fast enough."
+    ])}
+    <h2>Arrange</h2>
+    ${ul([
+      "refer every new diagnosis to neurology, and discuss whether imaging is needed",
+      "home oxygen if it helped, through the local home oxygen route, with a fire safety check",
+      "injected sumatriptan can be used daily through a bout without causing medication overuse headache",
+      "preventive treatment such as verapamil or lithium only on specialist advice. Verapamil needs a baseline ECG and repeat ECGs as the dose rises",
+      "a short course of prednisolone may be used to bridge an established bout, on specialist advice",
+      "support from " + ext("https://ouchuk.org/", "OUCH (UK)")
+    ])}
+    ${local("neurology", "headacheClinic")}
+  `,
+  next: { to: "discharge", label: "Continue to leaving SDEC" }
+},
+{
+  id: "unclear", stage: "primary", nav: "Diagnosis unclear", sub: true, level: "routine",
+  title: "Diagnosis unclear",
+  lede: "No red flags, but the features do not fit a clear pattern. A diary and a second look usually settle it.",
+  body: () => `
+    <h2>Now</h2>
+    ${ul([
+      "give a headache diary to keep for at least 8 weeks: date, duration, severity, symptoms, triggers, medicines and their effect, and periods",
+      "give safety-net advice"
+    ])}
+    <h2>At the second review</h2>
+    ${ul([
+      "reconsider migraine, as chronic migraine can blur its typical features",
+      "check that " + go("moh", "medication overuse") + " has been dealt with",
+      "go over the " + go("screen", "red and amber flags") + " again",
+      "consider sinus disease, jaw joint problems or neck disorders, depending on the pattern",
+      "review medicines that can cause headache: nitrates, calcium-channel blockers, PDE5 inhibitors and oral contraceptives",
+      "consider one-sided headaches that respond to indometacin (hemicrania), trigeminal neuralgia (brief shock-like pains) and sleep apnoea (morning headache)",
+      "blood tests if indicated: ESR or CRP (especially at 50 or over), thyroid function, FBC, glucose, U&E and LFTs"
+    ])}
+    <p>If it is still unclear, refer to the headache clinic or neurology, or use Advice and Guidance.</p>
+    ${local("headacheClinic", "neurology")}
+  `,
+  next: { to: "discharge", label: "Continue to leaving SDEC" }
+},
+
+/* ---------------- Leaving SDEC ---------------- */
+{
+  id: "discharge", stage: "leave", nav: "Discharge and follow-up",
+  title: "Before the person leaves SDEC",
+  lede: "Confirm the checks are done, give clear safety-net advice and make sure the GP knows the plan.",
+  body: () => `
+    <div class="tool">
+      <h3>Discharge checklist</h3>
+      ${[
+        ["dc-1", "Red and amber flags screened and recorded"],
+        ["dc-2", "Neurological examination, including the fundi, recorded as normal or explained"],
+        ["dc-3", "Pain controlled, eating and drinking, mobile"],
+        ["dc-4", "Diagnosis or working diagnosis explained"],
+        ["dc-5", "Acute treatment plan given, with a limit on days a month"],
+        ["dc-6", "Safety-net advice given in person and in writing"],
+        ["dc-7", "Follow-up or referral arranged"],
+        ["dc-8", "GP letter completed"]
+      ].map(([id, t]) => '<label class="check"><input id="' + id + '" type="checkbox"' + (STATE.checks[id] ? " checked" : "") + "> " + t + "</label>").join("")}
+      <div class="result" id="dc-result" aria-live="polite"></div>
+    </div>
+    <h2>Safety-net advice</h2>
+    ${lead("Tell the person to call 999 or come straight back if they have:", [
+      "a sudden, severe headache that peaks within minutes",
+      "new weakness, numbness, or problems with speech or vision",
+      "confusion, drowsiness or a seizure",
+      "fever with a stiff neck, or a rash that does not fade when pressed",
+      "a painful red eye with blurred vision"
+    ])}
+    ${lead("And to see their GP the same day if they are 50 or over and develop:", [
+      "jaw pain when chewing",
+      "scalp tenderness",
+      "any change in vision (go to the emergency department if vision is lost)"
+    ])}
+    <h2>The GP letter</h2>
+    ${lead("Include:", [
+      "the diagnosis and what it was based on",
+      "the red flags that were checked and excluded",
+      "the acute treatment plan, with acute medicines on no more than 2 days a week",
+      "any suggested preventive treatment and how to increase it",
+      "contraception advice for migraine with aura",
+      "referrals made and who is following the person up"
+    ])}
+    <h2>Patient information</h2>
+    ${ul([
+      ext("https://www.nhs.uk/conditions/headaches/", "NHS: headaches"),
+      ext("https://www.nhs.uk/conditions/migraine/", "NHS: migraine"),
+      ext("https://migrainetrust.org/", "The Migraine Trust"),
+      ext("https://ouchuk.org/", "OUCH (UK) for cluster headache")
+    ])}
+    <h2>Record the route</h2>
+    <p>Copy the steps you took through this pathway into the clinical notes.</p>
+    <button class="btn" id="copy-route" type="button">Copy route for the notes</button>
+    <textarea class="copy-out" id="copy-out" readonly hidden aria-label="Route summary"></textarea>
+    ${local("headacheClinic", "neurology")}
+  `,
+  mount: () => {
+    const ids = ["dc-1", "dc-2", "dc-3", "dc-4", "dc-5", "dc-6", "dc-7", "dc-8"];
+    const out = document.getElementById("dc-result");
+    const update = () => {
+      const done = ids.filter(id => document.getElementById(id).checked).length;
+      ids.forEach(id => { STATE.checks[id] = document.getElementById(id).checked; });
+      out.className = "result" + (done === ids.length ? " neg" : "");
+      out.textContent = done === ids.length ? "All 8 checks complete." : done + " of 8 checks complete.";
+    };
+    ids.forEach(id => document.getElementById(id).addEventListener("change", update));
+    update();
+    const btn = document.getElementById("copy-route");
+    const box = document.getElementById("copy-out");
+    btn.addEventListener("click", () => {
+      const text = routeSummary();
+      const fallback = () => { box.hidden = false; box.value = text; box.focus(); box.select(); btn.textContent = "Select and copy the text below"; };
+      try {
+        navigator.clipboard.writeText(text).then(() => { btn.textContent = "Copied"; box.hidden = true; }, fallback);
+      } catch (e) { fallback(); }
+    });
+  }
+},
+
+/* ---------------- Reference ---------------- */
+{
+  id: "contacts", stage: "ref", nav: "Local contacts",
+  title: "Local contacts",
+  lede: "Every service this pathway sends people to. Contacts shown as route to confirm need checking before the pathway goes live.",
+  body: () => `
+    ${contacts(...Object.keys(CONTACTS))}
+    ${panel("To update", `<p>Edit the local settings block at the top of the page script. Each contact has a service name and a route, such as a bleep, extension or referral system. Leave a route empty to keep it flagged.</p>`, "local")}
+  `
+},
+{
+  id: "sources", stage: "ref", nav: "Sources and governance",
+  title: "Sources and governance",
+  lede: "The guidance this pathway draws on, and its status.",
+  body: () => `
+    <h2>Status</h2>
+    <dl class="figures">
+      <dt>Version</dt><dd>${esc(META.version)}, ${esc(META.date)}</dd>
+      <dt>Owner</dt><dd>${META.owner ? esc(META.owner) : "To confirm"}</dd>
+      <dt>Approved by</dt><dd>${META.approvedBy ? esc(META.approvedBy) : "Not yet approved"}</dd>
+      <dt>Review due</dt><dd>${META.reviewDue ? esc(META.reviewDue) : "To set at approval"}</dd>
+    </dl>
+    <h2>Adapted from</h2>
+    ${ul([ext("https://girft-interactivepathways.org.uk/headache/", "GIRFT headache interactive pathway") + ", general practice stage. The content has been rewritten and extended for the acute setting. This is not an official GIRFT product"])}
+    <h2>National guidance</h2>
+    ${ul([
+      ext("https://www.nice.org.uk/guidance/cg150", "NICE CG150: Headaches in over 12s") + ". NICE decided in December 2025 to update the migraine prevention recommendations, including adding candesartan",
+      ext("https://www.nice.org.uk/guidance/ng228", "NICE NG228: Subarachnoid haemorrhage caused by a ruptured aneurysm") + " (2022)",
+      ext("https://www.nice.org.uk/guidance/ng232", "NICE NG232: Head injury"),
+      ext("https://www.nice.org.uk/guidance/ng136", "NICE NG136: Hypertension in adults"),
+      ext("https://www.nice.org.uk/guidance/ng133", "NICE NG133: Hypertension in pregnancy"),
+      "British Society for Rheumatology guideline on giant cell arteritis. Mackie SL and others, Rheumatology 2020",
+      "British and Irish Hypertension Society guidance on hypertensive emergencies. Kulkarni S and others, Journal of Human Hypertension 2023;37:863 to 879",
+      "UK joint specialist societies guideline on meningitis. McGill F and others, Journal of Infection 2016",
+      ext("https://www.gov.uk/government/news/new-pregnancy-prevention-measures-introduced-for-topiramate", "MHRA: pregnancy prevention measures for topiramate") + " (20 June 2024)",
+      ext("https://ichd-3.org/", "International Classification of Headache Disorders, 3rd edition (ICHD-3)"),
+      ext("https://www.england.nhs.uk/long-read/urgent-gp-direct-access-to-diagnostic-services-for-people-with-symptoms-not-meeting-the-threshold-for-an-urgent-suspected-cancer-referral/", "NHS England: direct access to diagnostics, including brain MRI"),
+      ext("https://bash.org.uk/wp-content/uploads/brizy/custom_files/BASHIncidentals.pdf", "BASH: incidental findings on brain imaging"),
+      "Lipton RB and others. A self-administered screener for migraine in primary care: the ID Migraine validation study. Neurology 2003"
+    ])}
+    ${panel("Clinical responsibility", `<p>This pathway supports, and does not replace, clinical judgement. Check doses against the BNF and the trust formulary before prescribing.</p>`, "caution")}
+  `
+}
+];
+
+/* ============================================================
+   Engine
+   ============================================================ */
+const BY_ID = Object.fromEntries(PAGES.map(p => [p.id, p]));
+const STATE = { trail: [], log: [], visited: new Set(), checks: {} };
+
+function route(r) {
+  return '<a class="route" href="#' + r.to + '"><span class="r-title">' + r.title + "</span>" +
+    (r.note ? '<span class="r-note">' + r.note + "</span>" : "") +
+    '<span class="r-side">' + (r.level ? chip(r.level) : "") + '<span class="arrow" aria-hidden="true">→</span></span></a>';
+}
+
+function routeSummary() {
+  const now = new Date();
+  const pad = n => String(n).padStart(2, "0");
+  const stamp = pad(now.getDate()) + "/" + pad(now.getMonth() + 1) + "/" + now.getFullYear() + " " + pad(now.getHours()) + ":" + pad(now.getMinutes());
+  const seen = [];
+  STATE.log.forEach(id => { if (!seen.includes(id)) seen.push(id); });
+  const steps = seen.filter(id => !BY_ID[id].sub && BY_ID[id].stage !== "ref").map(id => "- " + BY_ID[id].title);
+  const branches = seen.filter(id => BY_ID[id].sub).map(id => "- " + BY_ID[id].nav);
+  const done = Object.keys(STATE.checks).filter(k => STATE.checks[k]).length;
+  return "QEHB SDEC headache pathway (" + META.version + ")\nRoute recorded " + stamp +
+    "\nSteps completed:\n" + steps.join("\n") +
+    "\nBranches reviewed:\n" + (branches.length ? branches.join("\n") : "- none") +
+    "\nDischarge checklist: " + done + " of 8 complete";
+}
+
+function buildMap() {
+  const list = document.getElementById("map-list");
+  list.innerHTML = STAGES.map((s, i) => {
+    const pages = PAGES.filter(p => p.stage === s.id);
+    const num = s.id === "ref" ? "" : '<span class="n">' + (i + 1) + "</span>";
+    return '<section class="map-stage" data-stage="' + s.id + '"><h2>' + num + "<span>" + s.name + "</span></h2><ul>" +
+      pages.map(p => '<li data-text="' + esc((p.nav + " " + p.title).toLowerCase()) + '"><a href="#' + p.id + '" data-id="' + p.id + '"' + (p.sub ? ' class="sub"' : "") + ">" + p.nav + "</a></li>").join("") +
+      "</ul></section>";
+  }).join("");
+}
+
+function updateMap(id) {
+  document.querySelectorAll(".map a[data-id]").forEach(a => {
+    const pid = a.dataset.id;
+    if (pid === id) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+    a.classList.toggle("visited", STATE.visited.has(pid) && pid !== id);
+  });
+}
+
+function renderTrail(id) {
+  const el = document.getElementById("trail");
+  if (STATE.trail.length <= 1) { el.innerHTML = ""; return; }
+  const parts = STATE.trail.slice(0, -1).map(t => '<a href="#' + t + '">' + BY_ID[t].nav + "</a>");
+  el.innerHTML = '<span class="lbl">Your route</span>' + parts.join('<span class="sep" aria-hidden="true">/</span>') +
+    '<span class="sep" aria-hidden="true">/</span><span class="here" aria-current="step">' + BY_ID[id].nav + "</span>";
+}
+
+function render(id, opts) {
+  const p = BY_ID[id] || BY_ID.start;
+  id = p.id;
+  if (!(opts && opts.keepTrail)) {
+    const at = STATE.trail.indexOf(id);
+    if (id === "start") STATE.trail = ["start"];
+    else if (at >= 0) STATE.trail = STATE.trail.slice(0, at + 1);
+    else STATE.trail.push(id);
+  }
+  STATE.visited.add(id);
+  if (id === "start" && !(opts && opts.keepTrail)) STATE.log = [];
+  if (STATE.log[STATE.log.length - 1] !== id) STATE.log.push(id);
+  const stage = STAGES.find(s => s.id === p.stage);
+  const stageNo = STAGES.indexOf(stage) + 1;
+  const kicker = p.stage === "ref" ? stage.name : "Stage " + stageNo + " · " + stage.name;
+
+  let routes = "";
+  if (p.routes && p.routes.length) {
+    routes = '<h2 class="routes-title">' + (p.stage === "primary" && p.id === "primary" ? "Which fits best?" : "Next") + '</h2><div class="routes">' + p.routes.map(route).join("") + "</div>";
+  }
+  const canBack = STATE.trail.length > 1;
+  const footer = '<nav class="stepper" aria-label="Step navigation">' +
+    '<button class="btn" type="button" id="btn-back"' + (canBack ? "" : " disabled") + '>← Back</button>' +
+    (id !== "start" ? '<button class="btn" type="button" id="btn-restart">Restart</button>' : "") +
+    '<span class="spacer"></span>' +
+    (p.next ? '<a class="btn primary" href="#' + p.next.to + '">' + p.next.label + ' <span aria-hidden="true">→</span></a>' : "") +
+    "</nav>";
+
+  document.getElementById("page").innerHTML =
+    '<header><p class="kicker">' + kicker + '</p><h1 tabindex="-1">' + p.title + "</h1>" +
+    '<p class="lede">' + p.lede + "</p>" + (p.level ? '<div class="head-row">' + chip(p.level) + "</div>" : "") + "</header>" +
+    '<div class="prose">' + p.body() + "</div>" + routes + footer;
+
+  if (p.mount) p.mount();
+  const back = document.getElementById("btn-back");
+  if (back) back.addEventListener("click", () => {
+    if (STATE.trail.length > 1) navigate(STATE.trail[STATE.trail.length - 2]);
+  });
+  const restart = document.getElementById("btn-restart");
+  if (restart) restart.addEventListener("click", () => { STATE.checks = {}; navigate("start"); });
+
+  renderTrail(id);
+  updateMap(id);
+  document.title = (id === "start" ? "" : p.nav + " · ") + "QEHB SDEC headache pathway";
+}
+
+function navigate(id, push) {
+  render(id);
+  try { history[push === false ? "replaceState" : "pushState"](null, "", "#" + BY_ID[id].id); } catch (e) {}
+  window.scrollTo(0, 0);
+  const h = document.querySelector("#page h1");
+  if (h) h.focus({ preventScroll: true });
+  const map = document.getElementById("map");
+  if (map.classList.contains("open")) toggleMap(false);
+}
+
+function toggleMap(force) {
+  const map = document.getElementById("map");
+  const btn = document.getElementById("map-toggle");
+  const open = typeof force === "boolean" ? force : !map.classList.contains("open");
+  map.classList.toggle("open", open);
+  btn.setAttribute("aria-expanded", String(open));
+  btn.textContent = open ? "Close map" : "Pathway map";
+}
+
+/* Intercept in-page links so navigation works in every host */
+document.addEventListener("click", e => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a) return;
+  const id = a.getAttribute("href").slice(1);
+  if (!BY_ID[id]) return;
+  e.preventDefault();
+  navigate(id);
+});
+window.addEventListener("popstate", () => {
+  const id = (location.hash || "").slice(1);
+  render(BY_ID[id] ? id : "start");
+});
+document.getElementById("map-toggle").addEventListener("click", () => toggleMap());
+document.getElementById("find-step").addEventListener("input", e => {
+  const q = e.target.value.trim().toLowerCase();
+  let any = false;
+  document.querySelectorAll(".map-stage").forEach(sec => {
+    let shown = 0;
+    sec.querySelectorAll("li").forEach(li => {
+      const hit = !q || li.dataset.text.includes(q);
+      li.hidden = !hit;
+      if (hit) shown++;
+    });
+    sec.hidden = shown === 0;
+    if (shown) any = true;
+  });
+  document.getElementById("map-none").hidden = any;
+});
+
+/* Boot */
+(function boot() {
+  const hub = document.getElementById("hub-link");
+  if (LINKS.hub) { hub.href = LINKS.hub; hub.hidden = false; }
+  if (META.approvedBy) document.getElementById("status-pill").textContent = META.version + " · approved";
+  document.getElementById("version-line").textContent = META.version + " · " + META.date;
+  buildMap();
+  const first = (location.hash || "").slice(1);
+  if (BY_ID[first] && first !== "start") { STATE.trail = ["start"]; }
+  render(BY_ID[first] ? first : "start");
+})();
+</script>
