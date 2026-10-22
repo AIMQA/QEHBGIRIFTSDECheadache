@@ -576,7 +576,7 @@ button { font-family: inherit; }
 .deck .tb.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .deck .tb.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 .deck .tb:disabled { opacity: .45; cursor: default; }
-.deck .voice-pick { max-width: 190px; padding: 6px 8px; font-weight: 500; }
+.deck .voice-pick { max-width: 230px; padding: 6px 8px; font-weight: 500; }
 .deck .counter { font-family: var(--mono); font-size: 15px; color: var(--ink-2); font-variant-numeric: tabular-nums; padding: 0 6px; }
 .deck .keys { font-family: var(--mono); font-size: 13px; color: var(--ink-2); }
 .deck /* Notes drawer */
@@ -1401,21 +1401,34 @@ function toggleNotes(force) {
   el.notesBtn.setAttribute("aria-pressed", String(open)); el.notesBtn.classList.toggle("on", open);
   fit();
 }
+/* Best free British voices, in order of quality. Edge's neural voices (Sonia, Ryan) come first; Chrome's Google voices and Apple's enhanced voices follow; the older desktop voices are the fallback. */
+const VOICE_RANK = {
+  female: [/Sonia.*Natural/i, /Libby.*Natural/i, /Kate.*Premium/i, /Serena.*Premium/i, /Google UK English Female/i, /Kate.*Enhanced/i, /Serena.*Enhanced/i, /^Kate\b/i, /Serena/i, /Martha/i, /Stephanie/i, /Microsoft Hazel/i, /Microsoft Susan/i, /Female/i],
+  male:   [/Ryan.*Natural/i, /Thomas.*Natural/i, /Daniel.*Premium/i, /Oliver.*Premium/i, /Google UK English Male/i, /Daniel.*Enhanced/i, /Oliver.*Enhanced/i, /^Daniel\b/i, /Oliver/i, /Arthur/i, /Microsoft George/i, /Male/i]
+};
+const short = n => n.replace(/^Microsoft |^Google /, "").replace(/ Online \(Natural\)/, " (natural)").replace(/ - English \(.*\)$/, "").replace(/ \(en-GB\)$/, "");
+function bestVoice(vs, kind) {
+  const gb = vs.filter(v => /en[-_]GB/i.test(v.lang));
+  for (const re of VOICE_RANK[kind]) { const hit = gb.find(v => re.test(v.name)); if (hit) return hit; }
+  return gb[0] || vs.find(v => /^en/i.test(v.lang)) || null;
+}
 function pickVoice() {
   if (!synth) return;
   const vs = synth.getVoices();
-  let saved = null; try { saved = localStorage.getItem("deckVoice"); } catch (e) {}
-  voice = (saved && vs.find(v => v.name === saved)) ||
-          vs.find(v => /en[-_]GB/i.test(v.lang) && /Sonia|Libby|Maisie|Kate|Serena|Stephanie|Google UK English Female|Hazel|female/i.test(v.name)) ||
-          vs.find(v => /en[-_]GB/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
-  fillVoices(vs);
+  let saved = "female"; try { saved = localStorage.getItem("deckVoice") || "female"; } catch (e) {}
+  voice = (saved === "female" || saved === "male") ? bestVoice(vs, saved) : (vs.find(v => v.name === saved) || bestVoice(vs, "female"));
+  fillVoices(vs, saved);
 }
-function fillVoices(vs) {
+function fillVoices(vs, saved) {
   const sel = el.voicePick;
   if (!sel) return;
+  const f = bestVoice(vs, "female"), m = bestVoice(vs, "male");
   const english = vs.filter(v => /^en/i.test(v.lang)).sort((a, b) => (/en[-_]GB/i.test(b.lang) - /en[-_]GB/i.test(a.lang)) || a.name.localeCompare(b.name));
-  sel.innerHTML = english.map(v => '<option value="' + esc(v.name) + '"' + (voice && v.name === voice.name ? " selected" : "") + ">" + esc(v.name.replace(/^Microsoft |^Google /, "").replace(/ Online \(Natural\)/, " (natural)").replace(/ - English \(.*\)$/, "")) + (/en[-_]GB/i.test(v.lang) ? "" : " · " + v.lang) + "</option>").join("");
-  sel.hidden = english.length < 2;
+  let html = '<option value="female"' + (saved === "female" ? " selected" : "") + ">UK female" + (f ? " · " + esc(short(f.name)) : "") + "</option>" +
+             '<option value="male"' + (saved === "male" ? " selected" : "") + ">UK male" + (m ? " · " + esc(short(m.name)) : "") + "</option>";
+  if (english.length) html += '<optgroup label="All English voices">' + english.map(v => '<option value="' + esc(v.name) + '"' + (saved === v.name ? " selected" : "") + ">" + esc(short(v.name)) + (/en[-_]GB/i.test(v.lang) ? "" : " · " + v.lang) + "</option>").join("") + "</optgroup>";
+  sel.innerHTML = html;
+  sel.hidden = !vs.length;
 }
 /* How the voice says things that are written as abbreviations. Spoken text only; the slides are unchanged. */
 const SAY = [
@@ -1552,8 +1565,9 @@ function mount(container) {
   if (synth) {
     pickVoice(); on(synth, "voiceschanged", pickVoice);
     on(el.voicePick, "change", () => {
-      const vs = synth.getVoices(); voice = vs.find(v => v.name === el.voicePick.value) || voice;
-      try { localStorage.setItem("deckVoice", el.voicePick.value); } catch (e) {}
+      const vs = synth.getVoices(), v = el.voicePick.value;
+      voice = (v === "female" || v === "male") ? bestVoice(vs, v) : (vs.find(x => x.name === v) || voice);
+      try { localStorage.setItem("deckVoice", v); } catch (e) {}
       if (auto) speakCurrent();
     });
   } else { el.voice.hidden = true; el.voicePick.hidden = true; }
