@@ -1287,6 +1287,29 @@ EXTRA.forEach(([after, slide]) => {
   SLIDES.splice(at < 0 ? SLIDES.length - 1 : at + 1, 0, slide);
 });
 
+/* Timing: narration at 150 words a minute plus a pause per slide; exercises add room time */
+const WPM = 150, GAP = 0.7;
+SLIDES.forEach(sl => {
+  const words = sl.notes.trim().split(/\s+/).length;
+  sl.spoken = words / WPM * 60 + GAP;
+  const ex = /class="(?:q|flip|hot|step)"|class="hot sm"/.test(sl.html);
+  const isCase = /class="case"/.test(sl.html);
+  sl.exercise = isCase ? 150 : ex ? 90 : 0;
+  sl.total = sl.spoken + sl.exercise;
+});
+let acc = 0;
+SLIDES.forEach(sl => { sl.startAt = acc; acc += sl.total; });
+const TIMING = {
+  narrationMin: Math.round(SLIDES.reduce((a, sl) => a + sl.spoken, 0) / 60),
+  sessionMin: Math.round(acc / 60 / 5) * 5,
+  exercises: SLIDES.filter(sl => sl.exercise).length
+};
+const mmss = sec => { const m = Math.floor(sec / 60), s2 = Math.round(sec % 60); return m + ":" + String(s2).padStart(2, "0"); };
+SLIDES[0].html = SLIDES[0].html.replace("About 40 minutes · interactive · narrated",
+  "Narration " + TIMING.narrationMin + " minutes · with the " + TIMING.exercises + " exercises about " + TIMING.sessionMin + " minutes");
+SLIDES[0].notes = SLIDES[0].notes.replace("Welcome. This session is about headache in same day emergency care.",
+  "Welcome. This session is about headache in same day emergency care. The narration runs for about " + TIMING.narrationMin + " minutes, and with the exercises it fills a " + TIMING.sessionMin + "-minute teaching slot.");
+
 
 /* ---- Engine: mounts into a container, unmounts on navigation ---- */
 const TEMPLATE = `<div class="progress" aria-hidden="true"><i data-id="prog"></i></div>
@@ -1325,10 +1348,10 @@ function show(i, atEnd) {
   slides.forEach((e, k) => e.classList.toggle("active", k === i));
   ST.i = i; ST.step = atEnd ? frags(i).length : 0;
   applyStep(i); runEnter(i); buttons();
-  el.counter.textContent = (i + 1) + " / " + SLIDES.length;
+  el.counter.textContent = (i + 1) + " / " + SLIDES.length + " · " + Math.round(SLIDES[i].startAt / 60) + " of " + TIMING.sessionMin + " min";
   el.prog.style.width = ((i + 1) / SLIDES.length * 100) + "%";
   el.notesText.textContent = SLIDES[i].notes;
-  el.notesLabel.textContent = "Narration · slide " + (i + 1);
+  el.notesLabel.textContent = "Narration · slide " + (i + 1) + " · " + mmss(SLIDES[i].spoken) + " spoken" + (SLIDES[i].exercise ? " · allow " + mmss(SLIDES[i].exercise) + " for the exercise" : "");
   try { sessionStorage.setItem("deckSlide", String(i)); } catch (e) {}
   if (wasAuto) speakCurrent(); else stopVoice();
 }
@@ -1372,6 +1395,23 @@ function pickVoice() {
   voice = vs.find(v => /en[-_]GB/i.test(v.lang) && /female|Google UK English Female|Kate|Serena|Stephanie/i.test(v.name)) ||
           vs.find(v => /en[-_]GB/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
 }
+/* How the voice says things that are written as abbreviations. Spoken text only; the slides are unchanged. */
+const SAY = [
+  [/\bSDEC\b/g, "ess dec"], [/\bQEHB\b/g, "Q E H B"], [/\bUHB\b/g, "U H B"],
+  [/\bNSAIDs\b/g, "en saids"], [/\bNSAID\b/g, "en said"],
+  [/\bOCT\b/g, "O C T"], [/\bIIH\b/g, "I I H"], [/\bSAH\b/g, "S A H"], [/\bLP\b/g, "L P"], [/\bCT\b/g, "C T"], [/\bCTA\b/g, "C T A"], [/\bCTV\b/g, "C T V"],
+  [/\bGCS\b/g, "G C S"], [/\bGCA\b/g, "G C A"], [/\bTIA\b/g, "T I A"], [/\bMRI\b/g, "M R I"], [/\bECG\b/g, "E C G"], [/\bIV\b/g, "I V"], [/\bIM\b/g, "I M"],
+  [/\bRCVS\b/g, "R C V S"], [/\bPRES\b/g, "P R E S"], [/\bICHD-3\b/g, "I C H D 3"], [/\bCGRP\b/g, "C G R P"], [/\bAION\b/g, "A I O N"], [/\bRAPD\b/g, "R A P D"],
+  [/\bU&E\b/g, "U and E"], [/\bNEWS2\b/g, "news 2"], [/\bGP\b/g, "G P"], [/\bED\b/g, "E D"], [/\bHIV\b/g, "H I V"], [/\bCD4\b/g, "C D 4"],
+  [/\bID Migraine\b/g, "I D Migraine"], [/\bBSR\b/g, "B S R"], [/\bBIHS\b/g, "B I H S"], [/\bUKMEC\b/g, "U K M E C"], [/\bDVLA\b/g, "D V L A"], [/\bMHRA\b/g, "M H R A"], [/\bCiP\b/g, "sip"], [/\bCiPs\b/g, "sips"],
+  [/\bNG(\d+)\b/g, "N G $1"], [/\bTA(\d+)\b/g, "T A $1"], [/\bCG(\d+)\b/g, "C G $1"],
+  [/(\d+)\/(\d+)\s*mmHg/g, "$1 over $2 millimetres of mercury"], [/(\d+)\/(\d+)(?=\s*(?:after|or|is|with|and|,|\.))/g, "$1 over $2"],
+  [/\bmmHg\b/g, "millimetres of mercury"], [/\bmg\/kg\b/g, "milligrams per kilogram"], [/(\d)\s*mg\b/g, "$1 milligrams"], [/\b1\s*g\b/g, "1 gram"], [/(\d)\s*g\b/g, "$1 grams"],
+  [/\bL\/min\b/g, "litres per minute"], [/cmH2O/g, " centimetres of water"], [/\b1\s*cm\b/g, "1 centimetre"], [/(\d)\s*cm\b/g, "$1 centimetres"],
+  [/(\d+)\s*%/g, "$1 percent"], [/\b(\d+)\s*h\b/g, "$1 hours"]
+];
+const say = t => SAY.reduce((x, [re, to]) => x.replace(re, to), t);
+
 /* Narration autoplay: reads the slide sentence by sentence, reveals the builds as it goes, then moves to the next slide until the end or Stop */
 let auto = false, run = 0;
 function stopVoice() {
@@ -1396,7 +1436,7 @@ function speakCurrent() {
     if (ST.i < SLIDES.length - 1) show(ST.i + 1); else stopVoice();
   };
   sentences.forEach((text, k) => {
-    const u = new SpeechSynthesisUtterance(text.trim());
+    const u = new SpeechSynthesisUtterance(say(text.trim()));
     u.lang = "en-GB"; u.rate = 0.98; u.pitch = 1;
     if (voice) u.voice = voice;
     u.onend = () => {
@@ -1497,7 +1537,7 @@ function unmount() {
   off.forEach(fn => fn()); off = [];
   root.innerHTML = ""; root.className = ""; root = null; slides = [];
 }
-return { mount, unmount, get mounted() { return !!root; }, show };
+return { mount, unmount, get mounted() { return !!root; }, show, timing: () => TIMING, count: () => SLIDES.length, say };
 })();
 
 /* ============================================================
@@ -2346,10 +2386,14 @@ const PAGES = [
 {
   id: "teaching", stage: "ref", nav: "Teaching session",
   title: "Teaching session",
-  lede: "A narrated, interactive deck on the principles behind this pathway. About 40 minutes. Full screen to present.",
+  lede: "A narrated, interactive deck on the principles behind this pathway. Full screen to present.",
   body: () => `
+    <dl class="figures" style="margin-top:0">
+      <dt>${Deck.timing().sessionMin} minutes</dt><dd>A full teaching session: narration plus the ${Deck.timing().exercises} exercises, with time for the room to answer</dd>
+      <dt>${Deck.timing().narrationMin} minutes</dt><dd>Narration alone, if you press Narrate and let it play through all ${Deck.count()} slides</dd>
+    </dl>
     <div id="deck-root"></div>
-    <p class="small" style="margin-top:12px">Arrow keys or the buttons move through the builds; swipe on a phone. N shows the presenter notes. V (or Narrate) plays the whole deck from the current slide with the device’s own voice, revealing each build as it is read; press again to stop. F goes full screen. The quizzes, flip cards and cases are for the room to answer before you tap.</p>
+    <p class="small" style="margin-top:12px">The counter shows how far into the session each slide falls, and the notes drawer shows the spoken length of each slide. Arrow keys or the buttons move through the builds; swipe on a phone. N shows the presenter notes. V (or Narrate) plays the whole deck from the current slide with the device’s own voice, revealing each build as it is read; press again to stop. F goes full screen. The quizzes, flip cards and cases are for the room to answer before you tap.</p>
     <p class="small">Maps to IM Clinical CiP 1 (Managing an acute unselected take), CiP 2 (Managing the acute care of patients within a medical specialty service), CiP 4 (Managing patients in an outpatient clinic, ambulatory or community setting) and CiP 7 (Delivering effective resuscitation and managing the acutely deteriorating patient).</p>
   `,
   mount: () => Deck.mount(document.getElementById("deck-root")),
