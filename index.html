@@ -113,6 +113,14 @@ button, input { font-family: inherit; }
 .theme button[aria-pressed="true"] { background: #FFFFFF; color: #005EB8; }
 .masthead :focus-visible { box-shadow: 0 0 0 4px var(--focus), 0 0 0 7px #212B32; }
 
+/* In-development banner: shown until META.approvedBy is set */
+.devbar { background: #FFF4CC; border-bottom: 4px solid #FFB81C; margin: 0 calc(-1 * var(--gutter-r)) 0 calc(-1 * var(--gutter-l)); padding: 8px var(--gutter-r) 8px var(--gutter-l); color: #212B32; }
+.devbar p { max-width: 1180px; margin: 0 auto; font-size: 0.92rem; line-height: 1.4; }
+.devbar strong { color: #7A5300; }
+:root[data-theme="dark"] .devbar { background: #3A2E0E; color: #F0F4F5; }
+:root[data-theme="dark"] .devbar strong { color: #FFD166; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .devbar { background: #3A2E0E; color: #F0F4F5; } :root:not([data-theme="light"]) .devbar strong { color: #FFD166; } }
+@media (min-width: 961px) { .devbar { flex: none; } .devbar p { font-size: 0.86rem; } }
 /* Shell */
 .shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 256px minmax(0, 1fr); gap: 48px; padding-block: 22px 48px; }
 
@@ -797,7 +805,7 @@ button { font-family: inherit; }
 <header class="masthead">
   <div>
     <p class="where"><span class="long">Queen Elizabeth Hospital Birmingham · Same day emergency care</span><span class="short">QEHB · SDEC</span></p>
-    <div class="name-row"><p class="name">Headache <em>pathway</em></p><span class="status" id="status-pill">Draft for governance review</span></div>
+    <div class="name-row"><p class="name">Headache <em>pathway</em></p><span class="status" id="status-pill">In development · not approved</span></div>
   </div>
   <div class="mast-tools">
     <nav class="tabs" aria-label="Site sections">
@@ -814,6 +822,9 @@ button { font-family: inherit; }
     <button class="btn-ghost map-toggle" id="map-toggle" type="button" aria-expanded="false" aria-controls="map">Map</button>
   </div>
 </header>
+<div class="devbar" id="devbar" role="status">
+  <p><strong>In development.</strong> This pathway and teaching session are a draft. They have not been reviewed or approved by any clinician, by Queen Elizabeth Hospital Birmingham, University Hospitals Birmingham, GIRFT, NICE or any other organisation, and they must not be used to guide patient care.</p>
+</div>
 
 <div class="shell">
   <nav class="map" id="map" aria-label="Pathway map">
@@ -829,7 +840,7 @@ button { font-family: inherit; }
 </div>
 
 <footer class="foot">
-  <p>Adapted from the GIRFT headache interactive pathway. Not an official GIRFT or NHS England product. <a href="#teaching">Teaching session</a> · <a href="#sources">Sources and governance</a></p>
+  <p>In development: a draft, not approved by any organisation and not for use in patient care. Adapted from the GIRFT headache interactive pathway; not an official GIRFT, NHS England, QEHB or UHB product. <a href="#teaching">Teaching session</a> · <a href="#sources">Sources and governance</a></p>
   <p class="mono" id="version-line"></p>
 </footer>
 
@@ -1092,10 +1103,11 @@ const SLIDES = [
   eyebrow: "QEHB SDEC · teaching session",
   html: `<div class="cols art" style="margin-top:40px">
     <div><h1>Headache in SDEC</h1><p class="lede">Diagnosis and management of primary headache, and how to identify secondary headache.</p>
-    <p class="small" style="margin-top:28px">About 40 minutes · interactive · narrated<br>Based on the QEHB SDEC headache pathway, adapted from GIRFT</p></div>
+    <p class="small" style="margin-top:28px">About 40 minutes · interactive · narrated<br>Based on the QEHB SDEC headache pathway, adapted from GIRFT</p>
+    <p class="small" style="margin-top:14px;color:var(--amber);font-weight:700">In development: a draft that has not been reviewed or approved by any clinician or organisation. Not for use in patient care.</p></div>
     <div class="art">${ART.title}</div></div>
     <p class="hint">Arrow keys or the buttons move on · N shows the notes · Narrate plays the deck</p>`,
-  notes: "Welcome. This session covers headache in same day emergency care: how to diagnose and manage the 9 in 10 patients who have a primary headache and do not need a scan, and how to identify the minority who have a secondary cause. Use the arrow keys or the buttons to move through the slides. Some slides are short videos and some are exercises for the room."
+  notes: "Welcome. This session covers headache in same day emergency care: how to diagnose and manage the 9 in 10 patients who have a primary headache and do not need a scan, and how to identify the minority who have a secondary cause. Please note that this session and the pathway it is based on are still in development. They have not been reviewed or approved by any clinician or organisation, and they must not be used to guide patient care. Use the arrow keys or the buttons to move through the slides. Some slides are short videos and some are exercises for the room."
 },
 {
   eyebrow: "Video 1 · A typical case", kind: "video",
@@ -1642,10 +1654,10 @@ SLIDES.splice(SLIDES.findIndex(s => s.html.includes("<h2>Examination: 5 things t
 const AUDIO = {
   file: "emma.mp3",          // one recording of the whole deck, beside index.html
   name: "Emma",
-  cues: [[0.0, 23.52], [23.52, 96.58], [96.58, 141.12], [141.12, 174.41], [174.41, 207.38], [207.38, 252.72], [252.72, 300.41], [300.41, 361.25], [361.25, 419.21], [419.21, 463.42], [463.42, 535.34], [535.34, 639.7], [639.7, 667.01], [667.01, 707.38], [707.38, 795.07], [795.07, 896.71], [896.71, 916.75], [916.75, 923.11], [923.11, 931.51], [931.51, 986.62], [986.62, 1031.83], [1031.83, 1076.4], [1076.4, 1180.01], [1180.01, 1252.56], [1252.56, 1258.99], [1258.99, 1316.47], [1316.47, 1372.27], [1372.27, 1421.62], [1421.62, 1432.1], [1432.1, 1485.89], [1485.89, 1538.64], [1538.64, 1546.27], [1546.27, 1648.13], [1648.13, 1695.36], [1695.36, 1727.64], [1727.64, 1739.3], [1739.3, 1747.87], [1747.87, 1754.3], [1754.3, 1799.76], [1799.76, 1913.3], [1913.3, 1950.07]]   // [start, end] in seconds for each slide; filled in by the recording build
+  cues: [[0.0, 35.71], [35.71, 108.77], [108.77, 153.31], [153.31, 186.6], [186.6, 219.58], [219.58, 264.91], [264.91, 312.6], [312.6, 373.44], [373.44, 431.4], [431.4, 475.61], [475.61, 547.54], [547.54, 651.89], [651.89, 679.2], [679.2, 719.57], [719.57, 807.26], [807.26, 908.9], [908.9, 928.94], [928.94, 935.3], [935.3, 943.7], [943.7, 998.81], [998.81, 1044.02], [1044.02, 1088.59], [1088.59, 1192.2], [1192.2, 1264.75], [1264.75, 1271.18], [1271.18, 1328.66], [1328.66, 1384.46], [1384.46, 1433.81], [1433.81, 1444.3], [1444.3, 1498.08], [1498.08, 1550.83], [1550.83, 1558.46], [1558.46, 1660.32], [1660.32, 1707.55], [1707.55, 1739.83], [1739.83, 1751.5], [1751.5, 1760.06], [1760.06, 1766.5], [1766.5, 1811.95], [1811.95, 1925.5], [1925.5, 1962.26]]   // [start, end] in seconds for each slide; filled in by the recording build
 };
-AUDIO.cues2 = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, [1950.07, 1982.42], [1982.42, 2022.24], null, null, null, null, null, [2022.24, 2075.45], null, null, null, [2075.45, 2106.05], null, null, [2106.05, 2142.98], null, null, null, [2142.98, 2169.22], [2169.22, 2214.12], [2214.12, 2248.32], null, null, null];   // [start, end] for the answers that follow an exercise, by slide index
-AUDIO.prompts = {"quiz": [2248.32, 2254.85], "answers": [2254.85, 2261.11], "exercise": [2261.11, 2268.24]};   // spoken after an interactive slide
+AUDIO.cues2 = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, [1962.26, 1994.62], [1994.62, 2034.43], null, null, null, null, null, [2034.43, 2087.64], null, null, null, [2087.64, 2118.24], null, null, [2118.24, 2155.18], null, null, null, [2155.18, 2181.41], [2181.41, 2226.31], [2226.31, 2260.51], null, null, null];   // [start, end] for the answers that follow an exercise, by slide index
+AUDIO.prompts = {"quiz": [2260.51, 2267.04], "answers": [2267.04, 2273.3], "exercise": [2273.3, 2280.43]};   // spoken after an interactive slide
 const PROMPTS = {
   quiz: "Answer the questions on this slide. When you have finished the quiz, press Start to carry on.",
   answers: "Decide your answers first. When the room is ready, press Start to hear them.",
@@ -2254,7 +2266,7 @@ const PAGES = [
       <a class="route" href="#teaching"><span class="r-title">Teaching session</span><span class="r-note">About ${Deck.timing().sessionMin} minutes, narrated, with videos and exercises</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>
       <a class="route" href="#audit"><span class="r-title">Audit and QI</span><span class="r-note">Measures, aim builder and driver diagram</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>
     </div>
-    ${panel("Draft", `<p>For UHB governance review. Contacts marked “route to confirm” are unverified (see ${go("contacts", "local contacts")}).</p>`, "caution")}
+    ${panel("In development: not approved", `<p>This is a working draft. It has not been reviewed or approved by any clinician, governance group or organisation, including QEHB, UHB, GIRFT and NICE. The doses, thresholds and local contacts have not been verified: contacts marked “route to confirm” are placeholders (see ${go("contacts", "local contacts")}). Do not use it to guide patient care until it has been approved and the status on this page changes.</p>`, "stop")}
   `,
   next: { to: "streaming", label: "Start" }
 },
@@ -3075,7 +3087,7 @@ const PAGES = [
 {
   id: "teaching", stage: "ref", nav: "Teaching session",
   title: "Teaching session",
-  lede: "A narrated, interactive session on the diagnosis and management of primary headache, and how to identify secondary headache. Four short videos, exercises and a break. Use full screen to present.",
+  lede: "A narrated, interactive session on the diagnosis and management of primary headache, and how to identify secondary headache. Four short videos, exercises and a break. In development and not approved: for review only. Use full screen to present.",
   body: () => `
     <dl class="figures" style="margin-top:0">
       <dt>${Deck.timing().sessionMin} minutes</dt><dd>The full session: narration, ${Deck.timing().videos} videos, ${Deck.timing().exercises} exercises with time for the room to answer, and a 5-minute break at about ${Deck.timing().breakAt} minutes</dd>
@@ -3280,7 +3292,8 @@ const PAGES = [
     <dl class="figures">
       <dt>Version</dt><dd>${esc(META.version)}, ${esc(META.date)}</dd>
       <dt>Owner</dt><dd>${META.owner ? esc(META.owner) : "To confirm"}</dd>
-      <dt>Approved by</dt><dd>${META.approvedBy ? esc(META.approvedBy) : "Not yet approved"}</dd>
+      <dt>Status</dt><dd>${META.approvedBy ? "Approved" : "In development. Not reviewed or approved by any clinician, trust, governance group or organisation. Not for use in patient care."}</dd>
+      <dt>Approved by</dt><dd>${META.approvedBy ? esc(META.approvedBy) : "No one yet"}</dd>
       <dt>Review due</dt><dd>${META.reviewDue ? esc(META.reviewDue) : "To set at approval"}</dd>
     </dl>
     <h2>Adapted from</h2>
@@ -3559,7 +3572,7 @@ document.querySelectorAll(".theme button").forEach(b => b.addEventListener("clic
 (function boot() {
   const hub = document.getElementById("hub-link");
   if (LINKS.hub) { hub.href = LINKS.hub; hub.hidden = false; }
-  if (META.approvedBy) document.getElementById("status-pill").textContent = META.version + " · approved";
+  if (META.approvedBy) { document.getElementById("status-pill").textContent = META.version + " · approved"; document.getElementById("devbar").hidden = true; }
   document.getElementById("version-line").textContent = META.version + " · " + META.date;
   buildMap();
   const first = (location.hash || "").slice(1);
