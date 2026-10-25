@@ -1661,10 +1661,10 @@ SLIDES.splice(SLIDES.findIndex(s => s.html.includes("<h2>Examination: 5 things t
 const AUDIO = {
   file: "emma.mp3",          // one recording of the whole deck, beside index.html
   name: "Emma",
-  cues: [[0.0, 35.71], [35.71, 108.77], [108.77, 153.31], [153.31, 186.6], [186.6, 219.58], [219.58, 264.91], [264.91, 312.6], [312.6, 373.44], [373.44, 431.4], [431.4, 475.61], [475.61, 547.54], [547.54, 651.89], [651.89, 679.2], [679.2, 719.57], [719.57, 807.26], [807.26, 908.9], [908.9, 928.94], [928.94, 935.3], [935.3, 943.7], [943.7, 998.81], [998.81, 1044.02], [1044.02, 1088.59], [1088.59, 1192.2], [1192.2, 1264.75], [1264.75, 1271.18], [1271.18, 1328.66], [1328.66, 1384.46], [1384.46, 1433.81], [1433.81, 1444.3], [1444.3, 1498.08], [1498.08, 1550.83], [1550.83, 1558.46], [1558.46, 1660.32], [1660.32, 1707.55], [1707.55, 1739.83], [1739.83, 1751.5], [1751.5, 1760.06], [1760.06, 1766.5], [1766.5, 1811.95], [1811.95, 1925.5], [1925.5, 1962.26]]   // [start, end] in seconds for each slide; filled in by the recording build
+  cues: [[0.0, 35.71], [35.71, 108.86], [108.86, 153.41], [153.41, 186.67], [186.67, 219.65], [219.65, 264.98], [264.98, 312.74], [312.74, 373.61], [373.61, 431.57], [431.57, 475.78], [475.78, 547.7], [547.7, 652.06], [652.06, 679.37], [679.37, 719.81], [719.81, 807.5], [807.5, 909.14], [909.14, 929.28], [929.28, 935.64], [935.64, 944.04], [944.04, 999.1], [999.1, 1044.19], [1044.19, 1088.76], [1088.76, 1192.39], [1192.39, 1264.97], [1264.97, 1271.4], [1271.4, 1328.88], [1328.88, 1384.7], [1384.7, 1434.02], [1434.02, 1444.51], [1444.51, 1498.3], [1498.3, 1551.19], [1551.19, 1558.82], [1558.82, 1660.8], [1660.8, 1708.03], [1708.03, 1740.31], [1740.31, 1751.98], [1751.98, 1760.54], [1760.54, 1766.98], [1766.98, 1812.43], [1812.43, 1925.95], [1925.95, 1962.72]]   // [start, end] in seconds for each slide; filled in by the recording build
 };
-AUDIO.cues2 = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, [1962.26, 1994.62], [1994.62, 2034.43], null, null, null, null, null, [2034.43, 2087.64], null, null, null, [2087.64, 2118.24], null, null, [2118.24, 2155.18], null, null, null, [2155.18, 2181.41], [2181.41, 2226.31], [2226.31, 2260.51], null, null, null];   // [start, end] for the answers that follow an exercise, by slide index
-AUDIO.prompts = {"quiz": [2260.51, 2267.04], "answers": [2267.04, 2273.3], "exercise": [2273.3, 2280.43]};   // spoken after an interactive slide
+AUDIO.cues2 = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, [1962.72, 1995.1], [1995.1, 2034.96], null, null, null, null, null, [2034.96, 2088.17], null, null, null, [2088.17, 2118.77], null, null, [2118.77, 2155.7], null, null, null, [2155.7, 2181.94], [2181.94, 2226.91], [2226.91, 2261.04], null, null, null];   // [start, end] for the answers that follow an exercise, by slide index
+AUDIO.prompts = {"quiz": [2261.04, 2267.57], "answers": [2267.57, 2273.83], "exercise": [2273.83, 2280.96]};   // spoken after an interactive slide
 const PROMPTS = {
   quiz: "Answer the questions on this slide. When you have finished the quiz, press Start to carry on.",
   answers: "Decide your answers first. When the room is ready, press Start to hear them.",
@@ -1883,6 +1883,8 @@ const SAY = [
   [/(\d+)\s*%/g, "$1 percent"], [/\b(\d+)\s*h\b/g, "$1 hours"], [/\b0\.(\d+)/g, "nought point $1"]
 ];
 const say = t => SAY.reduce((x, [re, to]) => x.replace(re, to), t);
+/* Device voices only: respell migraine as MY-grain (the recording uses phonemes for this) */
+const sayLive = t => say(t).replace(/\bmigrainosus\b/gi, "my-grain-oh-suss").replace(/\bmigrainous\b/gi, "my-grain-us").replace(/\bmigraines\b/gi, "my-grains").replace(/\bmigraine\b/gi, "my-grain");
 
 /* Narration autoplay: reads the slide sentence by sentence, reveals the builds as it goes, then moves to the next slide until the end or Stop */
 let auto = false, waiting = false, run = 0, captions = false, answered = false, speed = 1;
@@ -2017,7 +2019,7 @@ function speakAnswers() {
   if (!synth) { next(); return; }
   const sentences = SENTENCES(text); let done = 0;
   sentences.forEach(t => {
-    const u = new SpeechSynthesisUtterance(say(t.trim())); u.lang = "en-GB"; u.rate = ttsRate(); if (voice) u.voice = voice;
+    const u = new SpeechSynthesisUtterance(sayLive(t.trim())); u.lang = "en-GB"; u.rate = ttsRate(); if (voice) u.voice = voice;
     u.onstart = () => { if (myRun === run) caption(t); };
     u.onend = () => { if (myRun !== run) return; if (++done === sentences.length) { caption(""); next(); } };
     u.onerror = () => { if (myRun === run) stopVoice(); };
@@ -2027,7 +2029,7 @@ function speakAnswers() {
 /* The device's own voice, sentence by sentence */
 function speakText(myRun, text, onDone) {
   if (!synth) { onDone(); return; }
-  const u = new SpeechSynthesisUtterance(say(text));
+  const u = new SpeechSynthesisUtterance(sayLive(text));
   u.lang = "en-GB"; u.rate = ttsRate(); u.pitch = 1;
   if (voice) u.voice = voice;
   u.onstart = () => { if (myRun === run) caption(text); };
@@ -2042,7 +2044,7 @@ function speakLive(myRun) {
   const sentences = SENTENCES(SLIDES[slideIndex].notes), total = sentences.length, video = SLIDES[slideIndex].kind === "video";
   let done = 0;
   sentences.forEach((text, k) => {
-    const u = new SpeechSynthesisUtterance(say(text.trim()));
+    const u = new SpeechSynthesisUtterance(sayLive(text.trim()));
     u.lang = "en-GB"; u.rate = ttsRate(); u.pitch = 1;
     if (voice) u.voice = voice;
     u.onstart = () => { if (myRun === run) caption(text); };
