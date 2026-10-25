@@ -720,7 +720,6 @@ button { font-family: inherit; }
 .deck .speed .tb:first-of-type { border-radius: 8px 0 0 8px; }
 .deck .speed .tb:last-of-type { border-radius: 0 8px 8px 0; }
 .deck .speed .tb[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-.deck .voice-hint { flex-basis: 100%; font-size: 13px; line-height: 1.4; color: var(--amber); background: var(--amber-soft); border: 1px solid color-mix(in srgb, var(--amber) 35%, transparent); border-radius: 8px; padding: 6px 10px; }
 .deck .counter { font-family: var(--mono); font-size: 15px; color: var(--ink-2); font-variant-numeric: tabular-nums; padding: 0 6px; }
 .deck .keys { font-family: var(--mono); font-size: 13px; color: var(--ink-2); }
 .deck /* Notes drawer */
@@ -1657,14 +1656,23 @@ const PAPILL = {
 };
 SLIDES.splice(SLIDES.findIndex(s => s.html.includes("<h2>Examination: 5 things to check</h2>")) + 1, 0, PAPILL);
 
-/* Recorded narration: one file per slide per voice, made with the Kokoro engine (Apache 2.0). Durations are filled in by the build; null means read them from the files. */
-const AUDIO = {
-  file: "emma.mp3",          // one recording of the whole deck, beside index.html
-  name: "Emma",
-  cues: [[0.0, 35.71], [35.71, 108.86], [108.86, 153.41], [153.41, 186.67], [186.67, 219.65], [219.65, 264.98], [264.98, 312.74], [312.74, 373.61], [373.61, 431.57], [431.57, 475.78], [475.78, 547.7], [547.7, 652.06], [652.06, 679.37], [679.37, 719.81], [719.81, 807.5], [807.5, 909.14], [909.14, 929.28], [929.28, 935.64], [935.64, 944.04], [944.04, 999.1], [999.1, 1044.19], [1044.19, 1088.76], [1088.76, 1192.39], [1192.39, 1264.97], [1264.97, 1271.4], [1271.4, 1328.88], [1328.88, 1384.7], [1384.7, 1434.02], [1434.02, 1444.51], [1444.51, 1498.3], [1498.3, 1551.19], [1551.19, 1558.82], [1558.82, 1660.8], [1660.8, 1708.03], [1708.03, 1740.31], [1740.31, 1751.98], [1751.98, 1760.54], [1760.54, 1766.98], [1766.98, 1812.43], [1812.43, 1925.95], [1925.95, 1962.72]]   // [start, end] in seconds for each slide; filled in by the recording build
+/* Recorded narration: one file per voice for the whole deck, beside index.html, made with the Kokoro engine (Apache 2.0).
+   Alex is a 50:50 blend of the Emma and George voices. Cue tables ([start, end] in seconds) are filled in by the recording build. */
+const VOICES = {
+  emma:   { file: "emma.mp3",   name: "Emma",   label: "Emma · UK female",      device: "female" },
+  george: { file: "george.mp3", name: "George", label: "George · UK male",      device: "male" },
+  alex:   { file: "alex.mp3",   name: "Alex",   label: "Alex · gender-neutral", device: "female" }
 };
-AUDIO.cues2 = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, [1962.72, 1995.1], [1995.1, 2034.96], null, null, null, null, null, [2034.96, 2088.17], null, null, null, [2088.17, 2118.77], null, null, [2118.77, 2155.7], null, null, null, [2155.7, 2181.94], [2181.94, 2226.91], [2226.91, 2261.04], null, null, null];   // [start, end] for the answers that follow an exercise, by slide index
-AUDIO.prompts = {"quiz": [2261.04, 2267.57], "answers": [2267.57, 2273.83], "exercise": [2273.83, 2280.96]};   // spoken after an interactive slide
+VOICES.emma.cues = [[0.0, 35.71], [35.71, 108.86], [108.86, 153.41], [153.41, 186.67], [186.67, 219.65], [219.65, 264.86], [264.86, 312.62], [312.62, 373.61], [373.61, 431.59], [431.59, 475.8], [475.8, 547.73], [547.73, 652.22], [652.22, 679.54], [679.54, 719.98], [719.98, 807.67], [807.67, 909.17], [909.17, 929.3], [929.3, 935.66], [935.66, 944.06], [944.06, 999.12], [999.12, 1044.26], [1044.26, 1088.83], [1088.83, 1192.46], [1192.46, 1265.04], [1265.04, 1271.47], [1271.47, 1328.95], [1328.95, 1384.9], [1384.9, 1434.22], [1434.22, 1444.7], [1444.7, 1498.49], [1498.49, 1551.29], [1551.29, 1558.92], [1558.92, 1660.92], [1660.92, 1708.01], [1708.01, 1740.29], [1740.29, 1751.95], [1751.95, 1760.52], [1760.52, 1766.95], [1766.95, 1812.41], [1812.41, 1925.93], [1925.93, 1962.7]];   // build:cues:emma
+VOICES.emma.cues2 = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, [1962.7, 1995.19], [1995.19, 2035.06], null, null, null, null, null, [2035.06, 2088.26], null, null, null, [2088.26, 2118.86], null, null, [2118.86, 2155.8], null, null, null, [2155.8, 2182.03], [2182.03, 2227.01], [2227.01, 2261.23], null, null, null];   // build:cues2:emma
+VOICES.emma.prompts = {"quiz": [2261.23, 2267.76], "answers": [2267.76, 2274.02], "exercise": [2274.02, 2281.15]};   // build:prompts:emma
+VOICES.george.cues = [[0.0, 41.14], [41.14, 123.22], [123.22, 172.85], [172.85, 209.66], [209.66, 246.91], [246.91, 296.35], [296.35, 350.3], [350.3, 417.96], [417.96, 483.12], [483.12, 532.49], [532.49, 613.03], [613.03, 730.15], [730.15, 760.49], [760.49, 807.22], [807.22, 906.46], [906.46, 1022.02], [1022.02, 1044.65], [1044.65, 1051.44], [1051.44, 1060.66], [1060.66, 1122.94], [1122.94, 1173.79], [1173.79, 1225.08], [1225.08, 1342.3], [1342.3, 1424.23], [1424.23, 1431.31], [1431.31, 1495.56], [1495.56, 1558.54], [1558.54, 1613.78], [1613.78, 1625.3], [1625.3, 1685.9], [1685.9, 1744.37], [1744.37, 1752.55], [1752.55, 1867.7], [1867.7, 1920.65], [1920.65, 1955.83], [1955.83, 1969.03], [1969.03, 1978.42], [1978.42, 1985.45], [1985.45, 2036.64], [2036.64, 2162.81], [2162.81, 2204.16]];   // build:cues:george
+VOICES.george.cues2 = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, [2204.16, 2240.98], [2240.98, 2285.35], null, null, null, null, null, [2285.35, 2344.7], null, null, null, [2344.7, 2379.1], null, null, [2379.1, 2420.78], null, null, null, [2420.78, 2449.56], [2449.56, 2500.7], [2500.7, 2539.37], null, null, null];   // build:cues2:george
+VOICES.george.prompts = {"quiz": [2539.37, 2546.54], "answers": [2546.54, 2553.31], "exercise": [2553.31, 2561.33]};   // build:prompts:george
+VOICES.alex.cues = [[0.0, 38.57], [38.57, 115.58], [115.58, 162.0], [162.0, 197.06], [197.06, 232.06], [232.06, 278.9], [278.9, 329.33], [329.33, 393.1], [393.1, 454.42], [454.42, 501.17], [501.17, 577.2], [577.2, 686.76], [686.76, 715.22], [715.22, 758.33], [758.33, 851.09], [851.09, 958.68], [958.68, 980.06], [980.06, 986.71], [986.71, 995.35], [995.35, 1054.27], [1054.27, 1101.94], [1101.94, 1149.86], [1149.86, 1259.57], [1259.57, 1336.61], [1336.61, 1343.35], [1343.35, 1403.98], [1403.98, 1463.02], [1463.02, 1514.86], [1514.86, 1525.78], [1525.78, 1582.46], [1582.46, 1637.78], [1637.78, 1645.63], [1645.63, 1753.92], [1753.92, 1803.67], [1803.67, 1837.13], [1837.13, 1849.56], [1849.56, 1858.27], [1858.27, 1865.09], [1865.09, 1913.47], [1913.47, 2033.11], [2033.11, 2072.62]];   // build:cues:alex
+VOICES.alex.cues2 = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, [2072.62, 2107.2], [2107.2, 2149.58], null, null, null, null, null, [2149.58, 2205.43], null, null, null, [2205.43, 2238.17], null, null, [2238.17, 2277.6], null, null, null, [2277.6, 2305.06], [2305.06, 2352.89], [2352.89, 2388.77], null, null, null];   // build:cues2:alex
+VOICES.alex.prompts = {"quiz": [2388.77, 2395.66], "answers": [2395.66, 2402.04], "exercise": [2402.04, 2409.5]};   // build:prompts:alex
+let AUDIO = VOICES.emma;   // the voice in use; Emma is the default and sets the session timings
 const PROMPTS = {
   quiz: "Answer the questions on this slide. When you have finished the quiz, press Start to carry on.",
   answers: "Decide your answers first. When the room is ready, press Start to hear them.",
@@ -1710,7 +1718,6 @@ const TEMPLATE = `<div class="progress" aria-hidden="true"><i data-id="prog"></i
   <select class="tb voice-pick" data-id="voice-pick" aria-label="Narration voice"></select>
   <button class="tb" data-id="b-cc" type="button" aria-pressed="false" title="Show the narration as subtitles">Subtitles</button>
   <span class="speed" role="group" aria-label="Narration speed"><span class="speed-l" aria-hidden="true">Speed</span><button class="tb" type="button" data-speed="1" aria-pressed="true" aria-label="Normal speed">1×</button><button class="tb" type="button" data-speed="1.25" aria-pressed="false" aria-label="1.25 times speed">1.25×</button><button class="tb" type="button" data-speed="1.5" aria-pressed="false" aria-label="1.5 times speed">1.5×</button><button class="tb" type="button" data-speed="2" aria-pressed="false" aria-label="2 times speed">2×</button></span>
-  <span class="voice-hint" hidden>A UK voice is missing on this device. iPhone or iPad: Settings → Accessibility → Spoken Content → Voices → English → English (UK), download Kate and Daniel (Premium). Mac: System Settings → Accessibility → Spoken Content → System voice → Manage voices. Windows: use Edge.</span>
   <button class="tb" data-id="b-full" type="button">Full screen</button>
   
   <span class="keys">→ next · ← back · N notes · V narrate · C subtitles · S speed · F full screen</span>
@@ -1826,8 +1833,6 @@ const ANY_RANK = {
   female: [/Moira/i, /Karen/i, /Tessa/i, /Samantha/i, /Victoria/i, /Allison/i, /\bAva\b/i, /Zira/i, /Jenny/i, /Aria/i, /Emma/i, /Female/i],
   male:   [/\bRishi\b/i, /\bLee\b/i, /\bTom\b/i, /\bAlex\b/i, /\bFred\b/i, /David/i, /\bMark\b/i, /\bGuy\b/i, /Male/i]
 };
-const REGION = { "en-IE": "Irish", "en-AU": "Australian", "en-ZA": "South African", "en-IN": "Indian", "en-US": "American", "en-CA": "Canadian", "en-NZ": "New Zealand" };
-const short = n => n.replace(/^Microsoft |^Google /, "").replace(/ Online \(Natural\)/, " (natural)").replace(/ - English \(.*\)$/, "").replace(/ \(en-GB\)$/, "");
 function findVoice(vs, kind) {
   const gb = vs.filter(v => /en[-_]GB/i.test(v.lang));
   for (const re of VOICE_RANK[kind]) { const hit = gb.find(v => re.test(v.name)); if (hit) return { voice: hit, uk: true }; }
@@ -1836,34 +1841,21 @@ function findVoice(vs, kind) {
   return { voice: gb[0] || en[0] || null, uk: false, none: true };
 }
 function bestVoice(vs, kind) { return findVoice(vs, kind).voice; }
-function describe(vs, kind) {
-  const r = findVoice(vs, kind);
-  if (!r.voice) return "none available";
-  if (r.uk) return short(r.voice.name);
-  const region = REGION[(r.voice.lang || "").replace("_", "-")] || "";
-  return r.none ? "not installed, using " + short(r.voice.name) : short(r.voice.name) + (region ? " (" + region + ")" : "") + ", no UK " + kind + " voice installed";
-}
-let choice = "rec:female";
+let choice = "rec:emma";
+const voiceKey = () => choice.slice(4);
+/* Backup only: the device's own UK voice of the matching kind, used if the recording cannot load */
+function deviceVoice() { const vs = synth ? synth.getVoices() : []; voice = bestVoice(vs, (VOICES[voiceKey()] || VOICES.emma).device); }
 function pickVoice() {
-  const vs = synth ? synth.getVoices() : [];
-  try { choice = localStorage.getItem("deckVoice") || "rec:female"; } catch (e) {}
-  if (choice.startsWith("rec:")) choice = "rec:female";
-  const live = choice.startsWith("rec:") ? "female" : choice;
-  voice = (live === "female" || live === "male") ? bestVoice(vs, live) : (vs.find(v => v.name === live) || bestVoice(vs, "female"));
-  fillVoices(vs, choice);
+  let saved = null; try { saved = localStorage.getItem("deckVoice"); } catch (e) {}
+  const key = saved && saved.startsWith("rec:") ? saved.slice(4) : "emma";
+  choice = "rec:" + (VOICES[key] && VOICES[key].cues ? key : "emma");
+  AUDIO = VOICES[voiceKey()];
+  deviceVoice(); fillVoices();
 }
-function fillVoices(vs, saved) {
+function fillVoices() {
   const sel = el.voicePick;
   if (!sel) return;
-  const english = vs.filter(v => /^en/i.test(v.lang)).sort((a, b) => (/en[-_]GB/i.test(b.lang) - /en[-_]GB/i.test(a.lang)) || a.name.localeCompare(b.name));
-  let html = '<option value="rec:female"' + (saved === "rec:female" ? " selected" : "") + ">Recorded · " + esc(AUDIO.name) + " (UK female)</option>" +
-             '<optgroup label="This device’s voices">' +
-             '<option value="female"' + (saved === "female" ? " selected" : "") + ">UK female · " + esc(describe(vs, "female")) + "</option>" +
-             '<option value="male"' + (saved === "male" ? " selected" : "") + ">UK male · " + esc(describe(vs, "male")) + "</option></optgroup>";
-  const missing = !saved.startsWith("rec:") && (!findVoice(vs, "female").uk || !findVoice(vs, "male").uk);
-  const hint = root.querySelector(".voice-hint"); if (hint) hint.hidden = !missing;
-  if (english.length && !synth) html = html; if (english.length) html += '<optgroup label="All English voices on this device">' + english.map(v => '<option value="' + esc(v.name) + '"' + (saved === v.name ? " selected" : "") + ">" + esc(short(v.name)) + (/en[-_]GB/i.test(v.lang) ? "" : " · " + v.lang) + "</option>").join("") + "</optgroup>";
-  sel.innerHTML = html;
+  sel.innerHTML = Object.keys(VOICES).filter(k => VOICES[k].cues).map(k => '<option value="rec:' + k + '"' + (choice === "rec:" + k ? " selected" : "") + ">" + esc(VOICES[k].label) + "</option>").join("");
   sel.hidden = false;
 }
 
@@ -1872,7 +1864,7 @@ const SAY = [
   [/\bSDECs\b/g, "ess decs"], [/\bSDEC\b/g, "ess dec"], [/\bQEHB\b/g, "Q E H B"], [/\bUHB\b/g, "U H B"],
   [/\bNSAIDs\b/g, "en saids"], [/\bNSAID\b/g, "en said"],
   [/\bOCT\b/g, "O C T"], [/\bIIH\b/g, "I I H"], [/\bSAH\b/g, "S A H"], [/\bLP\b/g, "L P"], [/\bCT\b/g, "C T"], [/\bCTA\b/g, "C T A"], [/\bCTV\b/g, "C T V"],
-  [/\bGCS\b/g, "G C S"], [/\bGCA\b/g, "G C A"], [/\bTIA\b/g, "T I A"], [/\bMRI\b/g, "M R I"], [/\bECG\b/g, "E C G"], [/\bIV\b/g, "I V"], [/\bIM\b/g, "I M"],
+  [/\bGCS\b/g, "G C S"], [/\bGCA\b/g, "G C A"], [/\bTIA\b/g, "T I A"], [/\bMRI\b/g, "M R I"], [/\bMR\b/g, "M R"], [/\bECG\b/g, "E C G"], [/\bIV\b/g, "I V"], [/\bIM\b/g, "I M"],
   [/\bRCVS\b/g, "R C V S"], [/\bPRES\b/g, "P R E S"], [/\bICHD-3\b/g, "I C H D 3"], [/\bCGRP\b/g, "C G R P"], [/\bAION\b/g, "A I O N"], [/\bRAPD\b/g, "R A P D"],
   [/\bU&E\b/g, "U and E"], [/\bNEWS2\b/g, "news 2"], [/\bGP\b/g, "G P"], [/\bED\b/g, "E D"], [/\bHIV\b/g, "H I V"], [/\bCD4\b/g, "C D 4"],
   [/\bID Migraine\b/g, "I D Migraine"], [/\bBSR\b/g, "B S R"], [/\bBIHS\b/g, "B I H S"], [/\bUKMEC\b/g, "U K M E C"], [/\bDVLA\b/g, "D V L A"], [/\bMHRA\b/g, "M H R A"], [/\bCiP\b/g, "sip"], [/\bCiPs\b/g, "sips"],
@@ -1884,7 +1876,7 @@ const SAY = [
 ];
 const say = t => SAY.reduce((x, [re, to]) => x.replace(re, to), t);
 /* Device voices only: respell migraine as MY-grain (the recording uses phonemes for this) */
-const sayLive = t => say(t).replace(/\bmigrainosus\b/gi, "my-grain-oh-suss").replace(/\bmigrainous\b/gi, "my-grain-us").replace(/\bmigraines\b/gi, "my-grains").replace(/\bmigraine\b/gi, "my-grain");
+const sayLive = t => say(t).replace(/\bmigrainosus\b/gi, "my-grain-oh-suss").replace(/\bmigrainous\b/gi, "my-grain-us").replace(/\bmigraines\b/gi, "my-grains").replace(/\bmigraine\b/gi, "my-grain").replace(/\bresus\b/gi, "ree-suss").replace(/\bencephalitis\b/gi, "en-keff-a-lie-tis").replace(/\bPaton's\b/g, "Payton's");
 
 /* Narration autoplay: reads the slide sentence by sentence, reveals the builds as it goes, then moves to the next slide until the end or Stop */
 let auto = false, waiting = false, run = 0, captions = false, answered = false, speed = 1;
@@ -2175,15 +2167,12 @@ function mount(container) {
   let sp0 = 1; try { sp0 = parseFloat(localStorage.getItem("deckSpeed") || "1") || 1; } catch (e) {}
   speed = SPEEDS.includes(sp0) ? sp0 : 1; applySpeed();
   pickVoice();
-  if (synth) on(synth, "voiceschanged", pickVoice);
+  if (synth) on(synth, "voiceschanged", deviceVoice);
   on(el.voicePick, "change", () => {
-    const vs = synth ? synth.getVoices() : [], v = el.voicePick.value;
-    choice = v;
-    const live = v.startsWith("rec:") ? "female" : v;
-    voice = (live === "female" || live === "male") ? bestVoice(vs, live) : (vs.find(x => x.name === live) || voice);
-    try { localStorage.setItem("deckVoice", v); } catch (e) {}
-    fillVoices(vs, v);
-    if (auto) speakCurrent();
+    choice = el.voicePick.value; AUDIO = VOICES[voiceKey()] || VOICES.emma;
+    try { localStorage.setItem("deckVoice", choice); } catch (e) {}
+    deviceVoice();
+    if (auto && !waiting) speakCurrent(); else if (!auto) stopVoice();
   });
   let start = 0; try { start = parseInt(sessionStorage.getItem("deckSlide") || "0", 10) || 0; } catch (e) {}
   show(start); fit(); setTimeout(fit, 300);
@@ -3130,7 +3119,7 @@ const PAGES = [
     <div id="deck-root"></div>
     <details class="more" id="deck-help">
       <summary>How to use the deck <span class="small">keys, narration, subtitles, curriculum mapping</span></summary>
-      <p class="small">The counter shows how far into the session each slide falls, and the notes drawer shows the spoken length of each slide. Arrow keys or the buttons move through the builds; swipe on a phone. N shows the presenter notes. V (or Narrate) plays the whole deck from the current slide in a recorded voice (Emma, UK female), revealing each build as it is read. On a quiz or case slide it reads the questions, pauses for the room to answer, and reads the answers only when you press Start; on the examination and red-flag slides it waits for you to tap the markers and cards. At the break it starts a 5-minute clock and waits. Press Stop at any time. C (or Subtitles) shows the narration as captions, including on the videos. Speed plays the narration at 1×, 1.25×, 1.5× or 2× (S cycles through them); the pitch stays the same, the slide builds and videos keep in step, and the choice is remembered on this browser. The session timings on this page are at normal speed. The 4 videos are animated and narrated; press Play on the slide to show one on its own, or let Narrate run through them. The device’s own voices are in the same menu if the recording cannot load. F goes full screen. The quizzes, flip cards and cases are for the room to answer before you tap.</p>
+      <p class="small">The counter shows how far into the session each slide falls, and the notes drawer shows the spoken length of each slide. Arrow keys or the buttons move through the builds; swipe on a phone. N shows the presenter notes. V (or Narrate) plays the whole deck from the current slide in a recorded voice, revealing each build as it is read. Voice chooses the recording: Emma (UK female, the default), George (UK male) or Alex (gender-neutral); the choice is remembered on this browser. On a quiz or case slide it reads the questions, pauses for the room to answer, and reads the answers only when you press Start; on the examination and red-flag slides it waits for you to tap the markers and cards. At the break it starts a 5-minute clock and waits. Press Stop at any time. C (or Subtitles) shows the narration as captions, including on the videos. Speed plays the narration at 1×, 1.25×, 1.5× or 2× (S cycles through them); the pitch stays the same, the slide builds and videos keep in step, and the choice is remembered on this browser. The session timings on this page are at normal speed. The 4 videos are animated and narrated; press Play on the slide to show one on its own, or let Narrate run through them. If a recording cannot load, the device’s own voice reads the narration instead. F goes full screen. The quizzes, flip cards and cases are for the room to answer before you tap.</p>
     <p class="small">Maps to IM Clinical CiP 1 (Managing an acute unselected take), CiP 2 (Managing the acute care of patients within a medical specialty service), CiP 4 (Managing patients in an outpatient clinic, ambulatory or community setting) and IM Generic CiP 4 (Is focussed on patient safety and delivers effective quality improvement in patient care).</p>
       </details>
 `,
@@ -3374,7 +3363,7 @@ const PAGES = [
       ext("https://commons.wikimedia.org/wiki/File:Fundus_photograph_of_normal_right_eye.jpg", "Fundus photograph of a normal right eye") + ", Mikael Häggström, cropped; CC0"
     ])}
     <h2>Narration</h2>
-    ${ul([ext("https://huggingface.co/hexgrad/Kokoro-82M", "Kokoro-82M") + " open-source speech engine (Apache 2.0), voice Emma; recorded from the presenter scripts"])}
+    ${ul([ext("https://huggingface.co/hexgrad/Kokoro-82M", "Kokoro-82M") + " open-source speech engine (Apache 2.0): voices Emma (bf_emma) and George (bm_george), and Alex, an equal blend of the two; recorded from the presenter scripts"])}
     <h2>Accessibility</h2>
     <p>Built to meet WCAG 2.2 level AA. Every page works with a keyboard alone (there is a skip link, visible focus, and the slides respond to the arrow keys), with screen readers (landmarks, labelled controls, live regions for results and quiz feedback), at 400% zoom, and in light and dark themes with text contrast of at least 4.5:1. Animation respects the reduced-motion setting. The narration is recorded, can be shown as subtitles, and every video is described in its narration.</p>
     <p class="small">Known limits: the teaching slides are a fixed 16:9 frame, so on a phone held upright the buttons on a slide are small; turn the phone sideways or use full screen. The videos are animated drawings without a separate audio description track. To report a problem, use the contact on the ${go("contacts", "local contacts")} page.</p>
