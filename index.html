@@ -713,6 +713,13 @@ button { font-family: inherit; }
 .deck .tb.wait { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); animation: deckpulse 1.4s ease-in-out infinite; }
 @keyframes deckpulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 50%, transparent); } 60% { box-shadow: 0 0 0 10px transparent; } }
 .deck .voice-pick { max-width: 260px; padding: 6px 8px; font-weight: 500; }
+.deck .speed { display: inline-flex; align-items: center; gap: 0; }
+.deck .speed-l { font-size: 14px; font-weight: 700; color: var(--ink-2); margin-right: 6px; }
+.deck .speed .tb { border-radius: 0; min-width: 48px; justify-content: center; padding-inline: 10px; }
+.deck .speed .tb + .tb { border-left-width: 0; }
+.deck .speed .tb:first-of-type { border-radius: 8px 0 0 8px; }
+.deck .speed .tb:last-of-type { border-radius: 0 8px 8px 0; }
+.deck .speed .tb[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .deck .voice-hint { flex-basis: 100%; font-size: 13px; line-height: 1.4; color: var(--amber); background: var(--amber-soft); border: 1px solid color-mix(in srgb, var(--amber) 35%, transparent); border-radius: 8px; padding: 6px 10px; }
 .deck .counter { font-family: var(--mono); font-size: 15px; color: var(--ink-2); font-variant-numeric: tabular-nums; padding: 0 6px; }
 .deck .keys { font-family: var(--mono); font-size: 13px; color: var(--ink-2); }
@@ -1702,10 +1709,11 @@ const TEMPLATE = `<div class="progress" aria-hidden="true"><i data-id="prog"></i
   <button class="tb" data-id="b-voice" type="button" aria-pressed="false">Narrate</button>
   <select class="tb voice-pick" data-id="voice-pick" aria-label="Narration voice"></select>
   <button class="tb" data-id="b-cc" type="button" aria-pressed="false" title="Show the narration as subtitles">Subtitles</button>
+  <span class="speed" role="group" aria-label="Narration speed"><span class="speed-l" aria-hidden="true">Speed</span><button class="tb" type="button" data-speed="1" aria-pressed="true" aria-label="Normal speed">1×</button><button class="tb" type="button" data-speed="1.5" aria-pressed="false" aria-label="1.5 times speed">1.5×</button><button class="tb" type="button" data-speed="2" aria-pressed="false" aria-label="2 times speed">2×</button></span>
   <span class="voice-hint" hidden>A UK voice is missing on this device. iPhone or iPad: Settings → Accessibility → Spoken Content → Voices → English → English (UK), download Kate and Daniel (Premium). Mac: System Settings → Accessibility → Spoken Content → System voice → Manage voices. Windows: use Edge.</span>
   <button class="tb" data-id="b-full" type="button">Full screen</button>
   
-  <span class="keys">→ next · ← back · N notes · V narrate · C subtitles · F full screen</span>
+  <span class="keys">→ next · ← back · N notes · V narrate · C subtitles · S speed · F full screen</span>
 </div>
 <div class="notes" data-id="notes" hidden><p class="nl" data-id="notes-label">Narration</p><p data-id="notes-text"></p></div>`;
 let root = null, el = {}, slides = [], ST = { i: 0, step: 0 }, voice = null, off = [];
@@ -1877,7 +1885,22 @@ const SAY = [
 const say = t => SAY.reduce((x, [re, to]) => x.replace(re, to), t);
 
 /* Narration autoplay: reads the slide sentence by sentence, reveals the builds as it goes, then moves to the next slide until the end or Stop */
-let auto = false, waiting = false, run = 0, captions = false, answered = false;
+let auto = false, waiting = false, run = 0, captions = false, answered = false, speed = 1;
+const SPEEDS = [1, 1.5, 2];
+/* Device voices: rate 1 is normal; their fast end is less clear, so 2× is capped a little lower */
+const ttsRate = () => Math.min(1.9, 0.98 * speed);
+function applySpeed() {
+  if (el.audio) { el.audio.defaultPlaybackRate = speed; el.audio.playbackRate = speed; try { el.audio.preservesPitch = true; } catch (e) {} }
+  if (!root) return;
+  root.querySelectorAll("[data-speed]").forEach(b => { const on = parseFloat(b.dataset.speed) === speed; b.setAttribute("aria-pressed", String(on)); b.classList.toggle("on", on); });
+}
+function setSpeed(v) {
+  speed = SPEEDS.includes(v) ? v : 1;
+  try { localStorage.setItem("deckSpeed", String(speed)); } catch (e) {}
+  applySpeed();
+  /* the device voice picks up a new rate at the next sentence; restart the current slide so the change is heard at once */
+  if (auto && !waiting && !choice.startsWith("rec:")) speakCurrent();
+}
 const SENTENCES = t => t.match(/[^.!?]+[.!?]+["”]?\s*|[^.!?]+$/g) || [t];
 function caption(text) {
   const c = root && root.querySelector(".caption");
@@ -1943,18 +1966,23 @@ function afterSlide(myRun, slideIndex) {
 function playCue(myRun, cue, onProgress, onDone) {
   const a = el.audio, start = cue[0], end = cue[1];
   a.dataset.run = String(myRun);
-  const done = () => { if (String(myRun) !== a.dataset.run || myRun !== run) return; a.pause(); a.ontimeupdate = null; onDone(); };
+  let finished = false;
+  const done = () => { if (finished || String(myRun) !== a.dataset.run || myRun !== run) return; finished = true; a.pause(); a.ontimeupdate = null; onDone(); };
   a.onended = done;
-  a.ontimeupdate = () => {
-    if (String(myRun) !== a.dataset.run) return;
-    if (a.currentTime >= end - 0.05) { done(); return; }
+  const tick = () => {
+    if (finished || String(myRun) !== a.dataset.run || myRun !== run) return;
+    if (a.currentTime >= end - 0.06 * a.playbackRate) { done(); return; }
     if (onProgress) onProgress(Math.max(0, (a.currentTime - start) / (end - start)));
   };
+  a.ontimeupdate = tick;
+  const poll = () => { if (finished || String(myRun) !== a.dataset.run || myRun !== run) return; if (!a.paused) tick(); requestAnimationFrame(poll); };
   a.onerror = () => { if (myRun === run) speakLive(myRun); };
   const go = () => {
     if (String(myRun) !== a.dataset.run) return;
     try { a.currentTime = start; } catch (e) {}
+    a.defaultPlaybackRate = speed; a.playbackRate = speed;
     const pr = a.play();
+    requestAnimationFrame(poll);
     if (pr && pr.catch) pr.catch(() => { if (myRun === run) speakLive(myRun); });
   };
   if (a.getAttribute("src") !== AUDIO.file) { a.src = AUDIO.file; a.load(); }
@@ -1989,7 +2017,7 @@ function speakAnswers() {
   if (!synth) { next(); return; }
   const sentences = SENTENCES(text); let done = 0;
   sentences.forEach(t => {
-    const u = new SpeechSynthesisUtterance(say(t.trim())); u.lang = "en-GB"; u.rate = 0.98; if (voice) u.voice = voice;
+    const u = new SpeechSynthesisUtterance(say(t.trim())); u.lang = "en-GB"; u.rate = ttsRate(); if (voice) u.voice = voice;
     u.onstart = () => { if (myRun === run) caption(t); };
     u.onend = () => { if (myRun !== run) return; if (++done === sentences.length) { caption(""); next(); } };
     u.onerror = () => { if (myRun === run) stopVoice(); };
@@ -2000,7 +2028,7 @@ function speakAnswers() {
 function speakText(myRun, text, onDone) {
   if (!synth) { onDone(); return; }
   const u = new SpeechSynthesisUtterance(say(text));
-  u.lang = "en-GB"; u.rate = 0.98; u.pitch = 1;
+  u.lang = "en-GB"; u.rate = ttsRate(); u.pitch = 1;
   if (voice) u.voice = voice;
   u.onstart = () => { if (myRun === run) caption(text); };
   u.onend = () => { if (myRun === run) onDone(); };
@@ -2015,7 +2043,7 @@ function speakLive(myRun) {
   let done = 0;
   sentences.forEach((text, k) => {
     const u = new SpeechSynthesisUtterance(say(text.trim()));
-    u.lang = "en-GB"; u.rate = 0.98; u.pitch = 1;
+    u.lang = "en-GB"; u.rate = ttsRate(); u.pitch = 1;
     if (voice) u.voice = voice;
     u.onstart = () => { if (myRun === run) caption(text); };
     u.onend = () => {
@@ -2063,6 +2091,7 @@ function onKey(e) {
   else if (k === "n" || k === "N") toggleNotes();
   else if (k === "v" || k === "V") speak();
   else if (k === "c" || k === "C") toggleCaptions();
+  else if (k === "s" || k === "S") setSpeed(SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length]);
   else if (k === "f" || k === "F") fullscreen();
   else if (k === "Escape" && !el.notes.hidden) toggleNotes(false);
 }
@@ -2140,6 +2169,9 @@ function mount(container) {
   on(el.stage, "touchstart", e => { tx = e.touches[0].clientX; }, { passive: true });
   on(el.stage, "touchend", e => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 60) { if (dx < 0) next(); else prev(); } }, { passive: true });
   el.audio = document.createElement("audio"); el.audio.preload = "auto"; root.appendChild(el.audio);
+  root.querySelectorAll("[data-speed]").forEach(b => on(b, "click", () => setSpeed(parseFloat(b.dataset.speed))));
+  let sp0 = 1; try { sp0 = parseFloat(localStorage.getItem("deckSpeed") || "1") || 1; } catch (e) {}
+  speed = SPEEDS.includes(sp0) ? sp0 : 1; applySpeed();
   pickVoice();
   if (synth) on(synth, "voiceschanged", pickVoice);
   on(el.voicePick, "change", () => {
@@ -3096,7 +3128,7 @@ const PAGES = [
     <div id="deck-root"></div>
     <details class="more" id="deck-help">
       <summary>How to use the deck <span class="small">keys, narration, subtitles, curriculum mapping</span></summary>
-      <p class="small">The counter shows how far into the session each slide falls, and the notes drawer shows the spoken length of each slide. Arrow keys or the buttons move through the builds; swipe on a phone. N shows the presenter notes. V (or Narrate) plays the whole deck from the current slide in a recorded voice (Emma, UK female), revealing each build as it is read. On a quiz or case slide it reads the questions, pauses for the room to answer, and reads the answers only when you press Start; on the examination and red-flag slides it waits for you to tap the markers and cards. At the break it starts a 5-minute clock and waits. Press Stop at any time. C (or Subtitles) shows the narration as captions, including on the videos. The 4 videos are animated and narrated; press Play on the slide to show one on its own, or let Narrate run through them. The device’s own voices are in the same menu if the recording cannot load. F goes full screen. The quizzes, flip cards and cases are for the room to answer before you tap.</p>
+      <p class="small">The counter shows how far into the session each slide falls, and the notes drawer shows the spoken length of each slide. Arrow keys or the buttons move through the builds; swipe on a phone. N shows the presenter notes. V (or Narrate) plays the whole deck from the current slide in a recorded voice (Emma, UK female), revealing each build as it is read. On a quiz or case slide it reads the questions, pauses for the room to answer, and reads the answers only when you press Start; on the examination and red-flag slides it waits for you to tap the markers and cards. At the break it starts a 5-minute clock and waits. Press Stop at any time. C (or Subtitles) shows the narration as captions, including on the videos. Speed plays the narration at 1×, 1.5× or 2× (S cycles through them); the pitch stays the same, the slide builds and videos keep in step, and the choice is remembered on this browser. The session timings on this page are at normal speed. The 4 videos are animated and narrated; press Play on the slide to show one on its own, or let Narrate run through them. The device’s own voices are in the same menu if the recording cannot load. F goes full screen. The quizzes, flip cards and cases are for the room to answer before you tap.</p>
     <p class="small">Maps to IM Clinical CiP 1 (Managing an acute unselected take), CiP 2 (Managing the acute care of patients within a medical specialty service), CiP 4 (Managing patients in an outpatient clinic, ambulatory or community setting) and IM Generic CiP 4 (Is focussed on patient safety and delivers effective quality improvement in patient care).</p>
       </details>
 `,
