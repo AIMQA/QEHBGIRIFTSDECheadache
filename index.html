@@ -305,7 +305,54 @@ details.more.accent summary .small { color: var(--ink-2); }
 .prose > details.more:first-child { margin-top: 0; }
 details.more.accent[open] { background: var(--paper); }
 
-/* Tools: calculators and checklists */
+/* Visual guides: pictures to read, with nothing to type and no calculated result */
+:root { --zA: #F0F4F5; --zB: #E3EEF9; --zC: #C6DBF1; --zD: #FFE39A; --zE: #F6C3BD; --zLow: #CDEBD8; --hatch: #A86F00; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --zA: #14293A; --zB: #183450; --zC: #22486F; --zD: #574310; --zE: #63291F; --zLow: #1E4A33; --hatch: #FFD166; } }
+:root[data-theme="dark"] { --zA: #14293A; --zB: #183450; --zC: #22486F; --zD: #574310; --zE: #63291F; --zLow: #1E4A33; --hatch: #FFD166; }
+.vguide { margin: 12px 0 0; max-width: 540px; }
+.vguide svg { width: 100%; height: auto; display: block; font-family: var(--body); }
+.vguide .zA { fill: var(--zA); } .vguide .zB { fill: var(--zB); } .vguide .zC { fill: var(--zC); } .vguide .zD { fill: var(--zD); } .vguide .zE { fill: var(--zE); } .vguide .zLow { fill: var(--zLow); }
+.vguide .edge { fill: none; stroke: var(--paper); stroke-width: 2; }
+.vguide .cell { stroke: var(--paper); stroke-width: 1; opacity: .7; }
+.vguide .axis { stroke: var(--ink-2); stroke-width: 1.5; }
+.vguide .tick { fill: var(--ink-2); font-size: 10px; }
+.vguide .ttl { fill: var(--ink); font-size: 11px; font-weight: 600; }
+.vguide .zl { fill: var(--ink); font-size: 11px; }
+.vguide .zl.b { font-weight: 700; }
+.vguide .zl.halo { paint-order: stroke; stroke: var(--zA); stroke-width: 4px; }
+.vguide .zk { fill: var(--ink); font-size: 12px; font-weight: 700; }
+.vguide.gs .zl { font-size: 12.5px; }
+.vguide.gs .tick { font-size: 11.5px; }
+.vguide .limit { stroke: var(--hatch); stroke-width: 2; stroke-dasharray: 5 4; }
+.vguide .limit-t { fill: var(--ink); font-size: 10.5px; font-weight: 600; }
+.vkey { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 6px; font-size: 0.9rem; }
+.vkey li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 8px; align-items: start; }
+.vkey b.sw { display: inline-grid; place-items: center; width: 26px; height: 22px; border-radius: 3px; font-size: 0.8rem; color: var(--ink); border: 1px solid var(--rule); }
+.vhow { margin: 0 0 10px; padding-left: 1.3em; font-size: 0.93rem; }
+.vhow li { margin: 0 0 4px; }
+.veg { margin: 10px 0 0; padding: 9px 13px; border-left: 4px solid var(--accent); background: var(--paper); font-size: 0.93rem; }
+/* Southend points table: read across each row; the column gives the points */
+.pts-wrap { container-type: inline-size; margin: 8px 0 0; }
+table.pts { width: 100%; min-width: 0; border-collapse: collapse; font-size: 0.86rem; background: var(--paper); }
+table.pts th, table.pts td { border: 1px solid var(--rule); padding: 6px 7px; text-align: left; vertical-align: top; }
+table.pts thead th { font-size: 0.8rem; text-align: center; background: var(--paper-2); }
+table.pts td.p1 { background: color-mix(in srgb, var(--accent) 8%, var(--paper)); }
+table.pts td.p2 { background: color-mix(in srgb, var(--accent) 16%, var(--paper)); }
+table.pts td.p3 { background: color-mix(in srgb, var(--accent) 26%, var(--paper)); }
+table.pts td.na { background: repeating-linear-gradient(45deg, transparent 0 5px, var(--rule) 5px 6px); }
+table.pts td::before { content: none; }
+.pts-minus { margin: 8px 0 0; padding: 8px 12px; background: var(--red-soft); border-left: 4px solid var(--red); font-size: 0.9rem; }
+@container (max-width: 520px) {
+  table.pts, table.pts tbody { display: block; width: 100%; }
+  table.pts thead { display: none; }
+  table.pts tr { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0 0 6px; padding: 0; border: 0; border-radius: 0; background: none; }
+  table.pts th, table.pts td { display: block; min-width: 0; padding: 5px 6px; border: 1px solid var(--rule); overflow-wrap: break-word; hyphens: auto; }
+  table.pts td { font-size: 0.8rem; }
+  table.pts th[scope="row"] { grid-column: 1 / -1; width: auto; background: var(--paper-2); padding: 6px 7px; border: 1px solid var(--rule); font-size: 0.86rem; }
+  table.pts td::before { content: attr(data-p); display: block; font-weight: 700; font-size: 0.75rem; color: var(--ink-2); }
+  table.pts td.na::before { content: none; }
+}
+/* Tools: checklists and forms */
 .tool { border: 1px solid var(--rule); border-radius: var(--radius); padding: 14px 16px; margin: 12px 0 16px; background: var(--paper-2); }
 .tool h3, .tool .tool-h { margin-top: 0 !important; }
 .prose .tool-h { font: 600 1rem var(--body); margin: 0 0 6px; }
@@ -890,8 +937,8 @@ button { font-family: inherit; }
    Leave a route empty ("") to show it as "route to confirm".
    ============================================================ */
 const META = {
-  version: "Draft 0.8.1",
-  date: "1 November 2026",
+  version: "Draft 0.8.2",
+  date: "3 November 2026",
   owner: "",            // for example, "SDEC clinical lead"
   approvedBy: "",       // governance group, once approved
   reviewDue: ""         // set at approval
@@ -1308,10 +1355,10 @@ const SLIDES = [
         ${f('<div class="panel good"><p class="lbl">Below 9 · low</p><p style="font-size:19px">GCA unlikely. No steroids on the score alone.</p></div>')}
         ${f('<div class="panel caution" style="margin-top:10px"><p class="lbl">9 to 12 · intermediate</p><p style="font-size:19px">Steroids if suspected, same-day referral. Ultrasound decides.</p></div>')}
         ${f('<div class="panel stop" style="margin-top:10px"><p class="lbl">Above 12 · high</p><p style="font-size:19px">Treat now. Ultrasound; if negative, biopsy or PET-CT.</p></div>')}
-        ${f('<p class="small" style="margin-top:10px">Maximum 32. Laskou 2019; Sebastian 2020. The pathway’s GCA page has the calculator.</p>')}
+        ${f('<p class="small" style="margin-top:10px">Maximum 32. Laskou 2019; Sebastian 2020. The pathway’s GCA page has the points table and the score scale.</p>')}
       </div>
     </div>`,
-  notes: "Here's the score as a table, for reference. The calculator is the first thing on the GCA page of the pathway, so there's no need to learn the weights. But the pattern's worth knowing. In the background items, age, recent onset and CRP carry the most weight. In the clinical items, it's jaw claudication, visual signs and an abnormal artery. And a more likely alternative diagnosis takes points away."
+  notes: "Here's the score as a table, for reference. The full points table is on the GCA page of the pathway, so there's no need to learn the weights. But the pattern's worth knowing. In the background items, age, recent onset and CRP carry the most weight. In the clinical items, it's jaw claudication, visual signs and an abnormal artery. And a more likely alternative diagnosis takes points away."
 },
 {
   eyebrow: "Stage 2 · Imaging",
@@ -1642,7 +1689,7 @@ const SLIDES = [
         "<strong>Measure it:</strong> 20 sets of notes a month show whether the pathway is being followed"
       ].map(i => f(i)))}</div>
     </div>
-    ${f('<div class="panel" style="margin-top:28px"><p class="lbl">The pathway</p><p style="font-size:20px"><a href="#start">Open the pathway from the start</a>. It has the doses, local contacts, the Southend calculator and the discharge checklist.</p></div>')}`,
+    ${f('<div class="panel" style="margin-top:28px"><p class="lbl">The pathway</p><p style="font-size:20px"><a href="#start">Open the pathway from the start</a>. It has the doses, local contacts, the Southend points table and the discharge checklist.</p></div>')}`,
   notes: "So, to sum up. Screen for secondary headache every time: time to peak, the 8 red flags, and the fundi. Give the diagnosis and explain it, because a scan does not give lasting reassurance, and a plan does. Treat attacks early, with an NSAID, a triptan and an antiemetic together, and never with an opioid. Keep acute medicines to 2 days a week, and start preventive treatment when attacks are frequent, chosen for the person in front of you. The GP letter carries the plan: the diagnosis, the acute treatment, the day limit, the preventive titration and the review date. And measure it, because 20 sets of notes a month will tell you whether the pathway is being followed. The last video shows you how."
 },
 {
@@ -1695,9 +1742,9 @@ SLIDES.splice(SLIDES.findIndex(s => s.html.includes("<h2>Examination: 5 things t
 const VOICES = {
   emma: { file: "emma.mp3", name: "Emma", label: "Emma · UK female", device: "female" }
 };
-VOICES.emma.cues = [[0.0, 43.08], [43.08, 127.9], [127.9, 174.29], [174.29, 208.34], [208.34, 242.4], [242.4, 297.31], [297.31, 351.34], [351.34, 412.63], [412.63, 471.82], [471.82, 518.45], [518.45, 595.87], [595.87, 703.42], [703.42, 731.38], [731.38, 775.82], [775.82, 867.48], [867.48, 973.73], [973.73, 993.29], [993.29, 1000.08], [1000.08, 1010.83], [1010.83, 1072.78], [1072.78, 1118.71], [1118.71, 1166.11], [1166.11, 1270.42], [1270.42, 1345.2], [1345.2, 1352.33], [1352.33, 1411.94], [1411.94, 1470.5], [1470.5, 1525.61], [1525.61, 1536.74], [1536.74, 1596.6], [1596.6, 1654.99], [1654.99, 1663.13], [1663.13, 1776.38], [1776.38, 1831.18], [1831.18, 1872.7], [1872.7, 1885.9], [1885.9, 1895.28], [1895.28, 1901.69], [1901.69, 1947.82], [1947.82, 2074.7], [2074.7, 2116.08]];   // build:cues:emma
-VOICES.emma.cues2 = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, [2116.08, 2152.49], [2152.49, 2196.77], null, null, null, null, null, [2196.77, 2258.69], null, null, null, [2258.69, 2292.62], null, null, [2292.62, 2329.87], null, null, null, [2329.87, 2356.39], [2356.39, 2404.34], [2404.34, 2439.38], null, null, null];   // build:cues2:emma
-VOICES.emma.prompts = {"quiz": [2439.38, 2445.7], "answers": [2445.7, 2452.54], "exercise": [2452.54, 2459.74]};   // build:prompts:emma
+VOICES.emma.cues = [[0.0, 43.08], [43.08, 127.9], [127.9, 174.29], [174.29, 208.34], [208.34, 242.4], [242.4, 297.31], [297.31, 351.34], [351.34, 412.63], [412.63, 471.82], [471.82, 518.45], [518.45, 595.87], [595.87, 703.42], [703.42, 730.97], [730.97, 775.42], [775.42, 867.07], [867.07, 973.32], [973.32, 992.88], [992.88, 999.67], [999.67, 1010.42], [1010.42, 1072.37], [1072.37, 1118.3], [1118.3, 1165.7], [1165.7, 1270.01], [1270.01, 1344.79], [1344.79, 1351.92], [1351.92, 1411.54], [1411.54, 1470.1], [1470.1, 1525.2], [1525.2, 1536.34], [1536.34, 1596.19], [1596.19, 1654.58], [1654.58, 1662.72], [1662.72, 1775.98], [1775.98, 1830.77], [1830.77, 1872.29], [1872.29, 1885.49], [1885.49, 1894.87], [1894.87, 1901.28], [1901.28, 1947.41], [1947.41, 2074.3], [2074.3, 2115.67]];   // build:cues:emma
+VOICES.emma.cues2 = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, [2115.67, 2152.08], [2152.08, 2196.36], null, null, null, null, null, [2196.36, 2258.28], null, null, null, [2258.28, 2292.22], null, null, [2292.22, 2329.46], null, null, null, [2329.46, 2355.98], [2355.98, 2403.94], [2403.94, 2438.98], null, null, null];   // build:cues2:emma
+VOICES.emma.prompts = {"quiz": [2438.98, 2445.29], "answers": [2445.29, 2452.13], "exercise": [2452.13, 2459.33]};   // build:prompts:emma
 let AUDIO = VOICES.emma;   // the voice in use; Emma is the default and sets the session timings
 const PROMPTS = {
   quiz: "Have a go at the questions on this slide. When you're done, press Start and we'll carry on.",
@@ -2294,7 +2341,7 @@ const driverDiagram = () => {
   const box = (x, y, w, h, text, cls) => '<g class="' + cls + '"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="6"/>' +
     text.split("|").map((line, i, arr) => '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + (i - (arr.length - 1) / 2) * 15 + 5) + '" text-anchor="middle">' + line + "</text>").join("") + "</g>";
   const drivers = ["Assessment", "Decision support", "Prescribing", "Communication"];
-  const ideas = ["Pathway on every SDEC|computer and clerking", "Southend calculator;|CT criteria agreed", "Migraine order set;|no opioids; 2-day rule", "Letter template with|plan and review date"];
+  const ideas = ["Pathway on every SDEC|computer and clerking", "Southend score guide;|CT criteria agreed", "Migraine order set;|no opioids; 2-day rule", "Letter template with|plan and review date"];
   let svg = '<svg class="driver-svg" viewBox="0 0 760 300" role="img" aria-label="Driver diagram: the aim leads to 4 primary drivers, assessment, decision support, prescribing and communication, each with a change idea to test">';
   svg += box(0, 100, 170, 100, "90% leave with a|diagnosis, a plan|and a letter; CT in|typical migraine under 5%", "aim");
   drivers.forEach((d, i) => { const y = 10 + i * 72; svg += '<path d="M170 150 C 220 150, 220 ' + (y + 25) + ', 260 ' + (y + 25) + '"/>' + box(260, y, 170, 50, d, "drv") + '<path d="M430 ' + (y + 25) + ' L 480 ' + (y + 25) + '"/>' + box(480, y, 280, 50, ideas[i], "idea"); });
@@ -2398,7 +2445,7 @@ const PAGES = [
     </dl>
     <h2>Tools</h2>
     <div class="routes" style="margin-top:6px">
-      <a class="route" href="#gca"><span class="r-title">Southend GCA probability score</span><span class="r-note">Calculator, with the bands and what to do</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>
+      <a class="route" href="#gca"><span class="r-title">Southend GCA probability score</span><span class="r-note">Points table and score scale, with what to do</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>
       <a class="route" href="#doses"><span class="r-title">Dose sheet</span><span class="r-note">Every drug in the pathway, by route</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>
       <a class="route" href="#discharge"><span class="r-title">Discharge checklist and letter</span><span class="r-note">Copy the route you took into the notes</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>
       <a class="route" href="#teaching"><span class="r-title">Teaching session</span><span class="r-note">A 5-minute summary video, then the full session of about ${Deck.timing().sessionMin} minutes, narrated, with videos and exercises</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>
@@ -2710,24 +2757,17 @@ const PAGES = [
     <summary>Southend GCA probability score <span class="small">12 items, maximum 32: low under 9, intermediate 9 to 12, high over 12</span></summary>
     <p>A pre-test probability score from the Southend fast-track clinic. It sorts suspected GCA into low, intermediate and high probability before the ultrasound; it does not replace the decision to treat on strong suspicion.</p>
     <div class="tool breakable" id="gcaps">
-      ${[
-        ["g-age", "Age", [["0", "49 or under"], ["1", "50 to 60"], ["2", "61 to 65"], ["3", "66 or over"]], "3"],
-        ["g-sex", "Sex", [["1", "Male"], ["2", "Female"]], "2"],
-        ["g-onset", "Symptom onset", [["0", "Over 24 weeks ago"], ["1", "12 to 24 weeks"], ["2", "6 to 12 weeks"], ["3", "Under 6 weeks"]], "3"],
-        ["g-crp", "CRP (mg/L)", [["0", "0 to 5"], ["1", "6 to 10"], ["2", "11 to 25"], ["3", "25 or more"]], "0"],
-        ["g-head", "New headache", [["0", "No"], ["1", "Yes"]], "1"],
-        ["g-pmr", "Polymyalgic symptoms", [["0", "No"], ["2", "Yes"]], "0"],
-        ["g-const", "Constitutional symptoms (fever, weight loss, sweats, fatigue)", [["0", "None"], ["1", "1 symptom"], ["3", "2 or more"]], "0"],
-        ["g-isch", "Ischaemic symptoms (jaw or tongue claudication)", [["0", "No"], ["3", "Yes"]], "0"],
-        ["g-vis", "Visual signs (AION, CRAO, field loss, RAPD)", [["0", "No"], ["3", "Yes"]], "0"],
-        ["g-ta", "Temporal artery", [["0", "Normal"], ["1", "Tender"], ["2", "Thickened"], ["3", "Pulse lost"]], "0"],
-        ["g-ext", "Extracranial artery", [["0", "Normal"], ["1", "Thickened"], ["2", "Bruit"], ["3", "Pulse lost"]], "0"],
-        ["g-cn", "Cranial nerve palsy", [["0", "No"], ["3", "Yes"]], "0"]
-      ].map(([id, label, opts, def]) => '<div class="field wide"><label for="' + id + '">' + label + '</label><select id="' + id + '">' + opts.map(o => '<option value="' + o[0] + '"' + (o[0] === def ? " selected" : "") + ">" + o[1] + "</option>").join("") + "</select></div>").join("")}
-      <p class="small" style="margin:10px 0 2px">Alternative diagnosis more likely (minus 3 each)</p>
-      ${[["g-inf", "Infection"], ["g-ca", "Cancer"], ["g-rh", "Systemic rheumatic disease"], ["g-hn", "Head and neck pathology"], ["g-oth", "Other"]].map(([id, t]) => '<label class="check"><input id="' + id + '" type="checkbox"> ' + t + "</label>").join("")}
-      <div class="result" id="gcaps-result" aria-live="polite"></div>
-      <p class="small" style="margin:8px 0 0">Example values shown (a 68-year-old woman with a new headache for under 6 weeks). Replace with the patient’s own.</p>
+      <h2 class="tool-h">Score guide</h2>
+      <ol class="vhow">
+        <li>Go down the items. In each row, find the description that fits; the column heading gives its points.</li>
+        <li>Add the points, then take off 3 for each alternative diagnosis that is more likely.</li>
+        <li>Find the total on the scale.</li>
+      </ol>
+      <div class="pts-wrap"><table class="pts"><thead><tr><th scope="col">Item</th><th scope="col">0 points</th><th scope="col">1 point</th><th scope="col">2 points</th><th scope="col">3 points</th></tr></thead><tbody><tr><th scope="row">Age</th><td class="p0" data-p="0 points">49 or under</td><td class="p1" data-p="1 point">50 to 60</td><td class="p2" data-p="2 points">61 to 65</td><td class="p3" data-p="3 points">66 or over</td></tr><tr><th scope="row">Sex</th><td class="na"></td><td class="p1" data-p="1 point">Male</td><td class="p2" data-p="2 points">Female</td><td class="na"></td></tr><tr><th scope="row">Symptom onset</th><td class="p0" data-p="0 points">Over 24 weeks ago</td><td class="p1" data-p="1 point">12 to 24 weeks</td><td class="p2" data-p="2 points">6 to 12 weeks</td><td class="p3" data-p="3 points">Under 6 weeks</td></tr><tr><th scope="row">CRP, mg/L</th><td class="p0" data-p="0 points">0 to 5</td><td class="p1" data-p="1 point">6 to 10</td><td class="p2" data-p="2 points">11 to 25</td><td class="p3" data-p="3 points">25 or more</td></tr><tr><th scope="row">New headache</th><td class="p0" data-p="0 points">No</td><td class="p1" data-p="1 point">Yes</td><td class="na"></td><td class="na"></td></tr><tr><th scope="row">Polymyalgic symptoms</th><td class="p0" data-p="0 points">No</td><td class="na"></td><td class="p2" data-p="2 points">Yes</td><td class="na"></td></tr><tr><th scope="row">Constitutional symptoms (fever, weight loss, sweats, fatigue)</th><td class="p0" data-p="0 points">None</td><td class="p1" data-p="1 point">1 symptom</td><td class="na"></td><td class="p3" data-p="3 points">2 or more</td></tr><tr><th scope="row">Ischaemic symptoms (jaw or tongue claudication)</th><td class="p0" data-p="0 points">No</td><td class="na"></td><td class="na"></td><td class="p3" data-p="3 points">Yes</td></tr><tr><th scope="row">Visual signs (AION, CRAO, field loss, RAPD)</th><td class="p0" data-p="0 points">No</td><td class="na"></td><td class="na"></td><td class="p3" data-p="3 points">Yes</td></tr><tr><th scope="row">Temporal artery</th><td class="p0" data-p="0 points">Normal</td><td class="p1" data-p="1 point">Tender</td><td class="p2" data-p="2 points">Thickened</td><td class="p3" data-p="3 points">Pulse lost</td></tr><tr><th scope="row">Extracranial artery</th><td class="p0" data-p="0 points">Normal</td><td class="p1" data-p="1 point">Thickened</td><td class="p2" data-p="2 points">Bruit</td><td class="p3" data-p="3 points">Pulse lost</td></tr><tr><th scope="row">Cranial nerve palsy</th><td class="p0" data-p="0 points">No</td><td class="na"></td><td class="na"></td><td class="p3" data-p="3 points">Yes</td></tr></tbody></table></div>
+      <p class="pts-minus"><b>Minus 3 for each</b> alternative diagnosis that is more likely: infection, cancer, systemic rheumatic disease, head and neck pathology, or other.</p>
+      <figure class="vguide gs" style="max-width:600px"><svg viewBox="0 0 360 74" role="img" aria-labelledby="gs-t gs-d"><title id="gs-t">Southend score scale</title><desc id="gs-d">A scale from 0 to 32 with one square per point. 0 to 8 is low probability, 9 to 12 is intermediate, 13 to 32 is high. A total below 0 counts as low.</desc><rect class="zLow" x="8.0" y="24" width="93.82" height="26"/><rect class="zD" x="101.82" y="24" width="41.7" height="26"/><rect class="zE" x="143.52" y="24" width="208.48" height="26"/><line class="cell" x1="18.42" y1="24" x2="18.42" y2="50"/><line class="cell" x1="28.85" y1="24" x2="28.85" y2="50"/><line class="cell" x1="39.27" y1="24" x2="39.27" y2="50"/><line class="cell" x1="49.7" y1="24" x2="49.7" y2="50"/><line class="cell" x1="60.12" y1="24" x2="60.12" y2="50"/><line class="cell" x1="70.55" y1="24" x2="70.55" y2="50"/><line class="cell" x1="80.97" y1="24" x2="80.97" y2="50"/><line class="cell" x1="91.39" y1="24" x2="91.39" y2="50"/><line class="cell" x1="101.82" y1="24" x2="101.82" y2="50"/><line class="cell" x1="112.24" y1="24" x2="112.24" y2="50"/><line class="cell" x1="122.67" y1="24" x2="122.67" y2="50"/><line class="cell" x1="133.09" y1="24" x2="133.09" y2="50"/><line class="cell" x1="143.52" y1="24" x2="143.52" y2="50"/><line class="cell" x1="153.94" y1="24" x2="153.94" y2="50"/><line class="cell" x1="164.36" y1="24" x2="164.36" y2="50"/><line class="cell" x1="174.79" y1="24" x2="174.79" y2="50"/><line class="cell" x1="185.21" y1="24" x2="185.21" y2="50"/><line class="cell" x1="195.64" y1="24" x2="195.64" y2="50"/><line class="cell" x1="206.06" y1="24" x2="206.06" y2="50"/><line class="cell" x1="216.48" y1="24" x2="216.48" y2="50"/><line class="cell" x1="226.91" y1="24" x2="226.91" y2="50"/><line class="cell" x1="237.33" y1="24" x2="237.33" y2="50"/><line class="cell" x1="247.76" y1="24" x2="247.76" y2="50"/><line class="cell" x1="258.18" y1="24" x2="258.18" y2="50"/><line class="cell" x1="268.61" y1="24" x2="268.61" y2="50"/><line class="cell" x1="279.03" y1="24" x2="279.03" y2="50"/><line class="cell" x1="289.45" y1="24" x2="289.45" y2="50"/><line class="cell" x1="299.88" y1="24" x2="299.88" y2="50"/><line class="cell" x1="310.3" y1="24" x2="310.3" y2="50"/><line class="cell" x1="320.73" y1="24" x2="320.73" y2="50"/><line class="cell" x1="331.15" y1="24" x2="331.15" y2="50"/><line class="cell" x1="341.58" y1="24" x2="341.58" y2="50"/><rect class="edge" x="8.0" y="24" width="93.82" height="26"/><text class="zl b" x="54.91" y="11" text-anchor="middle">Low</text><text class="zl" x="54.91" y="22" text-anchor="middle">below 9</text><rect class="edge" x="101.82" y="24" width="41.7" height="26"/><text class="zl b" x="122.67" y="11" text-anchor="middle">Intermediate</text><text class="zl" x="122.67" y="22" text-anchor="middle">9 to 12</text><rect class="edge" x="143.52" y="24" width="208.48" height="26"/><text class="zl b" x="247.76" y="11" text-anchor="middle">High</text><text class="zl" x="247.76" y="22" text-anchor="middle">above 12</text><line class="axis" x1="13.21" y1="50" x2="13.21" y2="54"/><text class="tick" x="13.21" y="65" text-anchor="middle">0</text><line class="axis" x1="54.91" y1="50" x2="54.91" y2="54"/><text class="tick" x="54.91" y="65" text-anchor="middle">4</text><line class="axis" x1="107.03" y1="50" x2="107.03" y2="54"/><text class="tick" x="107.03" y="65" text-anchor="middle">9</text><line class="axis" x1="148.73" y1="50" x2="148.73" y2="54"/><text class="tick" x="148.73" y="65" text-anchor="middle">13</text><line class="axis" x1="180.0" y1="50" x2="180.0" y2="54"/><text class="tick" x="180.0" y="65" text-anchor="middle">16</text><line class="axis" x1="221.7" y1="50" x2="221.7" y2="54"/><text class="tick" x="221.7" y="65" text-anchor="middle">20</text><line class="axis" x1="263.39" y1="50" x2="263.39" y2="54"/><text class="tick" x="263.39" y="65" text-anchor="middle">24</text><line class="axis" x1="305.09" y1="50" x2="305.09" y2="54"/><text class="tick" x="305.09" y="65" text-anchor="middle">28</text><line class="axis" x1="346.79" y1="50" x2="346.79" y2="54"/><text class="tick" x="346.79" y="65" text-anchor="middle">32</text></svg></figure>
+      <p class="veg"><b>Example.</b> A 68-year-old woman (3 + 2) with a new headache (1) for 3 weeks (3), CRP 40 (3) and jaw claudication (3), and no likelier alternative: 15, high probability.</p>
+      <p class="small" style="margin:8px 0 0">A total below 0 counts as low. A guide to read, not a calculator.</p>
     </div>
     ${ifthen([
       ["Below 9: low", "GCA unlikely. Do not start steroids on the score alone; look for the alternative diagnosis. Ultrasound only if clinical doubt remains. In the Southend cohort no low-probability patient had GCA."],
@@ -2756,21 +2796,6 @@ const PAGES = [
     ${local("gca", "ophthalmology")}
   `,
   mount: () => {
-    const sel = ["g-age", "g-sex", "g-onset", "g-crp", "g-head", "g-pmr", "g-const", "g-isch", "g-vis", "g-ta", "g-ext", "g-cn"];
-    const neg = ["g-inf", "g-ca", "g-rh", "g-hn", "g-oth"];
-    const out = document.getElementById("gcaps-result");
-    const update = () => {
-      const pos = sel.reduce((a, id) => a + parseInt(document.getElementById(id).value, 10), 0);
-      const minus = neg.filter(id => document.getElementById(id).checked).length * 3;
-      const total = pos - minus;
-      let cls = "neg", band = "low probability", act = "GCA unlikely on the score; look for the alternative diagnosis";
-      if (total > 12) { cls = "pos"; band = "high probability"; act = "Treat as GCA now and refer same day"; }
-      else if (total >= 9) { cls = "pos"; band = "intermediate probability"; act = "Steroids if clinically suspected; same-day referral; ultrasound decides"; }
-      out.className = "result " + cls;
-      out.textContent = "Score " + total + " of 32" + (minus ? " (" + pos + " minus " + minus + ")" : "") + ": " + band + ". " + act + ".";
-    };
-    [...sel, ...neg].forEach(id => document.getElementById(id).addEventListener("change", update));
-    update();
     const det = document.getElementById("gcaps-more");
     if (window.innerWidth < 961) det.open = true;
   },
@@ -2906,13 +2931,16 @@ const PAGES = [
   lede: "Check in everyone with frequent headache.",
   body: () => `
     <div class="tool">
-      <h2 class="tool-h">ICHD-3 check</h2>
-      <div class="field"><label for="moh-days">Headache days a month</label><input id="moh-days" type="number" min="0" max="31" inputmode="numeric" value="18"></div>
-      <div class="field"><label for="moh-simple">Days a month: paracetamol, aspirin or NSAID</label><input id="moh-simple" type="number" min="0" max="31" inputmode="numeric" value="16"></div>
-      <div class="field"><label for="moh-other">Days a month: triptan, opioid, ergot or combination</label><input id="moh-other" type="number" min="0" max="31" inputmode="numeric" value="0"></div>
-      <label class="check"><input id="moh-3m" type="checkbox" checked> More than 3 months</label>
-      <div class="result" id="moh-result" aria-live="polite"></div>
-      <p class="small" style="margin:8px 0 0">Example values. Replace with the patient’s own.</p>
+      <h2 class="tool-h">Overuse guide (ICHD-3)</h2>
+      <ol class="vhow">
+        <li>Count the headache days in the last month, using a diary if there is one. Find that row up the side.</li>
+        <li>Count the days with any acute medicine. A day counts once, however many doses or medicines. Find that column along the bottom.</li>
+        <li>Read the zone where they meet. In zone D, the type of medicine decides.</li>
+      </ol>
+      <figure class="vguide"><svg viewBox="0 0 360 304" role="img" aria-labelledby="moh-fig-t moh-fig-d"><title id="moh-fig-t">Medication overuse guide</title><desc id="moh-fig-d">A grid with one square for each day. Headache days a month go up the side, from 0 to 30; days a month with any acute medicine go along the bottom, from 0 to 30. Zone A: fewer than 4 headache days. Zone B: 4 to 14 headache days. Zone C: 15 or more headache days with medicine on fewer than 10 days. Zone D: 15 or more headache days with medicine on 10 to 14 days. Zone E: 15 or more headache days with medicine on 15 or more days. Below 15 headache days, the squares to the right of 8 medicine days are hatched: more than 2 days a week. The key below the grid says what each zone means.</desc><defs><pattern id="moh-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="var(--hatch)" stroke-width="1.6" opacity=".45"/></pattern></defs><rect class="zA" x="44.0" y="229.48" width="308.0" height="32.52"/><rect class="zB" x="44.0" y="140.06" width="308.0" height="89.42"/><rect class="zC" x="44.0" y="10.0" width="99.35" height="130.06"/><rect class="zD" x="143.35" y="10.0" width="49.68" height="130.06"/><rect class="zE" x="193.03" y="10.0" width="158.97" height="130.06"/><rect fill="url(#moh-hatch)" x="133.42" y="140.06" width="218.58" height="121.94"/><line class="cell" x1="53.94" y1="262.0" x2="53.94" y2="10.0"/><line class="cell" x1="63.87" y1="262.0" x2="63.87" y2="10.0"/><line class="cell" x1="73.81" y1="262.0" x2="73.81" y2="10.0"/><line class="cell" x1="83.74" y1="262.0" x2="83.74" y2="10.0"/><line class="cell" x1="93.68" y1="262.0" x2="93.68" y2="10.0"/><line class="cell" x1="103.61" y1="262.0" x2="103.61" y2="10.0"/><line class="cell" x1="113.55" y1="262.0" x2="113.55" y2="10.0"/><line class="cell" x1="123.48" y1="262.0" x2="123.48" y2="10.0"/><line class="cell" x1="133.42" y1="262.0" x2="133.42" y2="10.0"/><line class="cell" x1="143.35" y1="262.0" x2="143.35" y2="10.0"/><line class="cell" x1="153.29" y1="262.0" x2="153.29" y2="10.0"/><line class="cell" x1="163.23" y1="262.0" x2="163.23" y2="10.0"/><line class="cell" x1="173.16" y1="262.0" x2="173.16" y2="10.0"/><line class="cell" x1="183.1" y1="262.0" x2="183.1" y2="10.0"/><line class="cell" x1="193.03" y1="262.0" x2="193.03" y2="10.0"/><line class="cell" x1="202.97" y1="262.0" x2="202.97" y2="10.0"/><line class="cell" x1="212.9" y1="262.0" x2="212.9" y2="10.0"/><line class="cell" x1="222.84" y1="262.0" x2="222.84" y2="10.0"/><line class="cell" x1="232.77" y1="262.0" x2="232.77" y2="10.0"/><line class="cell" x1="242.71" y1="262.0" x2="242.71" y2="10.0"/><line class="cell" x1="252.65" y1="262.0" x2="252.65" y2="10.0"/><line class="cell" x1="262.58" y1="262.0" x2="262.58" y2="10.0"/><line class="cell" x1="272.52" y1="262.0" x2="272.52" y2="10.0"/><line class="cell" x1="282.45" y1="262.0" x2="282.45" y2="10.0"/><line class="cell" x1="292.39" y1="262.0" x2="292.39" y2="10.0"/><line class="cell" x1="302.32" y1="262.0" x2="302.32" y2="10.0"/><line class="cell" x1="312.26" y1="262.0" x2="312.26" y2="10.0"/><line class="cell" x1="322.19" y1="262.0" x2="322.19" y2="10.0"/><line class="cell" x1="332.13" y1="262.0" x2="332.13" y2="10.0"/><line class="cell" x1="342.06" y1="262.0" x2="342.06" y2="10.0"/><line class="cell" x1="44.0" y1="253.87" x2="352.0" y2="253.87"/><line class="cell" x1="44.0" y1="245.74" x2="352.0" y2="245.74"/><line class="cell" x1="44.0" y1="237.61" x2="352.0" y2="237.61"/><line class="cell" x1="44.0" y1="229.48" x2="352.0" y2="229.48"/><line class="cell" x1="44.0" y1="221.35" x2="352.0" y2="221.35"/><line class="cell" x1="44.0" y1="213.23" x2="352.0" y2="213.23"/><line class="cell" x1="44.0" y1="205.1" x2="352.0" y2="205.1"/><line class="cell" x1="44.0" y1="196.97" x2="352.0" y2="196.97"/><line class="cell" x1="44.0" y1="188.84" x2="352.0" y2="188.84"/><line class="cell" x1="44.0" y1="180.71" x2="352.0" y2="180.71"/><line class="cell" x1="44.0" y1="172.58" x2="352.0" y2="172.58"/><line class="cell" x1="44.0" y1="164.45" x2="352.0" y2="164.45"/><line class="cell" x1="44.0" y1="156.32" x2="352.0" y2="156.32"/><line class="cell" x1="44.0" y1="148.19" x2="352.0" y2="148.19"/><line class="cell" x1="44.0" y1="140.06" x2="352.0" y2="140.06"/><line class="cell" x1="44.0" y1="131.94" x2="352.0" y2="131.94"/><line class="cell" x1="44.0" y1="123.81" x2="352.0" y2="123.81"/><line class="cell" x1="44.0" y1="115.68" x2="352.0" y2="115.68"/><line class="cell" x1="44.0" y1="107.55" x2="352.0" y2="107.55"/><line class="cell" x1="44.0" y1="99.42" x2="352.0" y2="99.42"/><line class="cell" x1="44.0" y1="91.29" x2="352.0" y2="91.29"/><line class="cell" x1="44.0" y1="83.16" x2="352.0" y2="83.16"/><line class="cell" x1="44.0" y1="75.03" x2="352.0" y2="75.03"/><line class="cell" x1="44.0" y1="66.9" x2="352.0" y2="66.9"/><line class="cell" x1="44.0" y1="58.77" x2="352.0" y2="58.77"/><line class="cell" x1="44.0" y1="50.65" x2="352.0" y2="50.65"/><line class="cell" x1="44.0" y1="42.52" x2="352.0" y2="42.52"/><line class="cell" x1="44.0" y1="34.39" x2="352.0" y2="34.39"/><line class="cell" x1="44.0" y1="26.26" x2="352.0" y2="26.26"/><line class="cell" x1="44.0" y1="18.13" x2="352.0" y2="18.13"/><rect class="edge" x="44.0" y="229.48" width="308.0" height="32.52"/><rect class="edge" x="44.0" y="140.06" width="308.0" height="89.42"/><rect class="edge" x="44.0" y="10.0" width="99.35" height="130.06"/><rect class="edge" x="143.35" y="10.0" width="49.68" height="130.06"/><rect class="edge" x="193.03" y="10.0" width="158.97" height="130.06"/><line class="limit" x1="133.42" y1="262.0" x2="133.42" y2="140.06"/><text class="limit-t" x="199.99" y="163.64">More than 2 days a week:</text><text class="limit-t" x="199.99" y="177.46">at risk, cut down</text><text class="zk" x="50.95" y="25.45">C</text><text class="zl b" x="50.95" y="49.83">Chronic,</text><text class="zl" x="50.95" y="64.46">not overuse:</text><text class="zl" x="50.95" y="79.1">prevention</text><text class="zk" x="168.19" y="25.45" text-anchor="middle">D</text><text class="zl" x="168.19" y="49.83" text-anchor="middle">depends</text><text class="zl" x="168.19" y="64.46" text-anchor="middle">on the</text><text class="zl" x="168.19" y="79.1" text-anchor="middle">medicine</text><text class="zk" x="199.99" y="25.45">E</text><text class="zl b" x="199.99" y="49.83">Medication</text><text class="zl b" x="199.99" y="64.46">overuse headache</text><text class="zl" x="199.99" y="79.1">if over 3 months</text><text class="zk" x="50.95" y="157.14">B</text><text class="zl b" x="50.95" y="177.46">4 to 14 days:</text><text class="zl" x="50.95" y="192.09">prevention</text><text class="zk" x="50.95" y="250.62">A</text><text class="zl halo" x="139.38" y="250.62">Under 4 headache days</text><line class="axis" x1="44" y1="262" x2="352" y2="262"/><line class="axis" x1="44" y1="262" x2="44" y2="10"/><line class="axis" x1="48.97" y1="262" x2="48.97" y2="266"/><text class="tick" x="48.97" y="277" text-anchor="middle">0</text><line class="axis" x1="88.71" y1="262" x2="88.71" y2="266"/><text class="tick" x="88.71" y="277" text-anchor="middle">4</text><line class="axis" x1="128.45" y1="262" x2="128.45" y2="266"/><text class="tick" x="128.45" y="277" text-anchor="middle">8</text><line class="axis" x1="148.32" y1="262" x2="148.32" y2="266"/><text class="tick" x="148.32" y="277" text-anchor="middle">10</text><line class="axis" x1="198.0" y1="262" x2="198.0" y2="266"/><text class="tick" x="198.0" y="277" text-anchor="middle">15</text><line class="axis" x1="247.68" y1="262" x2="247.68" y2="266"/><text class="tick" x="247.68" y="277" text-anchor="middle">20</text><line class="axis" x1="297.35" y1="262" x2="297.35" y2="266"/><text class="tick" x="297.35" y="277" text-anchor="middle">25</text><line class="axis" x1="347.03" y1="262" x2="347.03" y2="266"/><text class="tick" x="347.03" y="277" text-anchor="middle">30</text><line class="axis" x1="40" y1="257.94" x2="44" y2="257.94"/><text class="tick" x="37" y="261.44" text-anchor="end">0</text><line class="axis" x1="40" y1="225.42" x2="44" y2="225.42"/><text class="tick" x="37" y="228.92" text-anchor="end">4</text><line class="axis" x1="40" y1="176.65" x2="44" y2="176.65"/><text class="tick" x="37" y="180.15" text-anchor="end">10</text><line class="axis" x1="40" y1="136.0" x2="44" y2="136.0"/><text class="tick" x="37" y="139.5" text-anchor="end">15</text><line class="axis" x1="40" y1="95.35" x2="44" y2="95.35"/><text class="tick" x="37" y="98.85" text-anchor="end">20</text><line class="axis" x1="40" y1="54.71" x2="44" y2="54.71"/><text class="tick" x="37" y="58.21" text-anchor="end">25</text><line class="axis" x1="40" y1="14.06" x2="44" y2="14.06"/><text class="tick" x="37" y="17.56" text-anchor="end">30</text><text class="ttl" x="198.0" y="294" text-anchor="middle">Days a month with any acute medicine</text><text class="ttl" transform="translate(11 136.0) rotate(-90)" text-anchor="middle">Headache days a month</text></svg></figure>
+      <ol class="vkey"><li><b class="sw" style="background:var(--zA)">A</b><span>Fewer than 4 headache days a month: an acute plan, used early, on no more than 2 days a week.</span></li><li><b class="sw" style="background:var(--zB)">B</b><span>4 to 14 headache days a month: offer preventive treatment. Not medication overuse headache.</span></li><li><b class="sw" style="background:var(--zC)">C</b><span>15 or more headache days, medicine on fewer than 10 days: not overuse. Chronic migraine is likely: offer preventive treatment.</span></li><li><b class="sw" style="background:var(--zD)">D</b><span>15 or more headache days, medicine on 10 to 14 days: medication overuse headache if any of it is a triptan, opioid, ergot or combination painkiller, or if more than one class is used, such as paracetamol on some days and an NSAID on others. Not if it is only paracetamol, or only NSAIDs such as aspirin or ibuprofen.</span></li><li><b class="sw" style="background:var(--zE)">E</b><span>15 or more headache days, medicine on 15 or more days: medication overuse headache, whatever the medicine.</span></li></ol>
+      <p class="veg"><b>Example.</b> 18 headache days, and co-codamol on 12 days: zone D. Co-codamol is a combination painkiller, so this is medication overuse headache if it has gone on for more than 3 months.</p>
+      <p class="small" style="margin:8px 0 0">Zones D and E also need the pattern to have lasted more than 3 months, with no better explanation for the headache (ICHD-3 8.2). The dashed line marks about 2 days a week; the hatched squares to its right are above the limit even when it is not overuse. A guide to read, not a calculator.</p>
     </div>
     <h2>Manage</h2>
     ${steps([
@@ -2923,34 +2951,6 @@ const PAGES = [
     ])}
     <p>Target: acute medicines on 2 days a week or fewer.</p>
   `,
-  mount: () => {
-    const ids = ["moh-days", "moh-simple", "moh-other", "moh-3m"];
-    const out = document.getElementById("moh-result");
-    const num = id => Math.max(0, Math.min(31, parseInt(document.getElementById(id).value, 10) || 0));
-    const update = () => {
-      const days = num("moh-days"), simple = num("moh-simple"), other = num("moh-other");
-      const long = document.getElementById("moh-3m").checked;
-      const reasons = [];
-      if (simple >= 15) reasons.push("simple analgesics 15 or more days a month");
-      if (other >= 10) reasons.push("triptan, opioid, ergot or combination 10 or more days a month");
-      if (!reasons.length && simple > 0 && other > 0 && Math.min(31, simple + other) >= 10) reasons.push("mixed classes about 10 or more days a month");
-      if (days < 15) {
-        out.className = "result neg";
-        out.textContent = "Not met: fewer than 15 headache days a month.";
-      } else if (!reasons.length) {
-        out.className = "result neg";
-        out.textContent = "Not met: medicine use below thresholds. Consider chronic migraine.";
-      } else if (!long) {
-        out.className = "result pos";
-        out.textContent = "Overuse pattern under 3 months (" + reasons.join("; ") + "). Cut down now.";
-      } else {
-        out.className = "result pos";
-        out.textContent = "Met: " + reasons.join("; ") + ".";
-      }
-    };
-    ids.forEach(id => document.getElementById(id).addEventListener("input", update));
-    update();
-  },
   next: { to: "primary", label: "Continue to primary headache" }
 },
 
@@ -3356,7 +3356,7 @@ const PAGES = [
     </figure>
     ${table(["Driver", "Change ideas to test"], [
       ["Assessment", "the pathway open on every SDEC computer; onset time and fundi as fixed fields in the clerking template; a fundus camera or OCT route that works the same day"],
-      ["Decision support", "the Southend calculator on the GCA page; the thunderclap timings on the wall of the assessment bay; a radiology agreement on CT criteria for headache"],
+      ["Decision support", "the Southend points table on the GCA page; the thunderclap timings on the wall of the assessment bay; a radiology agreement on CT criteria for headache"],
       ["Prescribing", "an SDEC migraine order set (NSAID, triptan, antiemetic; no opioid); the dose sheet printed by the drug cupboard; pharmacy flag on co-codamol for headache"],
       ["Communication", "a discharge letter template with diagnosis, plan, the 2-day limit, prevention and review date; the patient information links on the discharge page; a 4-week GP review request"]
     ])}
