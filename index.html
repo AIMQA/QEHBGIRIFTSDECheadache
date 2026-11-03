@@ -362,13 +362,17 @@ table.pts td::before { content: none; }
 .field.wide { grid-template-columns: minmax(0, 1fr) 150px; }
 .tool.breakable { break-inside: auto; }
 .tool.breakable .field { break-inside: avoid; }
-.field input[type="number"], .field input[type="text"] { font: 500 1rem var(--mono); width: 100%; min-height: 40px; padding: 6px 8px; border: 1px solid var(--control); border-radius: var(--radius); background: var(--paper); color: var(--ink); text-align: right; }
-.field input[type="text"] { font-family: var(--body); text-align: left; }
+.field input[type="number"], .field input[type="text"], .field input[type="password"] { font: 500 1rem var(--mono); width: 100%; min-height: 40px; padding: 6px 8px; border: 1px solid var(--control); border-radius: var(--radius); background: var(--paper); color: var(--ink); text-align: right; }
+.field input[type="text"], .field input[type="password"] { font-family: var(--body); text-align: left; }
 .check { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; font-size: 0.95rem; cursor: pointer; }
-.check input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--accent); flex: none; }
+.check input { width: 24px; height: 24px; margin: 0; accent-color: var(--accent); flex: none; }
 .result { margin-top: 10px; padding: 9px 13px; border-radius: var(--radius); font-weight: 500; border: 1px solid var(--rule); background: var(--paper); }
 .result.pos { background: var(--amber-soft); color: var(--amber); border-color: color-mix(in srgb, var(--amber) 35%, transparent); }
 .result.neg { background: var(--green-soft); color: var(--green); border-color: color-mix(in srgb, var(--green) 35%, transparent); }
+.sn-box { border-left: 6px solid var(--red); background: var(--red-soft); padding: 10px 16px; border-radius: var(--radius); margin: 8px 0; }
+.sn-box p { margin: 6px 0; }
+.audit-btns { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0; }
+.btn.off { opacity: 0.45; cursor: not-allowed; }
 .copy-out { width: 100%; min-height: 120px; font: 0.85rem var(--mono); padding: 10px; border: 1px solid var(--control); border-radius: var(--radius); background: var(--paper); color: var(--ink); margin-top: 10px; }
 
 /* Time-to-peak sketch on the history page */
@@ -870,6 +874,14 @@ button { font-family: inherit; }
 .deck:fullscreen .tb.full-only { display: inline-flex; }
 .prose > .deck { max-width: none; }
 .mode-deck .shell { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.mode-start .shell { grid-template-columns: minmax(0, 1fr); gap: 0; }
+@media (min-width: 961px) { .mode-start .map { display: none; } }
+.start-find { max-width: 640px; margin: 4px 0 18px; }
+.start-find label { display: block; font: 600 1.15rem var(--body); margin: 0 0 6px; }
+.start-find input { width: 100%; font: 500 1.1rem var(--body); min-height: 52px; padding: 10px 14px; border: 2px solid var(--control); border-radius: var(--radius); background: var(--paper); color: var(--ink); }
+.start-find .small { margin: 6px 0 10px; }
+.start-find .routes { margin-top: 4px; }
+.start-how { max-width: 640px; color: var(--ink-2); }
 .mode-deck main { max-width: none; }
 @media (min-width: 961px) { .mode-deck .map { display: none; } }
 @media (max-width: 700px) {
@@ -937,7 +949,7 @@ button { font-family: inherit; }
    Leave a route empty ("") to show it as "route to confirm".
    ============================================================ */
 const META = {
-  version: "Draft 0.8.2",
+  version: "Draft 0.8.5",
   date: "3 November 2026",
   owner: "",            // for example, "SDEC clinical lead"
   approvedBy: "",       // governance group, once approved
@@ -945,7 +957,8 @@ const META = {
 };
 const LINKS = {
   hub: "",              // URL of the clinical hub, shows a Clinical hub button when set
-  hypertensionTool: ""  // URL of the hub's hypertensive crisis tool
+  hypertensionTool: "", // URL of the hub's hypertensive crisis tool
+  auditEmail: ""        // shared inbox for audit records: to be confirmed. The Email button stays off until this is set.
 };
 const CONTACTS = {
   sdecSenior:    { service: "SDEC consultant or senior decision-maker", route: "" },
@@ -2426,34 +2439,26 @@ const PAGES = [
   title: "Headache in SDEC",
   lede: "Adults presenting to QEHB SDEC with headache. Adapted from the GIRFT primary care pathway.",
   body: () => `
-    <ol class="stage-map">
-      <li><span class="sn">Stage 1</span>${go("streaming", "Front door")}<p>Is SDEC the right place?</p></li>
-      <li><span class="sn">Stage 2</span>${go("history", "Assessment")}<p>History, examination, tests</p></li>
-      <li><span class="sn">Stage 3</span>${go("screen", "Secondary screen")}<p>Red and amber flags</p></li>
-      <li><span class="sn">Stage 4</span>${go("moh", "Medication overuse")}<p>Check before diagnosing</p></li>
-      <li><span class="sn">Stage 5</span>${go("primary", "Primary headache")}<p>Diagnose and treat</p></li>
-      <li><span class="sn">Stage 6</span>${go("discharge", "Leaving SDEC")}<p>Safety net, letter, follow-up</p></li>
-    </ol>
-    <h2>Key thresholds</h2>
-    <dl class="figures">
-      <dt>5 minutes</dt><dd>Peak within this time: thunderclap</dd>
-      <dt>6 hours</dt><dd>Normal CT, scanned within 6 hours of headache onset (not arrival): no routine LP (NICE NG228)</dd>
-      <dt>12 hours</dt><dd>Earliest LP after onset</dd>
-      <dt>180/120mmHg</dt><dd>Severe hypertension: look for organ damage</dd>
-      <dt>50 years</dt><dd>New persistent headache: consider GCA</dd>
-      <dt>2 days a week</dt><dd>Maximum acute medicine use</dd>
-    </dl>
-    <h2>Tools</h2>
-    <div class="routes" style="margin-top:6px">
-      <a class="route" href="#gca"><span class="r-title">Southend GCA probability score</span><span class="r-note">Points table and score scale, with what to do</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>
-      <a class="route" href="#doses"><span class="r-title">Dose sheet</span><span class="r-note">Every drug in the pathway, by route</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>
-      <a class="route" href="#discharge"><span class="r-title">Discharge checklist and letter</span><span class="r-note">Copy the route you took into the notes</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>
-      <a class="route" href="#teaching"><span class="r-title">Teaching session</span><span class="r-note">A 5-minute summary video, then the full session of about ${Deck.timing().sessionMin} minutes, narrated, with videos and exercises</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>
-      <a class="route" href="#audit"><span class="r-title">Audit and QI</span><span class="r-note">Measures, aim builder and driver diagram</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>
+    <div class="start-find">
+      <label for="start-find">Search the pathway</label>
+      <input id="start-find" type="search" placeholder="For example, thunderclap, GCA or overuse" autocomplete="off" aria-describedby="start-find-hint" aria-controls="start-results">
+      <p class="small" id="start-find-hint">Type a symptom, condition or medicine to go straight to that step.</p>
+      <div class="routes" id="start-results" aria-live="polite"></div>
     </div>
-    ${panel("In development: not approved", `<p>This is a working draft. It has not been reviewed or approved by any clinician, governance group or organisation, including QEHB, UHB, GIRFT and NICE. The doses, thresholds and local contacts have not been verified: contacts marked “route to confirm” are placeholders (see ${go("contacts", "local contacts")}). Do not use it to guide patient care until it has been approved and the status on this page changes.</p>`, "stop")}
+    ${panel("Use your clinical judgement", "<p>This pathway supports decisions; it does not replace them. Use it alongside your own clinical judgement, national guidelines, local policies and what matters to the patient. If something does not fit, act on your assessment and talk to a senior colleague.</p>")}
+    <p class="start-how"><b>How to use it.</b> Next step takes you through the pathway in order. Back and Restart, greyed out here, work once you have started.</p>
   `,
-  next: { to: "streaming", label: "Start" }
+  mount: () => {
+    const box = document.getElementById("start-find"), out = document.getElementById("start-results");
+    const pages = PAGES.filter(p => p.id !== "start").map(p => ({ p, text: (p.nav + " " + p.title + " " + (p.lede || "")).toLowerCase(), stage: (STAGES.find(s => s.id === p.stage) || {}).name || "" }));
+    box.addEventListener("input", () => {
+      const words = box.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      if (!words.length) { out.innerHTML = ""; return; }
+      const hits = pages.filter(x => words.every(w => x.text.includes(w))).slice(0, 8);
+      out.innerHTML = hits.length ? hits.map(x => '<a class="route" href="#' + x.p.id + '"><span class="r-title">' + x.p.nav + '</span><span class="r-note">' + esc(x.stage) + '</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>').join("") : '<p class="small">No steps match. Try another word, or press Next step to start at the beginning.</p>';
+    });
+  },
+  next: { to: "streaming", label: "Next step" }
 },
 {
   id: "streaming", stage: "front", nav: "Is SDEC the right place?",
@@ -2960,12 +2965,15 @@ const PAGES = [
   title: "Primary headache",
   lede: "Red flags and overuse excluded.",
   body: () => `
-    <div class="tool">
-      <h2 class="tool-h">ID Migraine (past 3 months)</h2>
-      <label class="check"><input id="idm-1" type="checkbox"> Activity limited on at least 1 day</label>
-      <label class="check"><input id="idm-2" type="checkbox"> Nausea</label>
-      <label class="check"><input id="idm-3" type="checkbox"> Photophobia</label>
-      <div class="result" id="idm-result" aria-live="polite"></div>
+    <div style="break-inside: avoid">
+    <h2>ID Migraine: 3 questions</h2>
+    <p>Ask about headaches over the past 3 months:</p>
+    ${ul([
+      "Have your headaches stopped you working, studying or doing what you needed to do on at least 1 day?",
+      "Have you felt sick with your headaches?",
+      "Has light bothered you a lot more than when you do not have a headache?"
+    ])}
+    <p>Yes to at least 2 of the 3 makes migraine likely: in the validation study, 93% of people who said yes to 2 or more had migraine. It is a screen, not the diagnosis; the full history and a normal examination make the diagnosis.</p>
     </div>
     ${table(["Feature", "Migraine", "Tension-type", "Cluster"], [
       ["Site", "Unilateral or bilateral", "Bilateral", "Strictly unilateral, orbital"],
@@ -2976,16 +2984,6 @@ const PAGES = [
     ], [], true)}
     <p class="small">Chronic tension-type headache is uncommon: consider overuse and chronic migraine.</p>
   `,
-  mount: () => {
-    const out = document.getElementById("idm-result");
-    const update = () => {
-      const n = ["idm-1", "idm-2", "idm-3"].filter(id => document.getElementById(id).checked).length;
-      if (n >= 2) { out.className = "result pos"; out.textContent = n + " of 3: migraine likely (PPV 93%)."; }
-      else { out.className = "result"; out.textContent = n + " of 3: not positive."; }
-    };
-    ["idm-1", "idm-2", "idm-3"].forEach(id => document.getElementById(id).addEventListener("change", update));
-    update();
-  },
   routes: [
     { to: "migraine", title: "Migraine", note: "", level: "routine" },
     { to: "tension", title: "Tension-type", note: "", level: "routine" },
@@ -3152,21 +3150,18 @@ const PAGES = [
 {
   id: "discharge", stage: "leave", nav: "Discharge",
   title: "Discharge",
-  lede: "Checklist, safety net, GP letter.",
+  lede: "Diagnosis and tests, checklist, safety net, GP letter and audit record.",
   body: () => `
     <div class="tool">
+      <h2 class="tool-h">Diagnosis and tests</h2>
+      <div class="field stack"><label for="dc-dx">Diagnosis</label><select id="dc-dx" style="max-width:360px">${DC_DX.map(d => '<option' + (STATE.dx === d ? " selected" : "") + ">" + d + "</option>").join("")}</select></div>
+      <p class="small" style="margin:10px 0 2px">Tests done: tick all that apply</p>
+      ${DC_TESTS.map(([id, t]) => '<label class="check"><input id="' + id + '" type="checkbox"' + (STATE.tests[id] ? " checked" : "") + "> " + t + "</label>").join("")}
+      <p class="small" style="margin:6px 0 0">These go into the summary for the notes and the GP letter, and into the audit record.</p>
+    </div>
+    <div class="tool">
       <h2 class="tool-h">Checklist</h2>
-      ${[
-        ["dc-1", "Red and amber flags documented"],
-        ["dc-2", "Neurological examination and fundi documented"],
-        ["dc-3", "Pain controlled, eating, mobile"],
-        ["dc-4", "Diagnosis explained"],
-        ["dc-5", "Acute plan with day limit"],
-        ["dc-6", "Written safety-net advice"],
-        ["dc-7", "Follow-up arranged"],
-        ["dc-8", "GP letter done"]
-      ].map(([id, t]) => '<label class="check"><input id="' + id + '" type="checkbox"' + (STATE.checks[id] ? " checked" : "") + "> " + t + "</label>").join("")}
-      <div class="result" id="dc-result" aria-live="polite"></div>
+      ${DC_CHECKS.map(([id, t]) => '<label class="check"><input id="' + id + '" type="checkbox"' + (STATE.checks[id] ? " checked" : "") + "> " + t + "</label>").join("")}
     </div>
     <h2>Return if</h2>
     ${ul([
@@ -3177,38 +3172,44 @@ const PAGES = [
       "painful red eye",
       "jaw claudication, scalp tenderness or visual change if 50 or over"
     ])}
+    <h2>Safety-net advice for the patient</h2>
+    <div class="sn-box">
+      <p>${SAFETY_NET.intro}</p>
+      ${ul(SAFETY_NET.urgent)}
+      <p>${SAFETY_NET.gp}</p>
+    </div>
+    <p class="small">This advice is added to the summary for the notes automatically. Give it to the patient in writing too.</p>
     <h2>GP letter</h2>
     ${ul([
       "diagnosis and red flags excluded",
+      "tests done and their results",
       "acute plan: 2 days a week or fewer",
       "suggested prevention and titration",
       "contraception advice if aura",
-      "referrals"
+      "referrals",
+      "the safety-net advice given"
     ])}
     <p>Patient information: ${ext("https://www.nhs.uk/conditions/migraine/", "NHS migraine")}, ${ext("https://migrainetrust.org/", "Migraine Trust")}, ${ext("https://ouchuk.org/", "OUCH (UK)")}.</p>
-    <button class="btn" id="copy-route" type="button">Copy route for the notes</button>
-    <textarea class="copy-out" id="copy-out" readonly hidden aria-label="Route summary"></textarea>
+    <button class="btn" id="copy-route" type="button">Copy summary for the notes or letter</button>
+    <textarea class="copy-out" id="copy-out" readonly hidden aria-label="Summary for the notes"></textarea>
+    <h2>Audit record</h2>
+    <p>As you fill in this page, a record for the audit is saved automatically on this computer: the date, diagnosis, tests, checklist and the steps you used. It holds no names, dates of birth, hospital numbers or free text. The audit lead downloads all the records from the ${go("audit-data", "Audit records")} page, which needs a password.</p>
+    <p class="small" id="audit-note" aria-live="polite"></p>
   `,
   mount: () => {
-    const ids = ["dc-1", "dc-2", "dc-3", "dc-4", "dc-5", "dc-6", "dc-7", "dc-8"];
-    const out = document.getElementById("dc-result");
-    const update = () => {
-      const done = ids.filter(id => document.getElementById(id).checked).length;
-      ids.forEach(id => { STATE.checks[id] = document.getElementById(id).checked; });
-      out.className = "result" + (done === ids.length ? " neg" : "");
-      out.textContent = done + " of 8 complete.";
+    const bind = (list, store) => list.forEach(([id]) => document.getElementById(id).addEventListener("change", e => { store[id] = e.target.checked; }));
+    bind(DC_TESTS, STATE.tests); bind(DC_CHECKS, STATE.checks);
+    document.getElementById("dc-dx").addEventListener("change", e => { STATE.dx = e.target.value; });
+    const copyBtn = (btn, box, text, label) => {
+      const fallback = () => { box.hidden = false; box.value = text(); box.focus(); box.select(); btn.textContent = "Select and copy the text below"; };
+      btn.addEventListener("click", () => { try { navigator.clipboard.writeText(text()).then(() => { btn.textContent = "Copied"; box.hidden = true; setTimeout(() => { btn.textContent = label; }, 2500); }, fallback); } catch (e) { fallback(); } });
     };
-    ids.forEach(id => document.getElementById(id).addEventListener("change", update));
-    update();
-    const btn = document.getElementById("copy-route");
-    const box = document.getElementById("copy-out");
-    btn.addEventListener("click", () => {
-      const text = routeSummary();
-      const fallback = () => { box.hidden = false; box.value = text; box.focus(); box.select(); btn.textContent = "Select and copy the text below"; };
-      try {
-        navigator.clipboard.writeText(text).then(() => { btn.textContent = "Copied"; box.hidden = true; }, fallback);
-      } catch (e) { fallback(); }
-    });
+    copyBtn(document.getElementById("copy-route"), document.getElementById("copy-out"), routeSummary, "Copy summary for the notes or letter");
+    const note = document.getElementById("audit-note");
+    const save = () => { const n = auditSave(); note.textContent = n === null ? "Nothing saved yet: the record is saved once you choose a diagnosis or tick a box." : n < 0 ? "This browser would not save the record. Use the summary for the notes instead." : "Saved to the audit log on this computer (" + n + " record" + (n === 1 ? "" : "s") + " here)."; };
+    document.querySelectorAll("#dc-dx, " + DC_TESTS.concat(DC_CHECKS).map(([id]) => "#" + id).join(", ")).forEach(n => n.addEventListener("change", save));
+    document.getElementById("copy-route").addEventListener("click", save);
+    save();
   }
 },
 
@@ -3302,6 +3303,94 @@ const PAGES = [
       ["Pre-eclampsia, severe", "Labetalol", "Per NICE NG133 and the obstetric team"]
     ], [2])}
   `
+},
+{
+  id: "audit-data", stage: "ref", nav: "Audit records (password)", cols: 1,
+  title: "Audit records",
+  lede: "Download the discharge records saved on this computer, to email to the audit inbox.",
+  body: () => `
+    <div id="ad-lock">
+      <form class="tool" id="ad-form" style="max-width:420px">
+        <h2 class="tool-h">Enter the password</h2>
+        <div class="field stack"><label for="ad-pass">Password</label><input id="ad-pass" type="password" autocomplete="off"></div>
+        <p class="small" id="ad-err" aria-live="assertive"></p>
+        <button class="btn primary" type="submit">Open the records</button>
+      </form>
+    </div>
+    <div id="ad-open" hidden>
+      <div class="tool">
+        <h2 class="tool-h">Records on this computer</h2>
+        <p id="ad-count" tabindex="-1"></p>
+        <div class="audit-btns">
+          <button class="btn primary" id="ad-dl" type="button">Download all records (CSV)</button>
+          <a class="btn" id="ad-mail" href="#">Open a new email to the audit inbox</a>
+          <button class="btn" id="ad-clear" type="button">Delete these records</button>
+        </div>
+        <p class="small" id="ad-note" aria-live="polite"></p>
+        <div class="table-wrap" id="ad-table"></div>
+      </div>
+      <h2>How to send the records</h2>
+      ${steps([
+        "Open this page on each SDEC computer that uses the pathway, and enter the password.",
+        "Press Download all records. A spreadsheet file, named like headache-audit-all-20261103.csv, saves to the Downloads folder.",
+        "Open a new email to the audit inbox (the button above does this once the address is set). The address is to be confirmed.",
+        "Attach the file from the Downloads folder and send the email.",
+        "When the email has gone, press Delete these records, then press it again to confirm, so the same records are not sent twice.",
+        "The audit lead opens each file in Excel and pastes the rows into one sheet. Each row is one patient; the columns are the same in every file."
+      ])}
+    </div>
+    <h2>Limits of the audit records</h2>
+    ${ul([
+      "<b>No central collection.</b> Records are saved only in the browser on the computer where the discharge page was filled in. Nothing is sent anywhere automatically, so each SDEC computer has to be downloaded separately.",
+      "<b>Each browser keeps its own records.</b> Records made in Edge do not appear in Chrome on the same computer, and the other way round.",
+      "<b>Records can be lost.</b> Clearing the browser’s history or site data, a browser reset or a replaced computer deletes them. A private or incognito window keeps none. Download them regularly, for example every week.",
+      "<b>Only completed pages are counted.</b> A record is saved once a diagnosis is chosen or a box is ticked on the discharge page. Patients whose discharge page was left blank are not recorded.",
+      "<b>Records cannot be edited here.</b> A record changes only while the same patient’s discharge page is still open; after Restart, the next patient starts a new record.",
+      "<b>The password is not strong security.</b> It is checked inside the page, so it keeps casual viewers out but would not stop someone determined. That is why the records hold no names, dates of birth, hospital numbers or free text. Do not add anything that could identify a patient.",
+      "<b>The file is attached by hand.</b> The email button only opens a new message to the audit inbox; attach the downloaded file yourself. The audit inbox address is to be confirmed.",
+      "<b>Information governance.</b> Check with your information governance lead before records are emailed, stored or shared."
+    ])}
+  `,
+  mount: () => {
+    const lock = document.getElementById("ad-lock"), open = document.getElementById("ad-open");
+    const show = () => {
+      lock.hidden = true; open.hidden = false;
+      const log = auditLoad(), count = document.getElementById("ad-count"), table = document.getElementById("ad-table");
+      const dates = log.map(r => r.cols[0][1]).sort();
+      count.textContent = log.length ? log.length + " record" + (log.length === 1 ? "" : "s") + " on this computer, from " + dates[0] + " to " + dates[dates.length - 1] + "." : "No records on this computer yet.";
+      document.getElementById("ad-dl").disabled = !log.length; document.getElementById("ad-clear").disabled = !log.length;
+      const last = log.slice(-10).reverse();
+      table.innerHTML = last.length ? "<table><caption class=\"small\" style=\"text-align:left\">The latest " + last.length + "</caption><thead><tr><th scope=\"col\">Date</th><th scope=\"col\">Diagnosis</th><th scope=\"col\">Tests done</th></tr></thead><tbody>" +
+        last.map(r => { const m = Object.fromEntries(r.cols); const tests = DC_TESTS.filter(([, t]) => m[t] === "Y").map(([, t]) => t).join(", ") || "none recorded"; return "<tr><td>" + esc(m.Date) + "</td><td>" + esc(m.Diagnosis) + "</td><td>" + esc(tests) + "</td></tr>"; }).join("") + "</tbody></table>" : "";
+    };
+    let unlocked = false; try { unlocked = sessionStorage.getItem("auditOpen") === "1"; } catch (e) {}
+    if (unlocked) show();
+    document.getElementById("ad-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const box = document.getElementById("ad-pass"), err = document.getElementById("ad-err");
+      if (passHash(box.value) === AUDIT_PASS_HASH) { try { sessionStorage.setItem("auditOpen", "1"); } catch (x) {} err.textContent = ""; show(); document.getElementById("ad-count").focus(); }
+      else { err.textContent = "That password is not right. Check capital letters and try again."; box.select(); }
+    });
+    const note = document.getElementById("ad-note");
+    document.getElementById("ad-dl").addEventListener("click", () => {
+      const log = auditLoad(); if (!log.length) return;
+      const d = new Date(), pad = n => String(n).padStart(2, "0"), name = "headache-audit-all-" + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + ".csv";
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([auditCsvAll(log)], { type: "text/csv" })); a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      note.textContent = "Downloaded " + name + " with " + log.length + " record" + (log.length === 1 ? "" : "s") + ". Attach it to an email to the audit inbox.";
+    });
+    const mail = document.getElementById("ad-mail");
+    if (LINKS.auditEmail) mail.href = "mailto:" + LINKS.auditEmail + "?subject=" + encodeURIComponent("Headache pathway audit records") + "&body=" + encodeURIComponent("The audit records file is attached.");
+    else { mail.removeAttribute("href"); mail.setAttribute("aria-disabled", "true"); mail.classList.add("off"); mail.textContent = "Audit inbox: to be confirmed"; }
+    let armed = 0;
+    const clear = document.getElementById("ad-clear");
+    clear.addEventListener("click", () => {
+      const n = auditLoad().length;
+      if (Date.now() - armed > 6000) { armed = Date.now(); clear.textContent = "Press again to delete " + n + " record" + (n === 1 ? "" : "s"); return; }
+      try { localStorage.removeItem(AUDIT_KEY); } catch (e) {}
+      armed = 0; clear.textContent = "Delete these records"; note.textContent = "Deleted. New records will be saved as patients are discharged."; show();
+    });
+  }
 },
 {
   id: "audit", stage: "ref", nav: "Audit and QI", cols: 1,
@@ -3505,7 +3594,7 @@ const PAGES = [
    Engine
    ============================================================ */
 const BY_ID = Object.fromEntries(PAGES.map(p => [p.id, p]));
-const STATE = { trail: [], log: [], visited: new Set(), checks: {} };
+const STATE = { trail: [], log: [], visited: new Set(), checks: {}, tests: {}, dx: "", episode: null };
 
 function route(r) {
   return '<a class="route" href="#' + r.to + '"><span class="r-title">' + r.title + "</span>" +
@@ -3513,19 +3602,70 @@ function route(r) {
     '<span class="r-side">' + (r.level ? chip(r.level) : "") + '<span class="arrow" aria-hidden="true">→</span></span></a>';
 }
 
+/* Discharge record: what was done, written into the notes summary and the audit record. Recording only: nothing here makes a clinical decision. */
+const DC_TESTS = [["t-ct", "CT head"], ["t-ctv", "CT venogram"], ["t-cta", "CT angiogram"], ["t-mri", "MRI or MR venogram"], ["t-lp", "Lumbar puncture (with xanthochromia)"],
+  ["t-bloods", "Blood tests: FBC, CRP, ESR"], ["t-fundi", "Fundoscopy or fundal photograph"], ["t-oct", "OCT"], ["t-bp", "Blood pressure and urine dip (pregnant or postpartum)"], ["t-none", "No tests needed"]];
+const DC_DX = ["Not recorded", "Migraine without aura", "Migraine with aura", "Chronic migraine", "Medication overuse headache", "Tension-type headache", "Cluster headache", "Other primary headache", "Secondary headache", "Diagnosis unclear"];
+const DC_CHECKS = [["dc-1", "Red and amber flags documented"], ["dc-2", "Neurological examination and fundi documented"], ["dc-3", "Pain controlled, eating, mobile"], ["dc-4", "Diagnosis explained"],
+  ["dc-5", "Acute plan with day limit"], ["dc-6", "Written safety-net advice"], ["dc-7", "Follow-up arranged"], ["dc-8", "GP letter done"]];
+const SAFETY_NET = {
+  intro: "If your headache gets worse, or you are worried, come back. Go to the emergency department (A&E) straight away, or call 999, if:",
+  urgent: ["your headache suddenly becomes very severe, or is the worst you have ever had",
+    "you have new weakness, numbness, or problems speaking or seeing",
+    "you become confused or very drowsy, or have a fit (seizure)",
+    "you have a high temperature with a stiff neck, or a rash that does not fade when you press a glass on it",
+    "you have a painful red eye",
+    "you are 50 or over and have jaw pain when you chew, a tender scalp or a change in your vision"],
+  gp: "See your GP or call NHS 111 if your headaches are getting worse over days or weeks, or your treatment plan is not working."
+};
+const safetyNetText = () => SAFETY_NET.intro + "\n" + SAFETY_NET.urgent.map(t => "- " + t).join("\n") + "\n" + SAFETY_NET.gp;
+function routeSeen() { const seen = []; STATE.log.forEach(id => { if (!seen.includes(id)) seen.push(id); }); return seen; }
+/* The audit record for this patient: named columns, no names, dates of birth, hospital numbers or free text. */
+function auditCols() {
+  const now = new Date(), pad = n => String(n).padStart(2, "0");
+  const seen = routeSeen(), yn = v => (v ? "Y" : "N");
+  return [["Date", now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate())], ["Pathway version", META.version], ["Diagnosis", STATE.dx || "Not recorded"]]
+    .concat(DC_TESTS.map(([id, t]) => [t, yn(STATE.tests[id])]))
+    .concat(DC_CHECKS.map(([id, t]) => [t, yn(STATE.checks[id])]))
+    .concat([["Steps completed", seen.filter(id => !BY_ID[id].sub && BY_ID[id].stage !== "ref").map(id => BY_ID[id].nav).join("; ")],
+      ["Branches reviewed", seen.filter(id => BY_ID[id].sub).map(id => BY_ID[id].nav).join("; ")]]);
+}
+/* Audit log: kept in this browser on this computer only (there is no server). Each patient's record is saved automatically
+   as the discharge page is filled in, and updated, not duplicated, if it changes. The Audit records page downloads them all. */
+const AUDIT_KEY = "sdecHeadacheAudit";
+function auditLoad() { try { const v = JSON.parse(localStorage.getItem(AUDIT_KEY) || "[]"); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
+function auditSave() {
+  const used = STATE.dx && STATE.dx !== "Not recorded" || Object.values(STATE.tests).some(Boolean) || Object.values(STATE.checks).some(Boolean);
+  if (!used) return null;
+  if (!STATE.episode) STATE.episode = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  const log = auditLoad(), rec = { id: STATE.episode, cols: auditCols() }, at = log.findIndex(r => r.id === rec.id);
+  if (at >= 0) log[at] = rec; else log.push(rec);
+  try { localStorage.setItem(AUDIT_KEY, JSON.stringify(log)); return log.length; } catch (e) { return -1; }
+}
+function auditCsvAll(log) {
+  const cell = v => '"' + String(v).replace(/"/g, '""') + '"';
+  if (!log.length) return "";
+  return log[0].cols.map(c => cell(c[0])).join(",") + "\r\n" + log.map(r => r.cols.map(c => cell(c[1])).join(",")).join("\r\n") + "\r\n";
+}
+/* The Audit records page asks for a password. It keeps casual viewers out; it is not strong security, because the check runs in the page. */
+const AUDIT_PASS_HASH = "f32e316c";
+function passHash(t) { let h = 0x811c9dc5; for (const ch of t) { h ^= ch.codePointAt(0); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16).padStart(8, "0"); }
 function routeSummary() {
   const now = new Date();
   const pad = n => String(n).padStart(2, "0");
   const stamp = pad(now.getDate()) + "/" + pad(now.getMonth() + 1) + "/" + now.getFullYear() + " " + pad(now.getHours()) + ":" + pad(now.getMinutes());
-  const seen = [];
-  STATE.log.forEach(id => { if (!seen.includes(id)) seen.push(id); });
+  const seen = routeSeen();
   const stepsDone = seen.filter(id => !BY_ID[id].sub && BY_ID[id].stage !== "ref").map(id => "- " + BY_ID[id].title);
   const branches = seen.filter(id => BY_ID[id].sub).map(id => "- " + BY_ID[id].nav);
   const done = Object.keys(STATE.checks).filter(k => STATE.checks[k]).length;
+  const tests = DC_TESTS.filter(([id]) => STATE.tests[id]).map(([, t]) => "- " + t);
   return "QEHB SDEC headache pathway (" + META.version + ")\nRoute recorded " + stamp +
+    "\nDiagnosis: " + (STATE.dx && STATE.dx !== "Not recorded" ? STATE.dx : "not recorded") +
+    "\nTests done:\n" + (tests.length ? tests.join("\n") : "- none recorded") +
     "\nSteps completed:\n" + stepsDone.join("\n") +
     "\nBranches reviewed:\n" + (branches.length ? branches.join("\n") : "- none") +
-    "\nDischarge checklist: " + done + " of 8 complete";
+    "\nDischarge checklist: " + done + " of " + DC_CHECKS.length + " complete" +
+    "\n\nSafety-net advice given to the patient:\n" + safetyNetText();
 }
 
 function buildMap() {
@@ -3571,6 +3711,7 @@ function render(id, opts) {
   id = p.id;
   if (Deck.mounted) Deck.unmount();
   document.body.classList.toggle("mode-deck", id === "teaching");
+  document.body.classList.toggle("mode-start", id === "start");
   document.getElementById("tab-teaching").toggleAttribute("aria-current", id === "teaching");
   document.getElementById("tab-pathway").toggleAttribute("aria-current", id !== "teaching");
   if (id === "teaching") document.getElementById("tab-teaching").setAttribute("aria-current", "page"); else document.getElementById("tab-pathway").setAttribute("aria-current", "page");
@@ -3594,7 +3735,7 @@ function render(id, opts) {
   const canBack = STATE.trail.length > 1;
   const footer = '<nav class="stepper" aria-label="Step navigation">' +
     '<button class="btn quiet" type="button" id="btn-back"' + (canBack ? "" : " disabled") + '>← Back</button>' +
-    (id !== "start" ? '<button class="btn quiet" type="button" id="btn-restart">Restart</button>' : "") +
+    '<button class="btn quiet" type="button" id="btn-restart"' + (id === "start" ? " disabled" : "") + '>Restart</button>' +
     '<span class="spacer"></span><span class="ver">' + esc(META.version + " · " + META.date) + '</span>' +
     (p.next ? '<a class="btn primary" href="#' + p.next.to + '">' + p.next.label + ' <span aria-hidden="true">→</span></a>' : "") +
     "</nav>";
@@ -3611,7 +3752,7 @@ function render(id, opts) {
     if (STATE.trail.length > 1) navigate(STATE.trail[STATE.trail.length - 2]);
   });
   const restart = document.getElementById("btn-restart");
-  if (restart) restart.addEventListener("click", () => { STATE.checks = {}; navigate("start"); });
+  if (restart) restart.addEventListener("click", () => { STATE.checks = {}; STATE.tests = {}; STATE.dx = ""; STATE.episode = null; navigate("start"); });
 
   renderTrail(id);
   updateMap(id);
