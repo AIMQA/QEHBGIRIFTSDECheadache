@@ -369,6 +369,11 @@ table.pts td::before { content: none; }
 .result { margin-top: 10px; padding: 9px 13px; border-radius: var(--radius); font-weight: 500; border: 1px solid var(--rule); background: var(--paper); }
 .result.pos { background: var(--amber-soft); color: var(--amber); border-color: color-mix(in srgb, var(--amber) 35%, transparent); }
 .result.neg { background: var(--green-soft); color: var(--green); border-color: color-mix(in srgb, var(--green) 35%, transparent); }
+.copy-panel { border: 2px solid var(--green); border-radius: var(--radius); background: var(--green-soft); padding: 14px 16px 16px; margin: 12px 0 18px; break-inside: avoid; column-span: all; }
+.copy-panel h2 { margin: 0 0 4px; font-size: 1.15rem; }
+.copy-panel p { margin: 0 0 12px; }
+.btn.big { font-size: 1.1rem; min-height: 52px; padding: 12px 18px; }
+@media (max-width: 600px) { .copy-panel .btn.big { width: 100%; } }
 .sn-box { border-left: 6px solid var(--red); background: var(--red-soft); padding: 10px 16px; border-radius: var(--radius); margin: 8px 0; }
 .sn-box p { margin: 6px 0; }
 .audit-btns { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0; }
@@ -949,7 +954,7 @@ button { font-family: inherit; }
    Leave a route empty ("") to show it as "route to confirm".
    ============================================================ */
 const META = {
-  version: "Draft 0.8.5",
+  version: "Draft 0.8.6",
   date: "3 November 2026",
   owner: "",            // for example, "SDEC clinical lead"
   approvedBy: "",       // governance group, once approved
@@ -3163,6 +3168,12 @@ const PAGES = [
       <h2 class="tool-h">Checklist</h2>
       ${DC_CHECKS.map(([id, t]) => '<label class="check"><input id="' + id + '" type="checkbox"' + (STATE.checks[id] ? " checked" : "") + "> " + t + "</label>").join("")}
     </div>
+    <section class="copy-panel" aria-labelledby="copy-h">
+      <h2 id="copy-h">Summary for the notes and GP letter</h2>
+      <p>The diagnosis, tests done, the steps you used and the safety-net advice given, ready to paste.</p>
+      <button class="btn primary big" id="copy-route" type="button">Copy summary for the notes</button>
+      <textarea class="copy-out" id="copy-out" readonly hidden aria-label="Summary for the notes"></textarea>
+    </section>
     <h2>Return if</h2>
     ${ul([
       "sudden severe headache",
@@ -3190,8 +3201,6 @@ const PAGES = [
       "the safety-net advice given"
     ])}
     <p>Patient information: ${ext("https://www.nhs.uk/conditions/migraine/", "NHS migraine")}, ${ext("https://migrainetrust.org/", "Migraine Trust")}, ${ext("https://ouchuk.org/", "OUCH (UK)")}.</p>
-    <button class="btn" id="copy-route" type="button">Copy summary for the notes or letter</button>
-    <textarea class="copy-out" id="copy-out" readonly hidden aria-label="Summary for the notes"></textarea>
     <h2>Audit record</h2>
     <p>As you fill in this page, a record for the audit is saved automatically on this computer: the date, diagnosis, tests, checklist and the steps you used. It holds no names, dates of birth, hospital numbers or free text. The audit lead downloads all the records from the ${go("audit-data", "Audit records")} page, which needs a password.</p>
     <p class="small" id="audit-note" aria-live="polite"></p>
@@ -3204,11 +3213,13 @@ const PAGES = [
       const fallback = () => { box.hidden = false; box.value = text(); box.focus(); box.select(); btn.textContent = "Select and copy the text below"; };
       btn.addEventListener("click", () => { try { navigator.clipboard.writeText(text()).then(() => { btn.textContent = "Copied"; box.hidden = true; setTimeout(() => { btn.textContent = label; }, 2500); }, fallback); } catch (e) { fallback(); } });
     };
-    copyBtn(document.getElementById("copy-route"), document.getElementById("copy-out"), routeSummary, "Copy summary for the notes or letter");
+    copyBtn(document.getElementById("copy-route"), document.getElementById("copy-out"), routeSummary, "Copy summary for the notes");
+    copyBtn(document.getElementById("copy-route-bar"), document.getElementById("copy-out"), routeSummary, "Copy summary for the notes");
     const note = document.getElementById("audit-note");
     const save = () => { const n = auditSave(); note.textContent = n === null ? "Nothing saved yet: the record is saved once you choose a diagnosis or tick a box." : n < 0 ? "This browser would not save the record. Use the summary for the notes instead." : "Saved to the audit log on this computer (" + n + " record" + (n === 1 ? "" : "s") + " here)."; };
     document.querySelectorAll("#dc-dx, " + DC_TESTS.concat(DC_CHECKS).map(([id]) => "#" + id).join(", ")).forEach(n => n.addEventListener("change", save));
     document.getElementById("copy-route").addEventListener("click", save);
+    document.getElementById("copy-route-bar").addEventListener("click", save);
     save();
   }
 },
@@ -3738,6 +3749,7 @@ function render(id, opts) {
     '<button class="btn quiet" type="button" id="btn-restart"' + (id === "start" ? " disabled" : "") + '>Restart</button>' +
     '<span class="spacer"></span><span class="ver">' + esc(META.version + " · " + META.date) + '</span>' +
     (p.next ? '<a class="btn primary" href="#' + p.next.to + '">' + p.next.label + ' <span aria-hidden="true">→</span></a>' : "") +
+    (id === "discharge" ? '<button class="btn primary" type="button" id="copy-route-bar">Copy summary for the notes</button>' : "") +
     "</nav>";
 
   document.getElementById("page").innerHTML =
