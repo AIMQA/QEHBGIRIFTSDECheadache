@@ -120,7 +120,14 @@ button, input { font-family: inherit; }
 :root[data-theme="dark"] .devbar { background: #3A2E0E; color: #F0F4F5; }
 :root[data-theme="dark"] .devbar strong { color: #FFD166; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .devbar { background: #3A2E0E; color: #F0F4F5; } :root:not([data-theme="light"]) .devbar strong { color: #FFD166; } }
-@media (min-width: 961px) { .devbar { flex: none; } .devbar p { font-size: 0.86rem; } }
+@media (min-width: 961px) { .devbar { flex: none; } .devbar p { font-size: 0.86rem; } .devbar .db-short, .devbar .db-more { display: none; } }
+/* Phones and tablets: the warning in 1 line, the full text a tap away */
+@media (max-width: 960px) {
+  .devbar .db-long { display: none; }
+  .devbar.open .db-long { display: inline; }
+  .devbar.open .db-short { display: none; }
+  .db-more { font: inherit; font-weight: 600; color: inherit; background: none; border: 0; padding: 4px 2px; min-height: 24px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+}
 /* Shell */
 .shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 256px minmax(0, 1fr); gap: 48px; padding-block: 22px 48px; }
 
@@ -152,10 +159,32 @@ main { min-width: 0; max-width: 44rem; }
 .trail a:hover { color: var(--accent); border-color: var(--accent); }
 .trail .sep { color: var(--rule); }
 .trail .here { color: var(--accent); font-weight: 600; padding: 2px 4px; }
+.trail .crumb { display: inline-flex; align-items: center; gap: 6px; }
+.trail .crumb[hidden] { display: none; }
+.trail-more { font: inherit; font-weight: 600; color: var(--accent); background: var(--paper); border: 1px dashed var(--accent); border-radius: 99px; padding: 3px 10px; min-height: 28px; cursor: pointer; }
+.trail-more:hover { background: var(--paper-2); }
+/* Long step on a laptop: name what is below the fold */
+.more-below { position: relative; z-index: 3; align-self: center; flex: none; margin: -48px auto 12px; display: block; width: fit-content; max-width: calc(100% - 32px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font: 600 0.9rem var(--body); color: var(--accent); background: var(--paper); border: 2px solid var(--accent); border-radius: 99px; padding: 7px 16px; min-height: 36px; cursor: pointer; box-shadow: 0 2px 10px rgba(0, 0, 0, .14); }
+.more-below:hover { background: var(--accent); color: #fff; }
+.more-below[hidden] { display: none; }
+.prose.scroll.has-more { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent); }
+/* Search results: why each step matched */
+.route .r-note mark { background: color-mix(in srgb, var(--accent) 16%, transparent); color: inherit; padding: 0 1px; border-radius: 2px; }
+#start-results .route .r-note { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+@media (min-width: 961px) { #start-results .route .r-note { -webkit-line-clamp: 1; } #start-results .route { padding-block: 8px; } }
+#start-results .route .r-stage { font-weight: 600; }
 
 .kicker { font-family: var(--mono); font-weight: 700; font-size: 0.8rem; color: var(--accent); margin: 0 0 8px; }
 h1 { font-family: var(--display); font-weight: 700; font-size: clamp(1.7rem, 4vw, 2.3rem); line-height: 1.08; letter-spacing: -0.015em; margin: 0 0 8px; text-wrap: balance; }
 h1:focus { outline: none; }
+h1[tabindex="-1"]:focus-visible { outline: none; box-shadow: none; }   /* focus moves here for screen readers after each step; it is not a Tab stop */
+/* Start page on a laptop: search and its results down the left, the judgement panel on the right */
+@media (min-width: 961px) {
+  .mode-start #page .prose { columns: auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto 1fr; column-gap: 56px; align-items: start; }
+  .mode-start #page .prose > .start-find { grid-column: 1; grid-row: 1 / 4; }
+  .mode-start #page .prose > :not(.start-find) { grid-column: 2; }
+}
 .lede { font-size: 1.06rem; color: var(--ink-2); margin: 0; max-width: 60ch; }
 .head-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
 .prose { margin-top: 18px; }
@@ -328,6 +357,14 @@ details.more.accent[open] { background: var(--paper); }
 .vkey { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 6px; font-size: 0.9rem; }
 .vkey li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 8px; align-items: start; }
 .vkey b.sw { display: inline-grid; place-items: center; width: 26px; height: 22px; border-radius: 3px; font-size: 0.8rem; color: var(--ink); border: 1px solid var(--rule); }
+/* Overuse guide: the grid beside its steps and key when there is room, so the whole guide is on screen at once */
+.tool.vg2 { container-type: inline-size; }
+@container (min-width: 700px) {
+  .vg2-in { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); column-gap: 24px; align-items: start; }
+  .vg2-in > .vguide { grid-column: 1; grid-row: 1 / span 4; margin-top: 0; }
+  .vg2-in > :not(.vguide) { grid-column: 2; }
+  .vg2-in > .vkey { margin-top: 0; }
+}
 .vhow { margin: 0 0 10px; padding-left: 1.3em; font-size: 0.93rem; }
 .vhow li { margin: 0 0 4px; }
 .veg { margin: 10px 0 0; padding: 9px 13px; border-left: 4px solid var(--accent); background: var(--paper); font-size: 0.93rem; }
@@ -382,6 +419,7 @@ table.pts td::before { content: none; }
 
 /* Time-to-peak sketch on the history page */
 .chart-fig { margin: 8px 0 14px; max-width: 520px; }
+.prose .chart-fig { max-width: 560px; }   /* a sketch, not a banner: leaves room for what follows */
 .chart-fig svg { width: 100%; height: auto; display: block; font-family: var(--mono); font-size: 13px; }
 .chart-fig text { fill: var(--ink-2); }
 .chart-fig .axis { stroke: var(--rule); stroke-width: 2; }
@@ -927,7 +965,7 @@ button { font-family: inherit; }
   </div>
 </header>
 <div class="devbar" id="devbar" role="status">
-  <p><strong>In development.</strong> This pathway and teaching session are a draft. They have not been reviewed or approved by any clinician, by Queen Elizabeth Hospital Birmingham, University Hospitals Birmingham, GIRFT, NICE or any other organisation, and they must not be used to guide patient care.</p>
+  <p><strong>In development.</strong> <span class="db-short">A draft, not reviewed or approved. Do not use it to guide patient care.</span> <span class="db-long" id="devbar-long">This pathway and teaching session are a draft. They have not been reviewed or approved by any clinician, by Queen Elizabeth Hospital Birmingham, University Hospitals Birmingham, GIRFT, NICE or any other organisation, and they must not be used to guide patient care.</span> <button class="db-more" type="button" aria-expanded="false" aria-controls="devbar-long">Details</button></p>
 </div>
 
 <div class="shell">
@@ -954,8 +992,8 @@ button { font-family: inherit; }
    Leave a route empty ("") to show it as "route to confirm".
    ============================================================ */
 const META = {
-  version: "Draft 0.8.7",
-  date: "4 November 2026",
+  version: "Draft 0.8.8",
+  date: "6 November 2026",
   owner: "",            // for example, "SDEC clinical lead"
   approvedBy: "",       // governance group, once approved
   reviewDue: ""         // set at approval
@@ -2462,13 +2500,13 @@ const PAGES = [
   `,
   mount: () => {
     const box = document.getElementById("start-find"), out = document.getElementById("start-results");
-    const pages = PAGES.filter(p => p.id !== "start").map(p => ({ p, text: (p.nav + " " + p.title + " " + (p.lede || "")).toLowerCase(), stage: (STAGES.find(s => s.id === p.stage) || {}).name || "" }));
     box.addEventListener("input", () => {
-      const words = box.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
-      if (!words.length) { out.innerHTML = ""; return; }
-      const hits = pages.filter(x => words.every(w => x.text.includes(w))).slice(0, 8);
-      out.innerHTML = hits.length ? hits.map(x => '<a class="route" href="#' + x.p.id + '"><span class="r-title">' + x.p.nav + '</span><span class="r-note">' + esc(x.stage) + '</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>').join("") : '<p class="small">No steps match. Try another word, or press Next step to start at the beginning.</p>';
+      if (!box.value.trim()) { out.innerHTML = ""; return; }
+      const all = findPages(box.value, 99), hits = all.slice(0, 4);
+      out.innerHTML = hits.length ? (all.length > 4 ? '<p class="small r-count">' + all.length + ' steps match; the closest 4 are shown. Add a word to narrow it.</p>' : "") + hits.map(x => '<a class="route" href="#' + x.id + '"><span class="r-title">' + esc(x.nav) + '</span><span class="r-note"><span class="r-stage">' + esc(x.stage) + '</span>' + (x.snip ? " · " + x.snip : "") + '</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>').join("") : '<p class="small">No steps match. Try a symptom, a condition or a medicine, or press Next step to start at the beginning.</p>';
     });
+    /* Enter opens the best match */
+    box.addEventListener("keydown", e => { if (e.key !== "Enter") return; const a = out.querySelector("a.route"); if (a) { e.preventDefault(); a.click(); } });
   },
   next: { to: "streaming", label: "Next step" }
 },
@@ -2515,7 +2553,7 @@ const PAGES = [
         <text x="340" y="292" text-anchor="middle">minutes from onset</text><text x="22" y="30" transform="rotate(-90 22 30)" text-anchor="end">pain</text>
         <text x="60" y="280" text-anchor="middle">0</text><text x="340" y="280" text-anchor="middle">30</text><text x="620" y="280" text-anchor="middle">60</text>
         <path class="line tc" d="M60 260L78 36L620 32"/><text x="150" y="28" class="tc-t">thunderclap (SAH): peak within 5 minutes</text>
-        <path class="line mig" d="M60 260C200 250 300 170 400 110S560 50 620 46"/><text x="330" y="96" class="mig-t">migraine builds over 30 to 60 minutes</text>
+        <path class="line mig" d="M60 260C200 250 300 170 400 110S560 50 620 46"/><text x="620" y="130" text-anchor="end" class="mig-t">migraine builds</text><text x="620" y="150" text-anchor="end" class="mig-t">over 30 to 60 minutes</text>
         <line class="thresh" x1="107" y1="260" x2="107" y2="20"/><text x="112" y="250" class="tc-t">5 min</text>
       </svg>
       <figcaption class="small">“When it started, how long did it take to get to its worst?” Seconds to minutes: thunderclap. Half an hour or more: almost always migraine.</figcaption>
@@ -2947,8 +2985,9 @@ const PAGES = [
   title: "Medication overuse",
   lede: "Check in everyone with frequent headache.",
   body: () => `
-    <div class="tool">
+    <div class="tool vg2">
       <h2 class="tool-h">Overuse guide (ICHD-3)</h2>
+      <div class="vg2-in">
       <ol class="vhow">
         <li>Count the headache days in the last month, using a diary if there is one. Find that row up the side.</li>
         <li>Count the days with any acute medicine. A day counts once, however many doses or medicines. Find that column along the bottom.</li>
@@ -2958,6 +2997,7 @@ const PAGES = [
       <ol class="vkey"><li><b class="sw" style="background:var(--zA)">A</b><span>Fewer than 4 headache days a month: an acute plan, used early, on no more than 2 days a week.</span></li><li><b class="sw" style="background:var(--zB)">B</b><span>4 to 14 headache days a month: offer preventive treatment. Not medication overuse headache.</span></li><li><b class="sw" style="background:var(--zC)">C</b><span>15 or more headache days, medicine on fewer than 10 days: not overuse. Chronic migraine is likely: offer preventive treatment.</span></li><li><b class="sw" style="background:var(--zD)">D</b><span>15 or more headache days, medicine on 10 to 14 days: medication overuse headache if any of it is a triptan, opioid, ergot or combination painkiller, or if more than one class is used, such as paracetamol on some days and an NSAID on others. Not if it is only paracetamol, or only NSAIDs such as aspirin or ibuprofen.</span></li><li><b class="sw" style="background:var(--zE)">E</b><span>15 or more headache days, medicine on 15 or more days: medication overuse headache, whatever the medicine.</span></li></ol>
       <p class="veg"><b>Example.</b> 18 headache days, and co-codamol on 12 days: zone D. Co-codamol is a combination painkiller, so this is medication overuse headache if it has gone on for more than 3 months.</p>
       <p class="small" style="margin:8px 0 0">Zones D and E also need the pattern to have lasted more than 3 months, with no better explanation for the headache (ICHD-3 8.2). The dashed line marks about 2 days a week; the hatched squares to its right are above the limit even when it is not overuse. A guide to read, not a calculator.</p>
+      </div>
     </div>
     <h2>Manage</h2>
     ${steps([
@@ -3718,10 +3758,100 @@ function updateMap(id) {
 
 function renderTrail(id) {
   const el = document.getElementById("trail");
+  el.classList.remove("open");
   if (STATE.trail.length <= 1) { el.innerHTML = ""; return; }
-  const parts = STATE.trail.slice(0, -1).map(t => '<a href="#' + t + '">' + BY_ID[t].nav + "</a>");
-  el.innerHTML = '<span class="lbl">Your route</span>' + parts.join('<span class="sep" aria-hidden="true">/</span>') +
-    '<span class="sep" aria-hidden="true">/</span><span class="here" aria-current="step">' + BY_ID[id].nav + "</span>";
+  const parts = STATE.trail.slice(0, -1).map(t => '<span class="crumb"><a href="#' + t + '">' + BY_ID[t].nav + '</a><span class="sep" aria-hidden="true">/</span></span>');
+  el.innerHTML = '<span class="lbl">Your route</span>' + parts.join("") + '<span class="here" aria-current="step">' + BY_ID[id].nav + "</span>";
+  fitTrail();
+}
+/* The route stays on one line: the earliest steps after Start fold behind a button that shows them all */
+function fitTrail() {
+  const el = document.getElementById("trail");
+  el.querySelectorAll(".trail-more").forEach(b => b.remove());
+  const crumbs = [...el.querySelectorAll(".crumb")];
+  crumbs.forEach(c => { c.hidden = false; });
+  if (crumbs.length < 3 || el.classList.contains("open")) return;
+  const btn = document.createElement("button");
+  btn.type = "button"; btn.className = "trail-more"; btn.setAttribute("aria-expanded", "false");
+  btn.addEventListener("click", () => { el.classList.add("open"); fitTrail(); const a = el.querySelector(".crumb:nth-of-type(2) a"); if (a) a.focus(); });
+  const wraps = () => { const kids = [...el.children].filter(k => !k.hidden); return kids.some(k => k.offsetTop > kids[0].offsetTop + 6); };
+  if (!wraps()) return;
+  crumbs[0].after(btn);
+  let n = 0;
+  for (let i = 1; i < crumbs.length; i++) {
+    crumbs[i].hidden = true; n++;
+    btn.innerHTML = '+' + n + '<span class="visually-hidden"> earlier step' + (n > 1 ? "s" : "") + ': show all</span>';
+    if (!wraps()) break;
+  }
+}
+window.addEventListener("resize", () => { clearTimeout(window.__trailT); window.__trailT = setTimeout(fitTrail, 120); });
+
+/* Search: each step's title, summary and full text, with the abbreviations clinicians type */
+const SYNONYMS = {
+  lp: ["lumbar puncture"], lumbar: ["lp"], sah: ["subarachnoid"], subarachnoid: ["sah"], gca: ["giant cell"], giant: ["gca"],
+  moh: ["medication overuse"], iih: ["intracranial hypertension"], cvst: ["venous sinus", "venous thrombosis"], vst: ["venous sinus"],
+  bp: ["blood pressure", "hypertension"], gon: ["occipital nerve"], tia: ["transient ischaemic"], ct: ["computed tomography"],
+  nsaid: ["ibuprofen", "naproxen", "aspirin"], nsaids: ["nsaid"], steroid: ["prednisolone", "dexamethasone", "methylprednisolone"], steroids: ["steroid"],
+  pregnancy: ["pregnant", "postpartum"], pregnant: ["pregnancy", "postpartum"], co: ["carbon monoxide"], scan: ["ct", "mri", "imaging"],
+  imaging: ["ct", "mri", "scan"], painkiller: ["analgesic", "paracetamol", "nsaid", "codeine", "co-codamol"], painkillers: ["painkiller"],
+  sumatriptan: ["triptan"], triptans: ["triptan"], opioids: ["opioid", "codeine", "co-codamol"], letter: ["gp letter"], "safety-net": ["safety net"]
+};
+/* Words a clinician would expect to find a step by, though its title does not say them */
+const SEARCH_KEYS = {
+  tests: "CT MRI scan imaging bloods ESR CRP venogram", thunderclap: "SAH subarachnoid LP lumbar puncture xanthochromia CT",
+  pressure: "IIH idiopathic intracranial hypertension LP lumbar puncture CSF leak", gca: "giant cell arteritis temporal prednisolone ESR",
+  moh: "painkillers codeine co-codamol analgesic", migraine: "aura triptan sumatriptan NSAID antiemetic treatment",
+  refractory: "status migrainosus nerve block dexamethasone", cluster: "oxygen verapamil", discharge: "safety net GP letter notes",
+  doses: "dose doses", focal: "stroke weakness", hypertension: "blood pressure BP", eye: "glaucoma ophthalmology"
+};
+let SEARCH_INDEX = null;
+function searchIndex() {
+  if (SEARCH_INDEX) return SEARCH_INDEX;
+  const dp = new DOMParser();   // parses without loading the photographs
+  SEARCH_INDEX = PAGES.filter(p => p.id !== "start").map((p, order) => {
+    let body = "";
+    try {   // join text pieces with spaces, so a list item or table cell does not run into the next
+      const doc = dp.parseFromString(typeof p.body === "function" ? p.body() : (p.body || ""), "text/html");
+      const w = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT); const bits = [];
+      while (w.nextNode()) bits.push(w.currentNode.nodeValue);
+      body = bits.join(" ").replace(/\s+([,.;:)])/g, "$1");
+    } catch (e) {}
+    const head = [p.nav, p.title, p.lede || "", SEARCH_KEYS[p.id] || ""].join(" · ");
+    const late = (p.stage === "ref" && p.id !== "doses") || p.id === "discharge";   // reference pages and the discharge form mention everything: list clinical steps first
+    return { id: p.id, nav: p.nav, order, late, stage: (STAGES.find(s => s.id === p.stage) || {}).name || "", head, lede: p.lede || "", body: body.replace(/\s+/g, " ").trim() };
+  });
+  return SEARCH_INDEX;
+}
+function findPages(q, limit) {
+  const words = q.toLowerCase().replace(/[^\p{L}\p{N}\s’'&-]/gu, " ").split(/\s+/).filter(Boolean);
+  if (!words.length) return [];
+  const esc_ = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = s => new RegExp("(^|[^\\p{L}\\p{N}])(" + esc_(s) + ")", "iu");     // at the start of a word, so "CT" is not found inside "infection"
+  const alts = words.map(w => [w, ...(SYNONYMS[w] || [])].map(re));
+  const hits = [];
+  for (const x of searchIndex()) {
+    let score = 0, first = null, allHead = true;
+    for (const a of alts) {
+      const inHead = a.some(r => r.test(x.head));
+      const rb = a.find(r => r.test(x.body));
+      const count = a.reduce((n, r) => n + (x.body.match(new RegExp(r.source, "giu")) || []).length, 0);
+      if (!inHead && !rb) { score = -1; break; }
+      score += (inHead ? 10 : 0) + Math.min(count, 3);   // a title match first, then the steps that say most about it
+      allHead = allHead && inHead;
+      if (!first && rb) first = rb;
+    }
+    if (score < 0) continue;
+    if (x.late) score -= 2.5;
+    let snip = "";
+    if (first) {
+      const m = first.exec(x.body), at = m.index + m[1].length, len = m[2].length;
+      let s = Math.max(0, x.body.lastIndexOf(" ", Math.max(0, at - 22))), e = x.body.indexOf(" ", Math.min(x.body.length, at + len + 70));
+      if (e < 0) e = x.body.length;
+      snip = (s > 0 ? "…" : "") + esc(x.body.slice(s, at).trimStart()) + "<mark>" + esc(x.body.slice(at, at + len)) + "</mark>" + esc(x.body.slice(at + len, e)) + (e < x.body.length ? "…" : "");
+    }
+    hits.push({ ...x, score, snip: allHead ? esc(x.lede) : snip });
+  }
+  return hits.sort((a, b) => b.score - a.score || a.order - b.order).slice(0, limit || 8);
 }
 
 function render(id, opts) {
@@ -3781,7 +3911,40 @@ function render(id, opts) {
 }
 
 /* Desktop: step through column count and type size until the step fits the screen; scroll only as a last resort */
-function fitPage() {
+function fitPage() { fitColumns(); moreCue(); }
+/* When a step is too long for the screen, say what is below and take the reader there */
+function moreCue() {
+  const pr = document.querySelector("#page .prose");
+  let btn = document.getElementById("more-below");
+  const long = pr && pr.classList.contains("scroll") && pr.scrollHeight > pr.clientHeight + 8 && window.innerWidth >= 961 && !document.body.classList.contains("mode-deck");
+  if (!long) { if (btn) btn.remove(); if (pr) pr.classList.remove("has-more"); return; }
+  if (!btn || btn.previousElementSibling !== pr) {
+    if (btn) btn.remove();
+    btn = document.createElement("button");
+    btn.type = "button"; btn.id = "more-below"; btn.className = "more-below";
+    btn.addEventListener("click", () => {
+      const p = document.querySelector("#page .prose"), t = btn._target;
+      const top = t ? p.scrollTop + t.getBoundingClientRect().top - p.getBoundingClientRect().top - 8 : p.scrollTop + p.clientHeight * 0.8;
+      p.scrollTo({ top, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    });
+    pr.after(btn);
+  }
+  if (!pr.dataset.cue) { pr.dataset.cue = "1"; pr.addEventListener("scroll", moreLabel, { passive: true }); }
+  moreLabel();
+}
+function moreLabel() {
+  const pr = document.querySelector("#page .prose"), btn = document.getElementById("more-below");
+  if (!pr || !btn) return;
+  const atEnd = pr.scrollTop + pr.clientHeight >= pr.scrollHeight - 6;
+  pr.classList.toggle("has-more", !atEnd);
+  btn.hidden = atEnd;
+  const top = pr.getBoundingClientRect().top;
+  const next = [...pr.querySelectorAll("h2, h3")].find(h => h.getBoundingClientRect().top - top > pr.clientHeight - 70);   // under the fade counts as below
+  btn._target = next || null;
+  const label = next ? "More below: " + next.textContent.trim() : "More below";
+  if (btn.dataset.label !== label) { btn.dataset.label = label; btn.innerHTML = esc(label) + ' <span aria-hidden="true">↓</span>'; }
+}
+function fitColumns() {
   const pr = document.querySelector("#page .prose");
   if (!pr || window.innerWidth < 961 || document.body.classList.contains("mode-deck")) return;
   if (pr.dataset.base === undefined) pr.dataset.base = pr.classList.contains("c1") ? "1" : "0";
@@ -3846,18 +4009,25 @@ document.addEventListener("click", e => {
   e.preventDefault();
   navigate(id);
 });
+/* Browser Back and Forward: the step is drawn afresh, so start at its top, as in-page links do */
+try { history.scrollRestoration = "manual"; } catch (e) {}
 window.addEventListener("popstate", () => {
   const id = (location.hash || "").slice(1);
-  if (BY_ID[id]) render(id); else if (!id) render("start");
+  if (BY_ID[id]) render(id); else if (!id) render("start"); else return;
+  window.scrollTo(0, 0);
+  const h = document.querySelector("#page h1");
+  if (h) h.focus({ preventScroll: true });
 });
 document.getElementById("map-toggle").addEventListener("click", () => toggleMap());
 document.getElementById("find-step").addEventListener("input", e => {
   const q = e.target.value.trim().toLowerCase();
+  const ids = q ? new Set(findPages(q, 99).map(x => x.id)) : null;
   let any = false;
   document.querySelectorAll(".map-stage").forEach(sec => {
     let shown = 0;
     sec.querySelectorAll("li").forEach(li => {
-      const hit = !q || li.dataset.text.includes(q);
+      const a = li.querySelector("a[data-id]");
+      const hit = !q || (a ? ids.has(a.dataset.id) : li.dataset.text.includes(q));
       li.hidden = !hit;
       if (hit) shown++;
     });
@@ -3866,6 +4036,12 @@ document.getElementById("find-step").addEventListener("input", e => {
     if (q && shown) setStage(sec, true);
   });
   document.getElementById("map-none").hidden = any;
+});
+
+/* Draft banner on small screens: Details shows the full statement */
+document.querySelector(".db-more").addEventListener("click", e => {
+  const bar = document.getElementById("devbar"), open = !bar.classList.contains("open");
+  bar.classList.toggle("open", open); e.currentTarget.setAttribute("aria-expanded", String(open)); e.currentTarget.textContent = open ? "Less" : "Details";
 });
 
 /* Theme: auto follows the device; light and dark are remembered on this browser */
