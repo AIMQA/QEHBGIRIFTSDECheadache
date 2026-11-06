@@ -992,7 +992,7 @@ button { font-family: inherit; }
    Leave a route empty ("") to show it as "route to confirm".
    ============================================================ */
 const META = {
-  version: "Draft 0.8.8",
+  version: "Draft 0.8.9",
   date: "6 November 2026",
   owner: "",            // for example, "SDEC clinical lead"
   approvedBy: "",       // governance group, once approved
@@ -3061,16 +3061,16 @@ const PAGES = [
       "rimegepant 75mg if 2 triptans and NSAIDs fail"
     ])}
     <h2>Prevention</h2>
-    <p>4 or more headache days a month. Titrate every 1 to 2 weeks, trial for at least 8 weeks.</p>
-    ${table(["Medicine", "Start", "Target", "Maximum", "Note"], [
-      ["Amitriptyline", "10mg nocte", "30mg to 75mg", "100mg", ""],
-      ["Candesartan", "4mg", "16mg", "16mg", "U&E before and after titration"],
-      ["Propranolol", "40mg", "80mg bd", "120mg bd", "Not in asthma"],
-      ["Topiramate", "25mg", "50mg bd", "100mg bd", "Pregnancy Prevention Programme (MHRA 2024)"]
+    <p>4 or more headache days a month. Choose the medicine for the person. Titrate every 1 to 2 weeks, trial for at least 8 weeks.</p>
+    ${table(["Medicine", "Start", "Target", "Maximum", "Suits", "Avoid if"], [
+      ["Amitriptyline", "10mg nocte", "30mg to 75mg", "100mg", "poor sleep, anxiety, tension-type overlap", "glaucoma, arrhythmia, drowsiness would affect work"],
+      ["Candesartan", "4mg", "16mg", "16mg", "hypertension, older, fewest side effects", "pregnancy, renal disease; U&amp;E before and after titration"],
+      ["Propranolol", "40mg", "80mg bd", "120mg bd", "hypertension, anxiety, young and fit", "asthma, athletes, depression, low blood pressure"],
+      ["Topiramate", "25mg", "50mg bd", "100mg bd", "obesity, epilepsy", "could become pregnant, unless within the Pregnancy Prevention Programme (MHRA 2024); kidney stones, low mood, cognitively demanding work"]
     ], [1, 2, 3])}
     ${ul([
       "gepants after 3 failed preventives (NICE TA906, TA973)",
-      "no valproate if could become pregnant"
+      "no valproate: under 55, in either sex, it can be started only if 2 specialists agree (MHRA 2024)"
     ])}
     ${panel("Aura", `<p>No oestrogen-containing contraception (UKMEC 4). Progestogen-only or non-hormonal methods are fine.</p>`, "caution")}
     <h2>Pregnancy and breastfeeding</h2>
