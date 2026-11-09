@@ -994,7 +994,7 @@ button { font-family: inherit; }
    Leave a route empty ("") to show it as "route to confirm".
    ============================================================ */
 const META = {
-  version: "Draft 0.9.0",
+  version: "Draft 0.9.1",
   date: "9 November 2026",
   owner: "",            // for example, "SDEC clinical lead"
   approvedBy: "",       // governance group, once approved
@@ -2498,19 +2498,19 @@ const PAGES = [
       <div class="routes" id="start-results" aria-live="polite"></div>
     </div>
     ${panel("Use your clinical judgement", "<p>This pathway supports decisions; it does not replace them. Use it alongside your own clinical judgement, national guidelines, local policies and what matters to the patient. If something does not fit, act on your assessment and talk to a senior colleague.</p>")}
-    <p class="start-how"><b>How to use it.</b> Next step takes you through the pathway in order. Back and Restart, greyed out here, work once you have started.</p>
+    <p class="start-how"><b>How to use it.</b> Start pathway takes you through the steps in order. Back and Restart, greyed out here, work once you have started.</p>
   `,
   mount: () => {
     const box = document.getElementById("start-find"), out = document.getElementById("start-results");
     box.addEventListener("input", () => {
       if (!box.value.trim()) { out.innerHTML = ""; return; }
       const all = findPages(box.value, 99), hits = all.slice(0, 4);
-      out.innerHTML = hits.length ? (all.length > 4 ? '<p class="small r-count">' + all.length + ' steps match; the closest 4 are shown. Add a word to narrow it.</p>' : "") + hits.map(x => '<a class="route" href="#' + x.id + '"><span class="r-title">' + esc(x.nav) + '</span><span class="r-note"><span class="r-stage">' + esc(x.stage) + '</span>' + (x.snip ? " · " + x.snip : "") + '</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>').join("") : '<p class="small">No steps match. Try a symptom, a condition or a medicine, or press Next step to start at the beginning.</p>';
+      out.innerHTML = hits.length ? (all.length > 4 ? '<p class="small r-count">' + all.length + ' steps match; the closest 4 are shown. Add a word to narrow it.</p>' : "") + hits.map(x => '<a class="route" href="#' + x.id + '"><span class="r-title">' + esc(x.nav) + '</span><span class="r-note"><span class="r-stage">' + esc(x.stage) + '</span>' + (x.snip ? " · " + x.snip : "") + '</span><span class="r-side"><span class="arrow" aria-hidden="true">→</span></span></a>').join("") : '<p class="small">No steps match. Try a symptom, a condition or a medicine, or press Start pathway to begin at the first step.</p>';
     });
     /* Enter opens the best match */
     box.addEventListener("keydown", e => { if (e.key !== "Enter") return; const a = out.querySelector("a.route"); if (a) { e.preventDefault(); a.click(); } });
   },
-  next: { to: "streaming", label: "Next step" }
+  next: { to: "streaming", label: "Start pathway" }
 },
 {
   id: "streaming", stage: "front", nav: "Is SDEC the right place?",
