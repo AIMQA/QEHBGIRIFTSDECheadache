@@ -106,6 +106,7 @@ button, input { font-family: inherit; }
 .tab + .tab { border-left: 2px solid #FFFFFF; }
 .tab:hover { background: #003087; }
 .tab[aria-current="page"] { background: #FFFFFF; color: #005EB8; }
+.tab abbr { text-decoration: none; }
 .theme { display: inline-flex; border: 2px solid #FFFFFF; border-radius: var(--radius); overflow: hidden; }
 .theme button { appearance: none; -webkit-appearance: none; font: 600 0.82rem var(--body); color: #FFFFFF; background: transparent; border: 0; padding: 0 11px; min-height: 36px; cursor: pointer; }
 .theme button + button { border-left: 2px solid #FFFFFF; }
@@ -953,6 +954,7 @@ button { font-family: inherit; }
     <nav class="tabs" aria-label="Site sections">
       <a class="tab" id="tab-pathway" href="#start" aria-current="page">Pathway</a>
       <a class="tab" id="tab-teaching" href="#teaching">Teaching</a>
+      <a class="tab" id="tab-qi" href="#audit" aria-label="QI (quality improvement)"><abbr title="Quality improvement">QI</abbr></a>
     </nav>
     <a class="btn-ghost red" href="#screen">Red flags</a>
     <div class="theme" role="group" aria-label="Theme">
@@ -992,8 +994,8 @@ button { font-family: inherit; }
    Leave a route empty ("") to show it as "route to confirm".
    ============================================================ */
 const META = {
-  version: "Draft 0.8.9",
-  date: "6 November 2026",
+  version: "Draft 0.9.0",
+  date: "9 November 2026",
   owner: "",            // for example, "SDEC clinical lead"
   approvedBy: "",       // governance group, once approved
   reviewDue: ""         // set at approval
@@ -3459,6 +3461,7 @@ const PAGES = [
       ${[["1", "Understand the problem", "#qi-1"], ["2", "Define the problem and aim", "#qi-2"], ["3", "Choose change ideas", "#qi-3"], ["4", "Test and measure improvement", "#qi-4"], ["5", "Sustain, spread and share", "#qi-5"]]
         .map(([n, t, h]) => '<li><span class="sn">Step ' + n + '</span><a href="' + h + '" data-jump>' + t + "</a></li>").join("")}
     </ol>
+    <p>Each discharge record is saved for audit on the computer it was made on. To download them, go to ${go("audit-data", "audit records")} (password needed).</p>
 
     <h2 id="qi-1">1. Understand the problem</h2>
     <p>Pull 20 consecutive headache attendances from the SDEC list and read the clerking, the imaging requests, the drug chart and the GP letter. Record for each: onset time written down; fundi documented; red flags documented as screened; diagnosis named; CT requested and why; opioids given; the 2-days-a-week limit in the letter; prevention started or recommended. The ${go("discharge", "“copy route for the notes” button")} puts the first 3 of these into the record in a form that is easy to find.</p>
@@ -3860,9 +3863,12 @@ function render(id, opts) {
   if (Deck.mounted) Deck.unmount();
   document.body.classList.toggle("mode-deck", id === "teaching");
   document.body.classList.toggle("mode-start", id === "start");
-  document.getElementById("tab-teaching").toggleAttribute("aria-current", id === "teaching");
-  document.getElementById("tab-pathway").toggleAttribute("aria-current", id !== "teaching");
-  if (id === "teaching") document.getElementById("tab-teaching").setAttribute("aria-current", "page"); else document.getElementById("tab-pathway").setAttribute("aria-current", "page");
+  /* Header tabs: Teaching, QI (the QI page and the audit records), otherwise Pathway */
+  const section = id === "teaching" ? "teaching" : (id === "audit" || id === "audit-data") ? "qi" : "pathway";
+  ["pathway", "teaching", "qi"].forEach(s => {
+    const t = document.getElementById("tab-" + s);
+    if (s === section) t.setAttribute("aria-current", "page"); else t.removeAttribute("aria-current");
+  });
   if (!(opts && opts.keepTrail)) {
     const at = STATE.trail.indexOf(id);
     if (id === "start") STATE.trail = ["start"];
